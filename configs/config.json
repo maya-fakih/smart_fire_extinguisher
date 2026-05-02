@@ -1,0 +1,43 @@
+{
+  "sensors": {
+    "smoke": {
+      "enabled": true,
+      "active": true,
+      "interface": "adc",
+      "pin": 0,
+      "raw_min": 0,
+      "raw_max": 4095,
+      "physical_min": 0,
+      "physical_max": 1000,
+      "threshold_physical": 300,
+      "unit": "ppm",
+      "valid_min": 0,
+      "valid_max": 1000,
+      "max_retries": 3
+    },
+    "heat_matrix": {
+      "enabled": true,
+      "active": true,
+      "interface": "i2c",
+      "address": "0x69",
+      "i2c_bus": 1,
+      "raw_min": 0,
+      "raw_max": 655.35,
+      "physical_min": -20,
+      "physical_max": 300,
+      "threshold_physical": 60,
+      "unit": "celsius",
+      "valid_min": -20,
+      "valid_max": 300,
+      "max_retries": 3,
+      "matrix_shape": [4, 4]
+    }
+  },
+  "system": {
+    "polling_interval_idle_ms": 10000,
+    "polling_interval_active_ms": 1000,
+    "max_gap_seconds": 20,
+    "max_gap_seconds_fallback": 60,
+    "rolling_window_n": 5
+  }
+}
