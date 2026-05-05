@@ -183,6 +183,41 @@ class I2CSensor(Sensor):
     # Sensor ABC implementation
     # ------------------------------------------------------------------
 
+    def ping(self) -> bool:
+        """
+        Test if the I2C device is connected and responding.
+
+        Sends a zero-byte write (write_quick) to the device address.
+        If the device is present, it will ACK; otherwise OSError is raised.
+
+        Returns:
+            True if device responds, False otherwise.
+        """
+        # For matrix sensors using Adafruit drivers
+        if self._driver_type in ("mlx90640", "amg88xx"):
+            if not _SMBUS_AVAILABLE:
+                return False
+            try:
+                import smbus2
+                with smbus2.SMBus(self.i2c_bus) as bus:
+                    bus.write_quick(self._address_int)
+                return True
+            except (OSError, Exception):
+                return False
+
+        # For generic I2C sensors
+        if not _SMBUS_AVAILABLE:
+            return False
+
+        try:
+            import smbus2
+            with smbus2.SMBus(self.i2c_bus) as bus:
+                # Attempt a quick 0-byte write to the address
+                bus.write_quick(self._address_int)
+            return True
+        except (OSError, Exception):
+            return False
+
     def read(self) -> float:
         """
         Read a scalar value from the I2C device.
@@ -197,50 +232,132 @@ class I2CSensor(Sensor):
 
         Returns:
             float — the scalar reading (raw ADC count or mean temperature).
-        """
-        self._init_hardware()
 
-        if self._driver_type == "mlx90640":
-            return self._read_mlx90640()
-        if self._driver_type == "amg88xx":
-            return self._read_amg88xx()
-        return self._read_generic()
+        Raises:
+            IOError: on any hardware communication failure.
+        """
+        try:
+            self._init_hardware()
+        except Exception as exc:
+            raise IOError(
+                f"I2CSensor '{self.name}': hardware initialization failed — {exc}"
+            ) from exc
+
+        try:
+            if self._driver_type == "mlx90640":
+                return self._read_mlx90640()
+            if self._driver_type == "amg88xx":
+                return self._read_amg88xx()
+            return self._read_generic()
+        except IOError:
+            raise  # Re-raise IOErrors from helper methods
+        except Exception as exc:
+            raise IOError(
+                f"I2CSensor '{self.name}': unexpected read error — {exc}"
+            ) from exc
 
     # ------------------------------------------------------------------
     # Driver-specific read helpers
     # ------------------------------------------------------------------
 
     def _read_mlx90640(self) -> float:
+        """Read MLX90640 thermal camera and return mean temperature."""
+        if self._mlx is None:
+            raise IOError(f"I2CSensor '{self.name}': MLX90640 not initialized")
+
         frame = [0.0] * 768  # 32 × 24 pixels
         try:
             self._mlx.getFrame(frame)
         except Exception as exc:
-            raise IOError(f"MLX90640 getFrame failed: {exc}") from exc
+            raise IOError(
+                f"I2CSensor '{self.name}': MLX90640 getFrame failed — {exc}"
+            ) from exc
+
+        # Validate frame data
+        if not frame or len(frame) != 768:
+            raise IOError(
+                f"I2CSensor '{self.name}': MLX90640 returned invalid frame"
+            )
+
+        # Check for invalid temperatures
+        if any(not (-273.15 <= temp <= 1000.0) for temp in frame):
+            raise IOError(
+                f"I2CSensor '{self.name}': MLX90640 returned impossible temperatures"
+            )
 
         self._last_matrix = frame
         mean = sum(frame) / len(frame)
         return mean
 
     def _read_amg88xx(self) -> float:
-        pixels = self._amg.pixels  # 8×8 list of lists
-        flat = [temp for row in pixels for temp in row]
+        """Read AMG8831 thermal grid and return mean temperature."""
+        if self._amg is None:
+            raise IOError(f"I2CSensor '{self.name}': AMG8831 not initialized")
+
+        try:
+            pixels = self._amg.pixels  # 8×8 list of lists
+        except Exception as exc:
+            raise IOError(
+                f"I2CSensor '{self.name}': AMG8831 read failed — {exc}"
+            ) from exc
+
+        # Validate structure
+        if not pixels or len(pixels) != 8:
+            raise IOError(
+                f"I2CSensor '{self.name}': AMG8831 returned invalid grid"
+            )
+
+        try:
+            flat = [temp for row in pixels for temp in row]
+        except Exception as exc:
+            raise IOError(
+                f"I2CSensor '{self.name}': AMG8831 data malformed — {exc}"
+            ) from exc
+
+        if len(flat) != 64:
+            raise IOError(
+                f"I2CSensor '{self.name}': AMG8831 expected 64 pixels, got {len(flat)}"
+            )
+
+        # Check for invalid temperatures
+        if any(not (-273.15 <= temp <= 1000.0) for temp in flat):
+            raise IOError(
+                f"I2CSensor '{self.name}': AMG8831 returned impossible temperatures"
+            )
+
         self._last_matrix = flat
         mean = sum(flat) / len(flat)
         return mean
 
     def _read_generic(self) -> float:
         """Read 2 bytes from self.register, return as unsigned 16-bit int."""
+        if self._bus is None:
+            raise IOError(f"I2CSensor '{self.name}': I2C bus not initialized")
+
         try:
             data = self._bus.read_i2c_block_data(
                 self._address_int, self.register, 2
             )
-            value = struct.unpack(">H", bytes(data))[0]
-            return float(value)
         except Exception as exc:
             raise IOError(
-                f"I2CSensor '{self.name}' read error at register "
-                f"0x{self.register:02X}: {exc}"
+                f"I2CSensor '{self.name}': I2C read error at register "
+                f"0x{self.register:02X} — {exc}"
             ) from exc
+
+        # Validate data
+        if not data or len(data) != 2:
+            raise IOError(
+                f"I2CSensor '{self.name}': I2C read returned invalid data"
+            )
+
+        try:
+            value = struct.unpack(">H", bytes(data))[0]
+        except struct.error as exc:
+            raise IOError(
+                f"I2CSensor '{self.name}': failed to unpack I2C data — {exc}"
+            ) from exc
+
+        return float(value)
 
     # ------------------------------------------------------------------
     # Matrix support

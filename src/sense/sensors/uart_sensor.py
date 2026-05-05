@@ -99,6 +99,33 @@ class UARTSensor(Sensor):
     # Sensor ABC implementation
     # ------------------------------------------------------------------
 
+    def ping(self) -> bool:
+        """
+        Test if the UART/serial port is available and accessible.
+
+        Attempts to open the serial port briefly. If the port exists
+        and is not in use, it will open successfully.
+
+        Returns:
+            True if port is accessible, False otherwise.
+        """
+        if not _SERIAL_AVAILABLE:
+            return False
+
+        try:
+            import serial
+            # Try to open the port with a very short timeout
+            ser = serial.Serial(
+                port=self.path,
+                baudrate=self.baudrate,
+                timeout=0.1,
+            )
+            is_open = ser.is_open
+            ser.close()
+            return is_open
+        except (Exception,):
+            return False
+
     def read(self) -> float:
         """
         Read one line from the serial port and parse a float from it.
@@ -116,7 +143,22 @@ class UARTSensor(Sensor):
             RuntimeError: if pyserial is not installed.
             IOError:      on timeout, decode failure, or parse failure.
         """
-        self._init_hardware()
+        if not _SERIAL_AVAILABLE:
+            raise RuntimeError(
+                "pyserial is not installed. Cannot read from UARTSensor."
+            )
+
+        try:
+            self._init_hardware()
+        except Exception as exc:
+            raise IOError(
+                f"UARTSensor '{self.name}': hardware initialization failed — {exc}"
+            ) from exc
+
+        if not self._serial or not self._serial.is_open:
+            raise IOError(
+                f"UARTSensor '{self.name}': serial port {self.path} not open"
+            )
 
         try:
             raw_bytes = self._serial.readline()
@@ -127,19 +169,36 @@ class UARTSensor(Sensor):
 
         if not raw_bytes:
             raise IOError(
-                f"UARTSensor '{self.name}': read timeout on {self.path}."
+                f"UARTSensor '{self.name}': read timeout on {self.path}. "
+                f"No data received within {self.timeout} seconds."
             )
 
         try:
             line = raw_bytes.decode("utf-8").strip()
         except UnicodeDecodeError as exc:
             raise IOError(
-                f"UARTSensor '{self.name}': decode error — {exc}"
+                f"UARTSensor '{self.name}': failed to decode data — {exc}. "
+                f"Received bytes: {raw_bytes.hex()}"
             ) from exc
+
+        if not line:
+            raise IOError(
+                f"UARTSensor '{self.name}': received empty line after decoding"
+            )
 
         # Handle "LABEL:value" format
         if ":" in line:
-            line = line.split(":", 1)[1].strip()
+            parts = line.split(":", 1)
+            if len(parts) != 2:
+                raise IOError(
+                    f"UARTSensor '{self.name}': malformed labelled value: {line!r}"
+                )
+            line = parts[1].strip()
+
+        if not line:
+            raise IOError(
+                f"UARTSensor '{self.name}': no numeric value found in line"
+            )
 
         try:
             value = float(line)
@@ -147,6 +206,12 @@ class UARTSensor(Sensor):
             raise IOError(
                 f"UARTSensor '{self.name}': cannot parse float from {line!r} — {exc}"
             ) from exc
+
+        # Validate that the value is a real number
+        if not (-1e308 <= value <= 1e308):
+            raise IOError(
+                f"UARTSensor '{self.name}': parsed value {value} is infinite or NaN"
+            )
 
         return value
 

@@ -116,6 +116,33 @@ class GPIOSensor(Sensor):
     # Sensor ABC implementation
     # ------------------------------------------------------------------
 
+    def ping(self) -> bool:
+        """
+        Test if the GPIO pin is accessible.
+
+        Attempts to configure the pin and read its current state.
+        If the pin is available and not in use, this succeeds.
+
+        Returns:
+            True if pin is accessible, False otherwise.
+        """
+        if not _GPIO_AVAILABLE:
+            return False
+
+        try:
+            # Try to setup and read the pin
+            pull_const = {
+                "up":   GPIO.PUD_UP,
+                "down": GPIO.PUD_DOWN,
+                "none": GPIO.PUD_OFF,
+            }[self.pull]
+
+            GPIO.setup(self.pin, GPIO.IN, pull_up_down=pull_const)
+            _ = GPIO.input(self.pin)  # Try to read the pin state
+            return True
+        except Exception:
+            return False
+
     def read(self) -> float:
         """
         Read the digital state of the GPIO pin.
@@ -127,15 +154,38 @@ class GPIOSensor(Sensor):
             RuntimeError: if RPi.GPIO is not available.
             IOError:      on any GPIO read failure.
         """
-        self._init_hardware()
+        if not _GPIO_AVAILABLE:
+            raise RuntimeError(
+                "RPi.GPIO is not installed or not running on a Raspberry Pi. "
+                "Cannot read from GPIOSensor."
+            )
+
+        try:
+            self._init_hardware()
+        except Exception as exc:
+            raise IOError(
+                f"GPIOSensor '{self.name}': hardware initialization failed — {exc}"
+            ) from exc
+
+        if not self._initialised:
+            raise IOError(
+                f"GPIOSensor '{self.name}': pin BCM {self.pin} not initialized"
+            )
 
         try:
             state = GPIO.input(self.pin)
-            return float(state)
         except Exception as exc:
             raise IOError(
                 f"GPIOSensor '{self.name}': GPIO.input({self.pin}) failed — {exc}"
             ) from exc
+
+        # Validate state is either 0 or 1
+        if state not in (0, 1, True, False):
+            raise IOError(
+                f"GPIOSensor '{self.name}': GPIO.input returned invalid state: {state}"
+            )
+
+        return float(state)
 
     # ------------------------------------------------------------------
     # Matrix support (not applicable for GPIO)

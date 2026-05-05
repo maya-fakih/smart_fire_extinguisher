@@ -136,6 +136,34 @@ class ADCSensor(Sensor):
     # Sensor ABC implementation
     # ------------------------------------------------------------------
 
+    def ping(self) -> bool:
+        """
+        Test if the ADS1115 ADC chip is connected and responding.
+
+        Attempts to initialize the I2C bus and communicate with the
+        ADS1115 at its default address. Returns True if the chip ACKs.
+
+        Returns:
+            True if ADS1115 responds, False otherwise.
+        """
+        if not _ADS_AVAILABLE:
+            return False
+
+        try:
+            # Try to initialize the I2C bus and ADS chip
+            import board
+            import busio
+            import adafruit_ads1x15.ads1115 as ADS
+
+            i2c = busio.I2C(board.SCL, board.SDA)
+            ads = ADS.ADS1115(i2c)
+            
+            # If we got here without exception, the chip responded
+            return True
+
+        except Exception:
+            return False
+
     def read(self) -> float:
         """
         Read the raw ADC value (0–32767 for ADS1115 in single-ended mode).
@@ -145,11 +173,45 @@ class ADCSensor(Sensor):
 
         Raises:
             RuntimeError: if the Adafruit library is not installed.
-            Exception:    on any hardware communication failure.
+            IOError:      on any hardware communication failure.
         """
-        self._init_hardware()
-        raw_value = self._channel.value  # 16-bit signed integer, 0–32767
-        return float(raw_value)
+        if not _ADS_AVAILABLE:
+            raise RuntimeError(
+                "adafruit-circuitpython-ads1x15 is not installed. "
+                "Cannot read from ADCSensor."
+            )
+
+        try:
+            self._init_hardware()
+        except Exception as exc:
+            raise IOError(
+                f"ADCSensor '{self.name}': hardware initialization failed — {exc}"
+            ) from exc
+
+        try:
+            raw_value = self._channel.value  # 16-bit signed integer, 0–32767
+            
+            # Validate that we got a valid number
+            if raw_value is None:
+                raise IOError(f"ADCSensor '{self.name}': read returned None")
+            
+            # Validate range
+            if not (0 <= raw_value <= 32767):
+                raise IOError(
+                    f"ADCSensor '{self.name}': raw value {raw_value} "
+                    f"outside expected range [0, 32767]"
+                )
+            
+            return float(raw_value)
+            
+        except AttributeError as exc:
+            raise IOError(
+                f"ADCSensor '{self.name}': channel not initialized — {exc}"
+            ) from exc
+        except Exception as exc:
+            raise IOError(
+                f"ADCSensor '{self.name}': read failed — {exc}"
+            ) from exc
 
     # ------------------------------------------------------------------
     # Matrix support (not applicable for ADC — returns empty)
