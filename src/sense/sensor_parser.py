@@ -13,10 +13,14 @@ class SensorParser:
         # path to config.json file
         self.config_path = config_path
 
+    def _load_config(self) -> dict:
+        # read and return the full config.json
+        with open(self.config_path, 'r') as f:
+            return json.load(f)
+
     def load(self) -> List[Sensor]:
         # open and read config.json
-        with open(self.config_path, 'r') as f:
-            config = json.load(f)
+        config = self._load_config()
 
         sensors = []
         for name, entry in config["sensors"].items():
@@ -77,29 +81,19 @@ class SensorParser:
             return None
 
     def save(self, sensors: List[Sensor]) -> None:
-        # read current config
-        with open(self.config_path, 'r') as f:
-            config = json.load(f)
-
-        # update each sensor entry
-        for sensor in sensors:
-            config["sensors"][sensor.name]["enabled"] = sensor.enabled
-            config["sensors"][sensor.name]["active"] = sensor.active
-
-        # write back to config.json
-        with open(self.config_path, 'w') as f:
-            json.dump(config, f, indent=2)
+        # ⚠️ config writes must go through SystemOrchestrator.update_config()
+        # SensorParser should not write directly to config.json at runtime
+        # this method is intentionally left without direct file writes
+        raise NotImplementedError(
+            "Config writes must go through SystemOrchestrator.update_config(). "
+            "Do not write directly to config.json from SensorParser."
+        )
 
     def disable(self, name: str) -> None:
-        # read current config
-        with open(self.config_path, 'r') as f:
-            config = json.load(f)
-
-        # disable the sensor
-        if name in config["sensors"]:
-            config["sensors"][name]["enabled"] = False
-            print(f"[INFO] {name} has been disabled")
-
-        # write back to config.json
-        with open(self.config_path, 'w') as f:
-            json.dump(config, f, indent=2)
+        # ⚠️ config writes must go through SystemOrchestrator.update_config()
+        # SensorParser should not write directly to config.json at runtime
+        # this method is intentionally left without direct file writes
+        raise NotImplementedError(
+            "Config writes must go through SystemOrchestrator.update_config(). "
+            "Do not write directly to config.json from SensorParser."
+        )

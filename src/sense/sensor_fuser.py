@@ -1,7 +1,6 @@
 import time
 import threading
 from typing import List, Tuple
-from datetime import datetime
 from sensor_parser import SensorParser
 from sensor_base import Sensor
 from snapshot import SensorSnapshot
@@ -9,14 +8,21 @@ from snapshot import SensorSnapshot
 
 class SensorFuser:
 
-    def __init__(self, config_path: str):
+    def __init__(self, config_path: str, state, notifier=None):
         # load all sensors from config.json using the parser
         parser = SensorParser(config_path)
         self.sensors: List[Sensor] = parser.load()
 
-        # polling intervals from config
-        self.interval_idle_ms = 10000
-        self.interval_active_ms = 1000
+        # reference to SystemState — needed to wake up downstream layers
+        self._state = state
+
+        # reference to NotificationService — needed to notify on sensor fault
+        self._notifier = notifier
+
+        # read polling intervals from config instead of hardcoding
+        config = parser._load_config()
+        self.interval_idle_ms = config["system"]["polling_interval_idle_ms"]
+        self.interval_active_ms = config["system"]["polling_interval_active_ms"]
 
         # threads — one per sensor
         self._threads: List[threading.Thread] = []
@@ -27,14 +33,22 @@ class SensorFuser:
         # is the fuser running?
         self._running = False
 
+        # event to signal sensor threads to switch polling rate
+        self._active_event = threading.Event()
+
     def start(self) -> None:
         self._running = True
+
+        # update SystemState — fuser is now running
+        self._state["sense_running"] = True
+        self._state["active_sensor_count"] = len(self.sensors)
+        self._state["faulted_sensors"] = []
 
         # start each sensor in its own thread
         for sensor in self.sensors:
             t = threading.Thread(
-                target=sensor.run_thread,
-                args=(self.interval_idle_ms,),
+                target=self._sensor_thread,
+                args=(sensor,),
                 daemon=True
             )
             self._threads.append(t)
@@ -51,6 +65,7 @@ class SensorFuser:
 
     def stop(self) -> None:
         self._running = False
+        self._state["sense_running"] = False
 
         # stop all sensors
         for sensor in self.sensors:
@@ -77,7 +92,7 @@ class SensorFuser:
         raw_matrices = {}
 
         for sensor in self.sensors:
-            # collect disabled sensors
+            # collect disabled/faulted sensors
             if sensor.fault:
                 disabled_sensors.append(sensor.name)
                 continue
@@ -94,37 +109,81 @@ class SensorFuser:
             if hasattr(sensor, 'matrix_shape'):
                 raw_matrices[sensor.name] = sensor.latest_raw
 
-        # build and return the snapshot
+        # build and return the snapshot using time.time() for timestamp
         return SensorSnapshot(
-            timestamp=datetime.now(),
+            timestamp=time.time(),
             sensor_readings=readings,
-            normalized=normalized,
+            sensor_normalized=normalized,
             triggered_sensors=triggered_sensors,
             disabled_sensors=disabled_sensors,
             raw_matrices=raw_matrices
         )
 
+    def _sensor_thread(self, sensor: Sensor) -> None:
+        # each sensor runs in its own thread
+        # switches between idle and active polling rate
+        while self._running and not sensor.fault:
+            sensor.poll()
+
+            # use active interval when fire detected, idle when calm
+            if self._active_event.is_set():
+                time.sleep(self.interval_active_ms / 1000)
+            else:
+                time.sleep(self.interval_idle_ms / 1000)
+
+    def _handle_fault(self, sensor: Sensor) -> None:
+        # update SystemState when a sensor faults
+        faulted = list(self._state["faulted_sensors"])
+        if sensor.name not in faulted:
+            faulted.append(sensor.name)
+            self._state["faulted_sensors"] = faulted
+            self._state["active_sensor_count"] -= 1
+
+        # notify admin about the fault
+        if self._notifier:
+            self._notifier.notify_fault(sensor.name, "hardware_fault")
+
+        print(f"[FAULT] Sensor faulted: {sensor.name}")
+
     def _monitor_loop(self) -> None:
         # keep checking sensors while running
         while self._running:
+
+            # check for newly faulted sensors
+            for sensor in self.sensors:
+                if sensor.fault:
+                    self._handle_fault(sensor)
+
             triggered, triggered_list = self.evaluate()
 
             if triggered:
                 print(f"[ALERT] Sensors triggered: {[s.name for s in triggered_list]}")
 
+                # write to SystemState to wake up downstream layers
+                self._state["sensor_triggered"] = True
+
+                # switch sensor threads to fast polling
+                self._active_event.set()
+
                 # take a snapshot
                 snap = self.snapshot()
 
-                # send snapshot to next layer
+                # send snapshot to sense_queue
                 self.emit_trigger(snap)
 
                 # check more frequently when fire detected
                 time.sleep(self.interval_active_ms / 1000)
             else:
+                # no trigger — reset SystemState
+                self._state["sensor_triggered"] = False
+
+                # switch sensor threads back to slow polling
+                self._active_event.clear()
+
                 # check less frequently when calm
                 time.sleep(self.interval_idle_ms / 1000)
 
     def emit_trigger(self, snapshot: SensorSnapshot) -> None:
-        # this sends the snapshot to SystemState sense_queue
-        # SystemOrchestrator connects this at boot time
-        print(f"[TRIGGER] Snapshot emitted at {snapshot.timestamp}")
+        # put snapshot into sense_queue for ThinkEngine to consume
+        self._state["sense_queue"].put(snapshot)
+        print(f"[TRIGGER] Snapshot sent to sense_queue at {snapshot.timestamp}")
