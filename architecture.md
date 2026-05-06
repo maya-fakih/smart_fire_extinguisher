@@ -1,6 +1,6 @@
 # Fire Detection and Response System — Architecture
 
-**Version:** 0.2 (research prototype)
+**Version:** 0.3 (implementation in progress)
 **Status:** Implementation in progress
 **Author:** Maya Fakih
 **Database:** PostgreSQL — JSONB columns handle variable sensor configurations so schema stays fixed regardless of hardware setup.
@@ -66,9 +66,9 @@ SENSE  ──►  SEE  ──►  THINK  ──►  ACT
 
 The `SystemOrchestrator` is the entry point of the entire system. It is responsible for:
 
-- Reading `config.json` at boot and extracting `system_mode`
+- Reading `config.json` at boot and parsing it into a config dict
 - Creating the `multiprocessing.Manager` and constructing `SystemState`
-- Instantiating all four layer components and passing them a reference to `SystemState`
+- Instantiating all four layer components and passing them the parsed config dict and a reference to `SystemState`
 - Calling `start()` on each component, which causes each to spawn its own OS process
 - Accepting mode change requests from the website and writing them to `SystemState`
 - Shutting down all processes gracefully on system exit
@@ -77,11 +77,13 @@ The orchestrator does not manage the internal logic of any layer. It is a boot m
 
 Each layer that needs the database creates its own connection directly. SystemState does not mediate database access.
 
+Config values (thresholds, model paths, gap settings) are private to each layer. They are read from the config dict at layer init and never placed in SystemState. SystemState carries runtime control signals only — not configuration.
+
 ### 3.2 SystemState — the shared blackboard
 
 SystemState carries control signals only. Data between SENSE and THINK travels via `sense_queue`. Data between SEE and THINK travels via `see_queue`. THINK writes its output (danger level + action) directly to SystemState for ACT to read — no think_queue or act_queue exists.
 
-A strict ownership rule applies: each field in `SystemState` has exactly one writer. No two processes write to the same field.
+A strict ownership rule applies: each field in `SystemState` has exactly one writer. No two processes write to the same field. All fields are backed by a `multiprocessing.Manager` dict so writes are visible across OS processes.
 
 | Field | Type | Written by | Read by |
 |-------|------|-----------|---------|
@@ -95,8 +97,13 @@ A strict ownership rule applies: each field in `SystemState` has exactly one wri
 | `think_running` | bool | ThinkEngine | Orchestrator |
 | `act_running` | bool | ActEngine | Orchestrator |
 | `camera_feed_active` | bool | SystemOrchestrator | VisionFuser |
+| `db_connected` | bool | ThinkEngine | Dashboard |
 | `danger_level` | int | ThinkEngine | ActEngine |
 | `recommended_action` | str | ThinkEngine | ActEngine |
+
+`faulted_sensors` entries must be dicts with `name` and `faulted_at` keys — enforced by the setter.
+
+`danger_level` accepts 0–5. 0 means no prediction yet (system just started).
 
 **`danger_level` and `recommended_action` rules:**
 - Written by ThinkEngine after every successful prediction cycle.
@@ -108,6 +115,11 @@ A strict ownership rule applies: each field in `SystemState` has exactly one wri
 - Set to `True` only when the user explicitly opens the Camera Feed tab on the website.
 - `SystemOrchestrator` is the sole writer via `set_camera_feed(active: bool)`.
 - `VisionFuser` activates when `sensor_triggered = True` OR `camera_feed_active = True`.
+
+**`db_connected` rules:**
+- Set to `True` by ThinkEngine when `ThinkDatabase.connect()` succeeds.
+- Set to `False` if connection fails after retries, or if a DB operation fails mid-run.
+- Read by the dashboard to display database status.
 
 **Queues** — owned by SystemState, only two exist:
 
@@ -130,12 +142,14 @@ A strict ownership rule applies: each field in `SystemState` has exactly one wri
 ```
 SystemOrchestrator
   fields:
-    state: SystemState
-    sensor_fuser: SensorFuser
-    vision_fuser: VisionFuser
-    think_engine: ThinkEngine
-    act_engine: ActEngine
-    notification_service: NotificationService
+    _config: dict
+    _manager: Manager
+    _state: SystemState
+    _sensor_fuser: SensorFuser
+    _vision_fuser: VisionFuser
+    _think_engine: ThinkEngine
+    _act_engine: ActEngine
+    _notifier: NotificationService
 
   methods:
     __init__(config_path: str) → None
@@ -143,7 +157,7 @@ SystemOrchestrator
     stop() → None
     set_mode(mode: str) → None
     set_camera_feed(active: bool) → None
-    restart_layer(layer_name: str) → None
+    restart_layer(layer_name: str) → None   (not yet implemented)
 ```
 
 ---
@@ -162,7 +176,7 @@ The SENSE layer is responsible for reading all physical sensors, validating thei
 
 ### 4.3 Design principles
 
-Every sensor type (ADC, I2C, UART, GPIO) inherits from `Sensor(ABC)`. `SensorFuser` calls `poll()` on each one without knowing what kind of sensor it is. `SensorParser` reads `config.json` at startup and constructs the correct concrete subclass — this is the only place sensor types are branched on.
+Every sensor type (ADC, I2C, UART, GPIO) inherits from `Sensor(ABC)`. `SensorFuser` calls `poll()` on each one without knowing what kind of sensor it is. `SensorParser` reads the config dict at startup and constructs the correct concrete subclass — this is the only place sensor types are branched on.
 
 Each sensor runs in its own thread inside the SensorFuser process. When any threshold is crossed, SensorFuser assembles a `SensorSnapshot`, puts it in `sense_queue`, and writes `sensor_triggered = True` to `SystemState`.
 
@@ -317,6 +331,8 @@ The THINK layer is the analytical core. It aligns sensor and vision snapshots, p
 
 THINK does not communicate with ACT via a queue. It writes to SystemState and the DB. ACT reads from SystemState.
 
+THINK can operate with SENSE only, SEE only, or both — controlled by `enabled` flags in `config.json`.
+
 ### 6.1 Flowchart
 
 ![THINK layer — process flowchart](assets/flowchart_think.png)
@@ -328,17 +344,17 @@ THINK does not communicate with ACT via a queue. It writes to SystemState and th
 ### 6.3 ThinkEngine loop — one cycle
 
 1. Pull latest `SensorSnapshot` from `sense_queue`, latest `VisionSnapshot` from `see_queue`
-2. Check timestamp gap < `max_gap_ms` — drop older snapshot and wait if gap too large
-3. Create `ThinkSnapshot` (thin alignment object — just the two snapshots + timestamp)
-4. Write to DB → get back `row_id`
-5. Call `ThinkLogs.build_vector(row_id)` → walks back DB chain, returns feature dict
+2. Check timestamp gap < `max_gap_ms` — raise `AlignmentError` if exceeded, ThinkEngine catches and skips cycle
+3. Create `ThinkSnapshot` (thin alignment object). If both snapshots are None, return None and skip.
+4. Call `ThinkDatabase.log_event(snap)` — DB writes the row and immediately assigns `event_id` internally. ThinkEngine never sees or handles a row ID.
+5. Call `ThinkDatabase.build_feature_vector()` → walks back DB chain using internally stored `last_row_id`, returns feature dict. Currently a stub returning `{}` — returns 1 (MINIMAL) as safe default when empty.
 6. Pass feature dict to `XGBoostModel.predict()` → returns `danger_level` (int 1–5)
 7. Lookup `recommended_action` from `poa_map` in config
-8. Update DB row with `danger_level` + `recommended_action`
+8. Call `ThinkDatabase.update_prediction(danger_level, action)` — uses internally stored `last_row_id`
 9. Write `danger_level` + `recommended_action` to SystemState
 10. Repeat
 
-In **training mode** step 6 is replaced by: display current chain stats on website, wait for human to label `true_danger_level`, write to DB with `validated = True`.
+In **training mode** step 6 is replaced by: display current chain stats on website, wait for human to label `true_danger_level`, call `ThinkDatabase.update_human_label(true_danger, true_action)`.
 
 ### 6.4 ThinkSnapshot
 
@@ -352,13 +368,15 @@ class ThinkSnapshot:
     vision_snapshot: VisionSnapshot
 ```
 
-The `row_id` returned by `ThinkDatabase.log_event()` is carried as a plain integer from that point on. It is not stored back in ThinkSnapshot.
+ThinkEngine never holds or passes row IDs. `ThinkDatabase` stores `last_row_id` internally and all subsequent calls in the same cycle use it automatically.
 
-### 6.5 Event chain and feature vector — ThinkLogs
+### 6.5 Event chain and feature vector
 
-`ThinkLogs` walks back the DB from the current timestamp and collects all rows belonging to the same continuous event — defined as rows where the time gap between consecutive entries does not exceed `max_gap_ms`. A gap larger than this means a new event has started and the chain stops there.
+`ThinkDatabase` assigns `event_id` atomically at the end of every `log_event()` call — ThinkEngine is not involved. The logic: look at the previous row in the DB. If its timestamp is within `max_gap_ms` of the current row, inherit its `event_id` (same event continues). If not, or if there is no previous row, use the current row's own `id` as the new `event_id` (new event starts here).
 
-For each sensor reading across the chain, ThinkLogs computes:
+`build_feature_vector()` calls `get_last_chain()` which fetches all rows sharing the current `event_id`, ordered by timestamp. From this chain it computes:
+
+For each sensor reading across the chain:
 - `latest_normalized` — current normalized reading
 - `avg` — mean across chain
 - `variance` — variance across chain
@@ -370,33 +388,35 @@ For vision fields across the chain (dominant cluster only):
 - `dominant_origin_x_velocity`, `dominant_origin_y_velocity`
 - `fire_union_area_velocity`, `smoke_union_area_velocity`
 
-Categorical fields (`composite_label`, `scene_label`, `escalation_trend`) are integer-encoded before being added to the vector. Encoding maps are defined in config.
+Categorical fields (`composite_label`, `scene_label`, `escalation_trend`) are integer-encoded using maps from config before being added to the vector.
 
-The final output of `ThinkLogs.build_vector()` is a flat `dict[str, float]` ready to be passed directly to XGBoost. Nothing in this dict is stored in the DB — it is recomputed on demand every cycle. For training data export, `build_vector()` is called on each validated DB row and the results are assembled into a DataFrame then saved as CSV.
+The final output is a flat `dict[str, float]` passed directly to XGBoost. Nothing in this dict is stored in the DB — recomputed on demand every cycle. For training export, `build_feature_vector()` is called on each validated row and assembled into a CSV.
+
+> **Current status:** Event chain assignment and retrieval are fully implemented. `build_feature_vector()` is a stub returning `{}` — feature computation is the next implementation task.
 
 ### 6.6 Machine learning
 
-**Phase 1 — RuleEngine** (current, no training data required)
+**Phase 1 — RuleEngine** (not yet implemented)
 Hand-tuned weighted scoring across the feature vector. Weights stored in `rule_weights.json`, editable from website.
 
-**Phase 2 — XGBoostModel** (once ~200 validated rows exist)
-`XGBClassifier` trained on validated DB rows. Predicts `danger_level` (classes 1–5) only. Action is always a `poa_map` lookup — XGBoost never predicts actions directly. Hyperparameters are loaded from `config.json` and controllable from the website without code changes.
+**Phase 2 — XGBoostModel** (current implementation)
+`XGBClassifier` trained on validated DB rows. Predicts `danger_level` (classes 1–5) only. Action is always a `poa_map` lookup — XGBoost never predicts actions directly. Hyperparameters loaded from config dict. Returns 1 as safe default when feature dict is empty.
 
-**Phase 3 — NeuralModel** (future, only if XGBoost is insufficient)
-Small LSTM or 1D-CNN operating over the raw chain sequence. Not planned for current implementation.
+**Phase 3 — NeuralModel** (not yet implemented)
+Small LSTM or 1D-CNN operating over the raw chain sequence.
 
-All three implement `BaseModel(ABC)`. Switching phases requires one line change in `config.json` and a retrain trigger from the website.
+All three implement `BaseModel(ABC)`. Switching phases requires one line change in `config.json`. `BaseModel` provides shared `evaluate()` and `evaluate_per_class()` methods — implemented on the base class, available to all models without duplication.
 
 ### 6.7 Offline training flow
 
 Triggered from website by admin. System keeps running normally.
 
-1. Pull all rows with `validated = True` from DB
-2. Call `ThinkLogs.build_vector(row_id)` for each row
+1. Pull all rows with `validated = True` from DB via `ThinkDatabase.get_validated_rows()`
+2. Call `ThinkDatabase.build_feature_vector()` for each row
 3. Assemble DataFrame — each row is one feature vector, label column is `true_danger_level`
-4. Save CSV to disk for inspection
+4. Save CSV to disk via `ThinkDatabase.export_csv(path)`
 5. Call `XGBoostModel.fit(X, y)`
-6. Save model weights to `model_weights/`
+6. Save model weights via `XGBoostModel.save(path)`
 7. Hot-swap the model in ThinkEngine — next prediction cycle uses new model
 
 ### 6.8 Danger level scale
@@ -416,86 +436,85 @@ The threshold at which ACT activates physical actuators is `danger_threshold_to_
 **ThinkEngine**
 ```
 fields:
+  _config: dict               received from Orchestrator as parsed dict — never opens config.json itself
+  _state: SystemState
   _model: BaseModel
   _db: ThinkDatabase
-  _logs: ThinkLogs
-  _state: SystemState
-  _config: dict
+  _max_gap_ms: int
+  _model_path: str
+  _active_model: str
+  _sense_enabled: bool
+  _see_enabled: bool
+  _running: bool
 
 methods:
-  __init__(config_path: str, state: SystemState) → None
-  run() → None                          main loop
-  _align(sense_q, see_q) → ThinkSnapshot | None
-  _predict_cycle(snap: ThinkSnapshot) → None
-  retrain() → None                      called from website
-  swap_model(model: BaseModel) → None
+  __init__(config: dict, state: SystemState) → None
+  start() → None              connects DB, loads model, starts loop
+  stop() → None
+  _run_loop() → None          main loop
+  _process(snap: ThinkSnapshot) → None
+  _align() → ThinkSnapshot | None
+  _lookup_action(danger_level: int) → str
+  _load_model() → None
 ```
 
 **ThinkDatabase**
 ```
+fields:
+  _connection
+  _connected: bool
+  _last_row_id: int           managed internally — ThinkEngine never touches row IDs
+  _max_gap_ms: int            passed in at construction from ThinkEngine
+
 methods:
-  __init__(config: dict) → None
-  log_event(snap: ThinkSnapshot) → int         returns row_id
-  update_prediction(row_id: int, danger_level: int, action: str) → None
-  validate_event(row_id: int, true_danger: int) → None
-  get_validated_rows() → list[dict]
+  __init__(max_gap_ms: int) → None
+  connect() → None
+  close() → None
+  log_event(snap: ThinkSnapshot) → None     writes row, calls _assign_event_id() automatically
+  _assign_event_id() → None                 private — assigns event_id by comparing timestamp gap to previous row
+  update_prediction(danger_level: int, action: str) → None
+  update_human_label(true_danger: int, true_action: str = None) → None
+  get_event_chain(event_id: int) → list
+  get_last_chain() → list
+  get_validated_rows() → list
+  build_feature_vector(row_id: int) → dict[str, float]   (stub — TODO: compute velocities, accelerations, encode categoricals)
   export_csv(path: str) → None
   clear_logs() → None
-```
-
-**ThinkLogs**
-```
-methods:
-  __init__(db: ThinkDatabase, config: dict) → None
-  get_chain(timestamp: datetime) → list[dict]
-  build_vector(row_id: int) → dict[str, float]
-  _calc_velocity(values: list[float], times: list[float]) → float
-  _calc_acceleration(velocities: list[float], times: list[float]) → float
-  _encode_categorical(value: str, col: str) → int
 ```
 
 **BaseModel (ABC)**
 ```
 methods:
-  fit(X: DataFrame, y: Series) → None      [abstract]
+  fit(X, y) → None                         [abstract]
   predict(features: dict) → int            [abstract]   returns danger_level 1–5
   save(path: str) → None                   [abstract]
   load(path: str) → None                   [abstract]
   feature_importance() → dict[str, float]  [abstract]
+  evaluate(X, y_true) → dict               accuracy, f1_macro, f1_weighted, precision_macro, recall_macro
+  evaluate_per_class(X, y_true) → dict     per-class precision, recall, f1, classes list
 ```
 
 **XGBoostModel(BaseModel)**
 ```
 fields:
-  _clf: XGBClassifier
-  # hyperparameters loaded from config.json:
-  n_estimators: int
-  max_depth: int
-  learning_rate: float
-  subsample: float
-  colsample_bytree: float
+  _model: XGBClassifier
+  _n_estimators: int
+  _max_depth: int
+  _learning_rate: float
+  _subsample: float
+  _colsample_bytree: float
 
 methods:
   fit(X, y) → None
-  predict(features: dict) → int      XGBoost output is 0-indexed, returned as 1–5
-  save(path: str) → None             native XGBoost .json format
+  predict(features: dict) → int      returns 1 if features empty; XGBoost is 0-indexed → returned as 1–5
+  save(path: str) → None             saves as xgboost_model.json
   load(path: str) → None
-  feature_importance() → dict        get_booster().get_fscore()
+  feature_importance() → dict        get_booster().get_score(importance_type="weight")
 ```
 
-**RuleEngine(BaseModel)**
-```
-fields:
-  weights: dict[str, float]       loaded from rule_weights.json
-  thresholds: dict[str, float]
+**RuleEngine(BaseModel)** — not yet implemented
 
-methods:
-  fit(X, y) → None        no-op
-  predict(features) → int
-  save(path) → None       writes to rule_weights.json
-  load(path) → None
-  feature_importance() → dict    returns weights as proxy
-```
+**NeuralModel(BaseModel)** — not yet implemented
 
 ### 6.10 Config reference (THINK section)
 
@@ -503,7 +522,7 @@ methods:
 "think": {
   "max_gap_ms": 500,
   "min_training_rows": 200,
-  "active_model": "rule_engine",
+  "active_model": "xgboost",
   "model_weights_path": "model_weights/",
   "xgboost": {
     "n_estimators": 100,
@@ -533,14 +552,16 @@ methods:
 
 ```
 ThinkEngine    ──◆ owns ──►  ThinkDatabase
-ThinkEngine    ──◆ owns ──►  ThinkLogs
 ThinkEngine    ── uses ───►  BaseModel (swappable)
 ThinkEngine    ── writes ──► SystemState.danger_level
 ThinkEngine    ── writes ──► SystemState.recommended_action
-ThinkLogs      ── queries ►  ThinkDatabase
-BaseModel      ◄── XGBoostModel
-BaseModel      ◄── RuleEngine
-BaseModel      ◄── NeuralModel (future)
+ThinkEngine    ── writes ──► SystemState.db_connected
+ThinkDatabase  ── manages ►  last_row_id (internal)
+ThinkDatabase  ── manages ►  event_id assignment (internal, via _assign_event_id)
+ThinkDatabase  ── reads/writes ► think_schema table
+BaseModel      ◄── XGBoostModel (implemented)
+BaseModel      ◄── RuleEngine (not yet implemented)
+BaseModel      ◄── NeuralModel (not yet implemented)
 ThinkSnapshot  ── contains ► SensorSnapshot + VisionSnapshot
 ```
 
@@ -568,7 +589,7 @@ ACT does not receive a queue message from THINK. It polls SystemState once per i
 
 **Surveillance** — no actuators fire. Sends dashboard link, human acts manually.
 
-**Training** — displays ThinkEngine's prediction on website, waits for human to provide true label, writes `validated = True` to DB row.
+**Training** — displays ThinkEngine's prediction on website, waits for human to provide true label, calls `ThinkDatabase.update_human_label()`.
 
 ### 7.4 2-DOF arm and IK
 
@@ -626,15 +647,16 @@ Notifications: email (with frame image + action links), website popup (ephemeral
 
 A single table holds the complete lifecycle of every event. THINK creates a row. THINK updates it with danger_level + action after prediction. Human validators add `validated = True` and `true_danger_level` in training mode.
 
-Computed fields (growth rates, accelerations, feature vectors) are **never stored**. They are recomputed by ThinkLogs on demand and optionally cached in memory for the duration of one cycle. This keeps the DB lean and avoids storing millions of intermediate calculations.
+Computed fields (growth rates, accelerations, feature vectors) are **never stored**. They are recomputed by `ThinkDatabase` on demand every cycle. This keeps the DB lean and avoids storing intermediate calculations.
 
 ```sql
-CREATE TABLE think_snapshots (
+CREATE TABLE IF NOT EXISTS think_schema (
   id                    SERIAL PRIMARY KEY,
+  event_id              INTEGER,
   timestamp             FLOAT NOT NULL,
 
   -- sensor inputs
-  triggered_sensors     TEXT[],
+  triggered_sensors     JSONB,
   sensor_readings       JSONB,
   sensor_normalized     JSONB,
 
@@ -660,15 +682,19 @@ CREATE TABLE think_snapshots (
 
   -- training
   validated             BOOLEAN DEFAULT FALSE,
-  true_danger_level     INT
+  true_danger_level     INT,
+  true_action           TEXT
 );
+
+CREATE INDEX IF NOT EXISTS idx_think_schema_event_id
+    ON think_schema (event_id);
 ```
 
 ---
 
 ## 9. Configuration Reference
 
-All system behaviour is controlled through `config.json`. No hardcoded thresholds exist in the codebase. Key settings and why they belong in config:
+All system behaviour is controlled through `config.json`. No hardcoded thresholds exist in the codebase. The Orchestrator parses the file once at boot and passes the resulting dict to each layer at construction. No layer opens `config.json` itself.
 
 | Setting | Why it belongs in config |
 |---------|--------------------------|
@@ -694,7 +720,10 @@ All system behaviour is controlled through `config.json`. No hardcoded threshold
 No queue. ThinkEngine writes `danger_level: int` and `recommended_action: str` to SystemState after each prediction cycle. ActEngine reads these once per iteration.
 
 ### THINK → DB
-ThinkEngine calls `ThinkDatabase.log_event(snap)` → returns `row_id`. Later calls `update_prediction(row_id, danger_level, action)`. In training mode calls `validate_event(row_id, true_danger_level)`.
+ThinkEngine calls `ThinkDatabase.log_event(snap)`. ThinkDatabase handles `event_id` assignment internally and stores `last_row_id` for all subsequent calls in the cycle. Later calls `update_prediction(danger_level, action)`. In training mode calls `update_human_label(true_danger, true_action)`.
+
+### Orchestrator → Layers
+Orchestrator parses `config.json` once and passes `(config: dict, state: SystemState)` to every layer at construction. No layer opens or parses `config.json` itself.
 
 ---
 
@@ -727,7 +756,7 @@ Browser → Flask route → SystemOrchestrator method → SystemState field upda
 
 ### 12.1 Dashboard screens
 
-**Live Dashboard** — system uptime, sensor readings, active sensor count, current mode, model accuracy. Mode switcher → `POST /api/mode`.
+**Live Dashboard** — system uptime, sensor readings, active sensor count, current mode, model accuracy, DB connection status. Mode switcher → `POST /api/mode`.
 
 **Camera Feed** — live MJPEG stream. Opening tab → `camera_feed_active = True`. Leaving → `False`.
 
@@ -748,7 +777,7 @@ update_config(new_config: dict) → None    validates → writes config.json →
 send_arm_command(angles: List[float]) → None
 trigger_actuator(name: str, state: bool) → None
 stop_all_actuators() → None
-trigger_retrain() → None                  calls ThinkEngine.retrain()
+trigger_retrain() → None                  calls ThinkEngine retrain flow
 ```
 
 ---
@@ -768,4 +797,3 @@ configs/      ← project-specific (config.json, labels.json)
 The four layer packages never contain project-specific logic. All adaptation happens in `src/core/` and `src/dashboard/`. `config.json` is the bridge.
 
 ---
-
