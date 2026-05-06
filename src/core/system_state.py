@@ -23,8 +23,34 @@ class SystemState:
         self.act_running         = False
         self.system_mode         = system_mode
 
+        #dont forget systemstate,db connected
+        # dont forget there was another flag but i forgot.. 
+        self.db_connected        = False
+        self.danger_level        = 0
+        self.recommended_action  = "monitor"
+        self.camera_feed_active  = False
+
 
     #--- bool ---
+    @property
+    def db_connected(self) -> bool:
+        return self._data['db_connected']
+
+    @db_connected.setter
+    def db_connected(self, value: bool):
+        if not isinstance(value, bool):
+            raise TypeError(f"db_connected must be bool, got {type(value)}")
+        self._data['db_connected'] = value
+
+    @property
+    def camera_feed_active(self) -> bool:
+        return self._data['camera_feed_active']
+
+    @camera_feed_active.setter
+    def camera_feed_active(self, value: bool):
+        if not isinstance(value, bool):
+            raise TypeError(f"camera_feed_active must be bool, got {type(value)}")
+        self._data['camera_feed_active'] = value
 
     @property
     def system_running(self) -> bool:
@@ -100,6 +126,18 @@ class SystemState:
             raise ValueError(f"active_sensor_count cannot be negative, got {value}")
         self._data['active_sensor_count'] = value
 
+    @property
+    def danger_level(self) -> int:
+        return self._data['danger_level']
+
+    @danger_level.setter
+    def danger_level(self, value: int):
+        if not isinstance(value, int):
+            raise TypeError(f"danger_level must be int, got {type(value)}")
+        if value not in range(0, 6):
+            raise ValueError(f"danger_level must be 0-5, got {value}")
+        self._data['danger_level'] = value
+
     # --- enum ---
 
     @property
@@ -112,6 +150,17 @@ class SystemState:
             self._data['system_mode'] = SystemMode(value)
         except ValueError:
             raise ValueError(f"Invalid system_mode '{value}'. Must be one of {[m.value for m in SystemMode]}")
+
+    # --- strings ---
+    @property
+    def recommended_action(self) -> str:
+        return self._data['recommended_action']
+
+    @recommended_action.setter
+    def recommended_action(self, value: str):
+        if not isinstance(value, str):
+            raise TypeError(f"recommended_action must be str, got {type(value)}")
+        self._data['recommended_action'] = value
 
     # --- list of dicts (full reassignment only) ---
 

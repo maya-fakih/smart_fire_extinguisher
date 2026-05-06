@@ -26,11 +26,6 @@ class SensorSnapshot:
     enabled_sensors: list[str] = field(default_factory=list)
     # names of sensors set as enabled in config.json
 
-    disabled_sensors: list[str] = field(default_factory=list)
-    # names of sensors currently faulted and removed from active pool
-    # e.g. ["co"] — SensorFuser continues with remaining healthy sensors
-    # this list includes diabled from config + faulty sensor
-
     triggered_sensors: list[str] = field(default_factory=list)
     # names of sensors that crossed their threshold this reading
     # e.g. ["smoke", "temp"]
