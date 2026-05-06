@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+venv/
+.venv/
+
+# Model artifacts (generated, not source)
+model_weights/xgb_model.json
+model_weights/neural_model.pt
+model_weights/*.onnx
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# OS nonsense
+.DS_Store
+Thumbs.db
+
+# Word doc temp files (you already have these)
+~$*
+*.tmp
+
+# Dashboard
+*.pyc
+instance/
+
+# Sensitive config (if you ever put credentials in here)
+configs/smtp_credentials.json
+
+../fyp_env/
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.egg-info/
+.DS_Store
