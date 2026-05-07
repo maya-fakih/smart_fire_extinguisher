@@ -92,6 +92,47 @@ db-reset:
 db-shell:
 	PGPASSWORD=$(DB_PASS) psql -U $(DB_USER) -d $(DB_NAME) -h $(DB_HOST)
 
+setup_cam: check_venv
+	@echo "Setting up IMX500 AI Camera on Raspberry Pi..."
+	@echo ""
+	@echo "Step 1 — Installing IMX500 firmware and tools..."
+	sudo apt update
+	sudo apt install -y imx500-all imx500-tools
+	@echo "✅ IMX500 firmware and tools installed"
+	@echo ""
+	@echo "Step 2 — Installing Ultralytics for model export..."
+	$(PIP) install ultralytics
+	@echo "✅ Ultralytics installed"
+	@echo ""
+	@echo "Step 3 — Installing Picamera2 if not already present..."
+	$(PIP) install picamera2 || sudo apt install -y python3-picamera2
+	@echo "✅ Picamera2 ready"
+	@echo ""
+	@echo "⚠️  IMPORTANT: A reboot is required after installing IMX500 firmware."
+	@echo "   Run: sudo reboot"
+	@echo ""
+	@echo "After reboot, verify the camera is detected with:"
+	@echo "   rpicam-hello --list-cameras"
+	@echo ""
+	@echo "To package your trained model, run:"
+	@echo "   make package_model MODEL=path/to/best.pt"
+
+package_model: check_venv
+	@if [ -z "$(MODEL)" ]; then \
+		echo "❌ No model specified. Usage: make package_model MODEL=path/to/best.pt"; \
+		exit 1; \
+	fi
+	@echo "Exporting $(MODEL) to IMX500 format..."
+	$(PYTHON) -c "\
+from ultralytics import YOLO; \
+model = YOLO('$(MODEL)'); \
+model.export(format='imx', data='data.yaml')"
+	@echo "✅ Export complete — packerOut.zip generated"
+	@echo ""
+	@echo "Packaging .rpk file..."
+	imx500-package -i $(dir $(MODEL))imx_model/packerOut.zip -o network.rpk
+	@echo "✅ network.rpk ready — copy to Pi and load via Picamera2 at boot"
+
 help:
 	@echo "Available commands:"
 	@echo ""
@@ -112,3 +153,7 @@ help:
 	@echo "  make db-migrate   - Apply schema.sql to the database"
 	@echo "  make db-reset     - Drop and recreate database then re-migrate"
 	@echo "  make db-shell     - Open a psql shell to inspect data"
+	@echo ""
+	@echo "  make setup_cam    - Install IMX500 camera tools and Ultralytics on Pi"
+	@echo "  make package_model MODEL=path/to/best.pt"
+	@echo "                    - Export trained YOLO model to IMX500 .rpk format"

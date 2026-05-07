@@ -1,6 +1,6 @@
 # Fire Detection and Response System — Architecture
 
-**Version:** 0.3 (implementation in progress)
+**Version:** 0.3.1 (implementation in progress)
 **Status:** Implementation in progress
 **Author:** Maya Fakih
 **Database:** PostgreSQL — JSONB columns handle variable sensor configurations so schema stays fixed regardless of hardware setup.
@@ -200,7 +200,7 @@ class SensorSnapshot:
 
 ### 4.6 Class summary
 
-- `Sensor(ABC)` — base class: `read()`, `to_physical()`, `to_normalized()`, `threshold_hit()`, `poll()`
+- `Sensor(ABC)` — base class: `read()`, `to_physical()`, `to_normalized()`, `threshold_hit()`, `poll()`, `ping()`, `read_specific values()`
 - `ADCSensor(Sensor)` — reads ADS1115 via pin
 - `I2CSensor(Sensor)` — reads I2C device by address
 - `UARTSensor(Sensor)` — reads serial device by path
@@ -222,11 +222,21 @@ class SensorSnapshot:
 },
 "system": {
   "polling_interval_idle_ms": 10000,
-  "polling_interval_active_ms": 1000,
-  "max_gap_ms": 500,
-  "rolling_window_n": 5
+  "polling_interval_active_ms": 1000
 }
 ```
+
+### 4.8 Sensor read function
+
+Since each sensor is different we need a way to understand their correct transformation function from raw data to human form physical data. To allow for the flexibility of the system the config file should include the read method for each sensor.
+
+Example inlcudes but is not limited to the adc model where we can use python's ability to read strings and convert them to equations. For other models we can have configured multiple functions for different reading types in the class as read_i2c_normal or whatever with describtive names that can be set in the config file, and then these functions will be called in read based on the correct configuration.
+
+### 4.9 Sensor ping function
+
+Sensor ping is a test that checks if we can read from the hardware to ensure that the system can actually connect the hardware, it can flag issues like wrong pin configuration in config, burnt IO on the pi, or a wrong sensor.
+
+The ping is different for different types sure costumize for each of the 4 sensor time.
 
 ---
 
@@ -343,12 +353,12 @@ THINK can operate with SENSE only, SEE only, or both — controlled by `enabled`
 
 ### 6.3 ThinkEngine loop — one cycle
 
-1. Pull latest `SensorSnapshot` from `sense_queue`, latest `VisionSnapshot` from `see_queue`
+1. Pull `SensorSnapshot` from `sense_queue` and `VisionSnapshot` from `see_queue`. If a snapshot is missing on one side while the other is present, drop the partial — misaligned data is worse than no data.
 2. Check timestamp gap < `max_gap_ms` — raise `AlignmentError` if exceeded, ThinkEngine catches and skips cycle
 3. Create `ThinkSnapshot` (thin alignment object). If both snapshots are None, return None and skip.
 4. Call `ThinkDatabase.log_event(snap)` — DB writes the row and immediately assigns `event_id` internally. ThinkEngine never sees or handles a row ID.
-5. Call `ThinkDatabase.build_feature_vector()` → walks back DB chain using internally stored `last_row_id`, returns feature dict. Currently a stub returning `{}` — returns 1 (MINIMAL) as safe default when empty.
-6. Pass feature dict to `XGBoostModel.predict()` → returns `danger_level` (int 1–5)
+5. Call `ThinkDatabase.build_feature_vector(last_row_id)` → walks back DB chain bounded by `chain_length`, returns feature dict.
+6. Pass feature dict to `XGBoostModel.predict()` → returns `danger_level` (int 1–5). Returns 1 (MINIMAL) as safe default when feature dict is empty.
 7. Lookup `recommended_action` from `poa_map` in config
 8. Call `ThinkDatabase.update_prediction(danger_level, action)` — uses internally stored `last_row_id`
 9. Write `danger_level` + `recommended_action` to SystemState
@@ -374,25 +384,31 @@ ThinkEngine never holds or passes row IDs. `ThinkDatabase` stores `last_row_id` 
 
 `ThinkDatabase` assigns `event_id` atomically at the end of every `log_event()` call — ThinkEngine is not involved. The logic: look at the previous row in the DB. If its timestamp is within `max_gap_ms` of the current row, inherit its `event_id` (same event continues). If not, or if there is no previous row, use the current row's own `id` as the new `event_id` (new event starts here).
 
-`build_feature_vector()` calls `get_last_chain()` which fetches all rows sharing the current `event_id`, ordered by timestamp. From this chain it computes:
+`build_feature_vector(row_id)` walks back from the given `row_id` (not `_last_row_id`) so it works for both live prediction and offline training over historical rows. It fetches the last N rows of the event ending at `row_id`, where N is `chain_length` from config. From this bounded chain it computes:
 
-For each sensor reading across the chain:
-- `latest_normalized` — current normalized reading
+For each sensor in the canonical sensor list (locked at startup from `config["sensors"]` keys):
+- `latest` — current normalized reading
 - `avg` — mean across chain
 - `variance` — variance across chain
 - `velocity` — first derivative (Δvalue / Δtime)
 - `acceleration` — second derivative (Δvelocity / Δtime)
 
-For vision fields across the chain (dominant cluster only):
-- `dominant_area_velocity`, `dominant_area_acceleration`
-- `dominant_origin_x_velocity`, `dominant_origin_y_velocity`
-- `fire_union_area_velocity`, `smoke_union_area_velocity`
+For vision fields (latest row + chain velocities):
+- Latest row scalars: `fire_count`, `smoke_count`, `cluster_count`, `fire_union_area`, `smoke_union_area`, `scene_confidence`
+- Booleans encoded as 0.0/1.0: `glimpsed_fire`, `human_near_fire`
+- Chain velocities: `fire_union_area_velocity`, `smoke_union_area_velocity`
 
-Categorical fields (`composite_label`, `scene_label`, `escalation_trend`) are integer-encoded using maps from config before being added to the vector.
+Categorical fields (`composite_label`, `scene_label`) are integer-encoded using maps from config before being added to the vector.
 
-The final output is a flat `dict[str, float]` passed directly to XGBoost. Nothing in this dict is stored in the DB — recomputed on demand every cycle. For training export, `build_feature_vector()` is called on each validated row and assembled into a CSV.
+**Missing data is encoded as `np.nan` everywhere** — XGBoost handles NaN natively and learns missingness as a signal. Specifically:
+- Faulted or disabled sensor in a cycle → that sensor's reading is NaN for that row
+- Chain length < 2 → velocity is NaN (cannot be computed)
+- Chain length < 3 → acceleration is NaN (cannot be computed)
+- Vision-absent row (sense-only mode) → all vision features are NaN
 
-> **Current status:** Event chain assignment and retrieval are fully implemented. `build_feature_vector()` is a stub returning `{}` — feature computation is the next implementation task.
+The final output is a flat `dict[str, float]` passed directly to XGBoost. Nothing in this dict is stored in the DB — recomputed on demand every cycle. For training export, `build_feature_vector(row_id)` is called on each validated row and assembled into a CSV.
+
+> **Current status:** Event chain assignment, retrieval, and feature vector computation are fully implemented. Heat matrix sensors are currently treated as scalar (max value) — full aggregation strategy (mean, variance, hotspot count) deferred until SENSE layer decides whether to aggregate at the sensor level or pass arrays through.
 
 ### 6.6 Machine learning
 
@@ -412,7 +428,7 @@ All three implement `BaseModel(ABC)`. Switching phases requires one line change 
 Triggered from website by admin. System keeps running normally.
 
 1. Pull all rows with `validated = True` from DB via `ThinkDatabase.get_validated_rows()`
-2. Call `ThinkDatabase.build_feature_vector()` for each row
+2. Call `ThinkDatabase.build_feature_vector(row_id)` for each row
 3. Assemble DataFrame — each row is one feature vector, label column is `true_danger_level`
 4. Save CSV to disk via `ThinkDatabase.export_csv(path)`
 5. Call `XGBoostModel.fit(X, y)`
@@ -461,13 +477,17 @@ methods:
 **ThinkDatabase**
 ```
 fields:
+  _config: dict               full config dict, passed in at construction
   _connection
   _connected: bool
   _last_row_id: int           managed internally — ThinkEngine never touches row IDs
-  _max_gap_ms: int            passed in at construction from ThinkEngine
+  _max_gap_ms: int            read from config["think"]["max_gap_ms"]
+  _chain_length: int          read from config["think"]["chain_length"]
+  _sensor_list: list[str]     locked at startup from config["sensors"] keys
+  _label_encoding: dict       read from config["think"]["label_encoding"]
 
 methods:
-  __init__(max_gap_ms: int) → None
+  __init__(config: dict) → None
   connect() → None
   close() → None
   log_event(snap: ThinkSnapshot) → None     writes row, calls _assign_event_id() automatically
@@ -477,7 +497,12 @@ methods:
   get_event_chain(event_id: int) → list
   get_last_chain() → list
   get_validated_rows() → list
-  build_feature_vector(row_id: int) → dict[str, float]   (stub — TODO: compute velocities, accelerations, encode categoricals)
+  build_feature_vector(row_id: int) → dict[str, float]   walks back from row_id, bounded by chain_length
+  _extract_sensor_series(chain, sensor_name) → tuple[list, list]   private — pulls values+timestamps; defensive list-handling for unaggregated heat matrix
+  _extract_vision_series(chain, field) → tuple[list, list]         private — pulls values+timestamps for vision fields
+  _safe_velocity(values, timestamps) → float                       private — Δvalue/Δtime, NaN if uncomputable
+  _safe_acceleration(values, timestamps) → float                   private — Δvelocity/Δtime, NaN if uncomputable
+  _nan_if_none(v) → float                                          private — None → np.nan, preserves real numbers including 0
   export_csv(path: str) → None
   clear_logs() → None
 ```
@@ -521,6 +546,7 @@ methods:
 ```json
 "think": {
   "max_gap_ms": 500,
+  "chain_length": 5,
   "min_training_rows": 200,
   "active_model": "xgboost",
   "model_weights_path": "model_weights/",
@@ -540,7 +566,6 @@ methods:
   },
   "label_encoding": {
     "composite_label": { "none": 0, "smoke": 1, "fire": 2, "fire-smoke": 3 },
-    "escalation_trend": { "IMPROVING": 0, "STABLE": 1, "WORSENING": 2 },
     "scene_label": { "classroom": 0, "hospital": 1, "kitchen": 2,
                      "warehouse": 3, "office": 4, "server_room": 5,
                      "corridor": 6, "parking_garage": 7 }
@@ -701,6 +726,7 @@ All system behaviour is controlled through `config.json`. No hardcoded threshold
 | `threshold_physical` per sensor | Different deployments have different sensitivity requirements |
 | `danger_threshold_to_act` | A data centre acts at level 2; a wildfire site acts at level 4 |
 | `max_gap_ms` | Controls what counts as "the same event" |
+| `chain_length` | Bounds how many recent rows of an event feed the feature vector |
 | `min_training_rows` | Threshold before XGBoost replaces RuleEngine |
 | `poa_map` | Operator decides the action plan for their context |
 | XGBoost hyperparameters | Tunable from website without touching code |
@@ -744,6 +770,9 @@ Add per-cluster features for top N clusters (zero-padded). Requires retraining o
 ### 11.5 NeuralModel
 Small LSTM or 1D-CNN operating over raw chain sequences. Only if XGBoost proves insufficient.
 
+### 11.6 Heat matrix aggregation in SENSE
+Currently THINK defensively takes `max()` of any list-typed sensor reading. The cleaner fix lives in the SENSE layer: heat matrix sensors should aggregate to flat scalar keys (`heat_max`, `heat_mean`, `heat_std`, hotspot count, etc.) inside their own `to_normalized()` so feature building stays generic. Heat matrix is also philosophically closer to SEE than SENSE — refactor candidate.
+
 ---
 
 ## 12. Website and IoT Control
@@ -764,7 +793,7 @@ Browser → Flask route → SystemOrchestrator method → SystemState field upda
 
 **Console & Logs** — system log stream, CPU/memory/storage usage. Clear logs button.
 
-**Configuration** — editable sensor cards, system settings including XGBoost hyperparameters. Save → writes `config.json` → restarts affected layer. Admin only.
+**Configuration** — editable sensor cards, system settings including XGBoost hyperparameters. Save → writes `config.json` → restarts all layers. Admin only.
 
 **Control** — arm joint sliders, actuator manual triggers, emergency stop. Admin only.
 
@@ -773,7 +802,7 @@ Browser → Flask route → SystemOrchestrator method → SystemState field upda
 ```
 set_mode(mode: str) → None
 set_camera_feed(active: bool) → None
-update_config(new_config: dict) → None    validates → writes config.json → restarts layer
+update_config(new_config: dict) → None    validates → writes config.json → restarts all layers
 send_arm_command(angles: List[float]) → None
 trigger_actuator(name: str, state: bool) → None
 stop_all_actuators() → None

@@ -86,6 +86,7 @@ class ThinkEngine:
     # --- alignment ---
 
     def _align(self):
+        # Drop partials: misaligned snapshots are worse than no snapshot.
         sense_snap = None
         see_snap = None
 
