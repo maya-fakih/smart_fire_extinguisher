@@ -1,8 +1,14 @@
-from multiprocessing import Manager
+from multiprocessing import Manager, Lock
 from core.enums import SystemMode
 
 
 class SystemState:
+    """
+    Shared blackboard for all four layers.
+    Backed by a multiprocessing.Manager dict so writes are visible across OS processes.
+    Each field has exactly one writer (enforced by convention, not by code).
+    Queues carry SensorSnapshot and VisionSnapshot to the THINK layer.
+    """
     def __init__(self, manager, system_mode: str):
         self._data = manager.dict()
 
@@ -13,6 +19,7 @@ class SystemState:
         # updated from saved snapshots
         # might choose to have them in the db but for now placeholder
         # they are in system state for easier acess than having to query the db
+        # will be here for quick acess not full db queries left and right but may descide to delete them later :D
         self.sensor_triggered    = False
         self.active_sensor_count = 0
         self.faulted_sensors     = []
@@ -22,9 +29,6 @@ class SystemState:
         self.think_running       = False
         self.act_running         = False
         self.system_mode         = system_mode
-
-        #dont forget systemstate,db connected
-        # dont forget there was another flag but i forgot.. 
         self.db_connected        = False
         self.danger_level        = 0
         self.recommended_action  = "monitor"

@@ -3,16 +3,23 @@
 import os
 import time
 import psycopg2
+import numpy as np
 from psycopg2.extras import RealDictCursor
 from exceptions import DatabaseError
 
 
 class ThinkDatabase:
-    def __init__(self, max_gap_ms: int):
+    def __init__(self, config: dict):
+        self._config = config
+        think_cfg = config.get("think", {})
+        self._max_gap_ms = think_cfg.get("max_gap_ms", 500)
+        self._chain_length = think_cfg.get("chain_length", 5)
+        self._sensor_list = list(config.get("sensors", {}).keys())
+        self._label_encoding = think_cfg.get("label_encoding", {})
+
         self._connection = None
         self._connected = False
         self._last_row_id = None
-        self._max_gap_ms = max_gap_ms
 
     # --- connection ---
 
@@ -77,7 +84,7 @@ class ThinkDatabase:
         except Exception as e:
             self._connection.rollback()
             raise DatabaseError(f"Failed to log event: {e}")
-        
+
     def _assign_event_id(self) -> None:
         try:
             with self._connection.cursor() as cur:
@@ -180,11 +187,152 @@ class ThinkDatabase:
     # --- feature building ---
 
     def build_feature_vector(self, row_id: int) -> dict:
-        chain = self.get_last_chain()
+        """
+        Build feature vector for the chain ending at row_id.
+        Walks back from the given row_id (NOT _last_row_id) so this works for
+        both live prediction and offline training (CSV export).
+        Returns a flat dict[str, float] for XGBoost. Missing data → np.nan.
+        """
+        try:
+            # 1. Find this row's event_id
+            with self._connection.cursor() as cur:
+                cur.execute("SELECT event_id FROM think_schema WHERE id = %s", (row_id,))
+                row = cur.fetchone()
+                if not row or row["event_id"] is None:
+                    return {}
+                event_id = row["event_id"]
+
+                # 2. Get last N rows of this event up to row_id
+                cur.execute("""
+                    SELECT * FROM (
+                        SELECT * FROM think_schema
+                        WHERE event_id = %s AND id <= %s
+                        ORDER BY timestamp DESC
+                        LIMIT %s
+                    ) sub
+                    ORDER BY timestamp ASC
+                """, (event_id, row_id, self._chain_length))
+                chain = cur.fetchall()
+        except Exception as e:
+            raise DatabaseError(f"Failed to fetch chain for feature vector: {e}")
+
         if not chain:
             return {}
-        # TODO: compute velocities, accelerations, encode categoricals
-        return {}
+
+        features = {}
+        latest = chain[-1]
+
+        # 3. Sensor features (per sensor in canonical list)
+        for sensor in self._sensor_list:
+            vals, ts = self._extract_sensor_series(chain, sensor)
+            valid = [v for v in vals if not np.isnan(v)]
+
+            features[f"{sensor}_latest"] = vals[-1] if not np.isnan(vals[-1]) else np.nan
+            features[f"{sensor}_avg"] = float(np.nanmean(vals)) if valid else np.nan
+            features[f"{sensor}_variance"] = float(np.nanvar(vals)) if len(valid) >= 2 else np.nan
+            features[f"{sensor}_velocity"] = self._safe_velocity(vals, ts)
+            features[f"{sensor}_acceleration"] = self._safe_acceleration(vals, ts)
+
+        # 4. Vision features — from latest row + velocities across chain
+        vision_present = latest.get("composite_label") is not None
+
+        if vision_present:
+            features["fire_count"] = self._nan_if_none(latest.get("fire_count"))
+            features["smoke_count"] = self._nan_if_none(latest.get("smoke_count"))
+            features["cluster_count"] = self._nan_if_none(latest.get("cluster_count"))
+            features["fire_union_area"] = self._nan_if_none(latest.get("fire_union_area"))
+            features["smoke_union_area"] = self._nan_if_none(latest.get("smoke_union_area"))
+            features["scene_confidence"] = self._nan_if_none(latest.get("scene_confidence"))
+
+            gf = latest.get("glimpsed_fire")
+            hnf = latest.get("human_near_fire")
+            features["glimpsed_fire"] = float(gf) if gf is not None else np.nan
+            features["human_near_fire"] = float(hnf) if hnf is not None else np.nan
+
+            fua_vals, fua_ts = self._extract_vision_series(chain, "fire_union_area")
+            sua_vals, sua_ts = self._extract_vision_series(chain, "smoke_union_area")
+            features["fire_union_area_velocity"] = self._safe_velocity(fua_vals, fua_ts)
+            features["smoke_union_area_velocity"] = self._safe_velocity(sua_vals, sua_ts)
+
+            comp = latest.get("composite_label")
+            scene = latest.get("scene_label")
+            features["composite_label_encoded"] = self._label_encoding.get("composite_label", {}).get(comp, np.nan)
+            features["scene_label_encoded"] = self._label_encoding.get("scene_label", {}).get(scene, np.nan)
+        else:
+            for k in ["fire_count", "smoke_count", "cluster_count",
+                      "fire_union_area", "smoke_union_area", "scene_confidence",
+                      "glimpsed_fire", "human_near_fire",
+                      "fire_union_area_velocity", "smoke_union_area_velocity",
+                      "composite_label_encoded", "scene_label_encoded"]:
+                features[k] = np.nan
+
+        return features
+
+    # --- feature helpers ---
+
+    def _extract_sensor_series(self, chain: list, sensor_name: str) -> tuple:
+        """
+        Pull one sensor's normalized values across the chain.
+        Missing readings → np.nan.
+        Defensive: if a sensor stored an array (e.g. heat matrix not yet aggregated
+        at the sensor layer), fall back to the max value.
+        """
+        values = []
+        timestamps = []
+        for row in chain:
+            normalized = row.get("sensor_normalized")
+            if normalized is None:
+                values.append(np.nan)
+            else:
+                v = normalized.get(sensor_name, np.nan)
+                if isinstance(v, list):
+                    v = max(v) if v else np.nan
+                values.append(v if v is not None else np.nan)
+            timestamps.append(row["timestamp"])
+        return values, timestamps
+
+    def _extract_vision_series(self, chain: list, field: str) -> tuple:
+        """Pull one vision field across the chain. NaN if missing."""
+        values = []
+        timestamps = []
+        for row in chain:
+            v = row.get(field)
+            values.append(np.nan if v is None else v)
+            timestamps.append(row["timestamp"])
+        return values, timestamps
+
+    def _safe_velocity(self, values: list, timestamps: list) -> float:
+        """Δvalue/Δtime over last 2 non-NaN points. NaN if not computable."""
+        pairs = [(v, t) for v, t in zip(values, timestamps) if not np.isnan(v)]
+        if len(pairs) < 2:
+            return np.nan
+        (v1, t1), (v2, t2) = pairs[-2], pairs[-1]
+        dt = t2 - t1
+        if dt == 0:
+            return np.nan
+        return (v2 - v1) / dt
+
+    def _safe_acceleration(self, values: list, timestamps: list) -> float:
+        """Δvelocity/Δtime over last 3 non-NaN points. NaN if not computable."""
+        pairs = [(v, t) for v, t in zip(values, timestamps) if not np.isnan(v)]
+        if len(pairs) < 3:
+            return np.nan
+        (v1, t1), (v2, t2), (v3, t3) = pairs[-3], pairs[-2], pairs[-1]
+        dt1 = t2 - t1
+        dt2 = t3 - t2
+        if dt1 == 0 or dt2 == 0:
+            return np.nan
+        vel1 = (v2 - v1) / dt1
+        vel2 = (v3 - v2) / dt2
+        # midpoint times for the two velocity intervals
+        dt_between = ((t3 + t2) / 2) - ((t2 + t1) / 2)
+        if dt_between == 0:
+            return np.nan
+        return (vel2 - vel1) / dt_between
+
+    def _nan_if_none(self, v):
+        """Convert None or 'falsy-but-not-zero' to np.nan; preserve real numbers including 0."""
+        return np.nan if v is None else v
 
     # --- utilities ---
 
