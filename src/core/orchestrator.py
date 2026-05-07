@@ -186,7 +186,7 @@ class SystemOrchestrator:
             json.dump(self._config, f, indent=2)
 
         # Restart so layers pick up the new values
-        self.restart_all
+        self.restart_all()
 
     # ------------------------------------------------------------------
     # Dashboard
