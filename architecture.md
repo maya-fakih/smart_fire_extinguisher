@@ -200,7 +200,7 @@ class SensorSnapshot:
 
 ### 4.6 Class summary
 
-- `Sensor(ABC)` — base class: `read()`, `to_physical()`, `to_normalized()`, `threshold_hit()`, `poll()`
+- `Sensor(ABC)` — base class: `read()`, `to_physical()`, `to_normalized()`, `threshold_hit()`, `poll()`, `ping()`, `read_specific values()`
 - `ADCSensor(Sensor)` — reads ADS1115 via pin
 - `I2CSensor(Sensor)` — reads I2C device by address
 - `UARTSensor(Sensor)` — reads serial device by path
@@ -227,6 +227,18 @@ class SensorSnapshot:
   "rolling_window_n": 5
 }
 ```
+
+### 4.8 Sensor read function
+
+Since each sensor is different we need a way to understand their correct transformation function from raw data to human form physical data. To allow for the flexibility of the system the config file should include the read method for each sensor.
+
+Example inlcudes but is not limited to the adc model where we can use python's ability to read strings and convert them to equations. For other models we can have configured multiple functions for different reading types in the class as read_i2c_normal or whatever with describtive names that can be set in the config file, and then these functions will be called in read based on the correct configuration.
+
+### 4.9 Sensor ping function
+
+Sensor ping is a test that checks if we can read from the hardware to ensure that the system can actually connect the hardware, it can flag issues like wrong pin configuration in config, burnt IO on the pi, or a wrong sensor.
+
+The ping is different for different types sure costumize for each of the 4 sensor time.
 
 ---
 
