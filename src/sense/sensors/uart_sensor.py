@@ -1,244 +1,64 @@
-"""
-uart_sensor.py — Concrete sensor for UART/serial devices.
-
-Reads a single float value from a serial port. The expected wire protocol
-is a UTF-8 line ending in '\n' that contains either:
-  • A bare number:            "423.7\n"
-  • A labelled number:        "CO2:423.7\n"  (everything after ':' is parsed)
-
-This covers most hobbyist UART sensors (MH-Z19 CO2, GPS NMEA subset,
-custom Arduino/STM32 serial reporters, etc.).
-
-Hardware dependency: pyserial
-  pip install pyserial
-
-Gracefully absent on non-Pi machines — RuntimeError raised only on read().
-"""
+# src/sense/sensors/uart_sensor.py
 
 from __future__ import annotations
-
 import logging
-
-from sense.sensor import Sensor
+from sense.sensor_base import Sensor
 
 logger = logging.getLogger(__name__)
 
 try:
     import serial
-
     _SERIAL_AVAILABLE = True
 except ImportError:
     _SERIAL_AVAILABLE = False
-    logger.warning(
-        "pyserial not installed. UARTSensor will raise RuntimeError on read()."
-    )
+    logger.warning("pyserial not installed. UARTSensor unavailable.")
 
 
 class UARTSensor(Sensor):
     """
     Reads a numeric value from a UART serial device.
-
-    Args:
-        path:     Serial device path, e.g. "/dev/ttyAMA0" or "/dev/ttyUSB0".
-        baudrate: Serial baud rate (default 9600).
-        timeout:  Read timeout in seconds (default 2.0).
-        **kwargs: Passed to Sensor.__init__.
+    Expects each readline() to return a UTF-8 line containing a float,
+    optionally prefixed with a label: "CO2:423.7" or just "423.7".
+    Config keys: port, baud_rate (default 9600), timeout_s (default 2.0).
     """
 
-    def __init__(
-        self,
-        path: str,
-        baudrate: int = 9600,
-        timeout: float = 2.0,
-        **kwargs,
-    ):
+    def __init__(self, path: str, baudrate: int = 9600, timeout: float = 2.0, **kwargs):
         super().__init__(**kwargs)
         self.path = path
         self.baudrate = baudrate
         self.timeout = timeout
+        self._serial = None
 
-        # Lazy hardware handle
-        self._serial: "serial.Serial | None" = None
-
-    # ------------------------------------------------------------------
-    # Hardware initialisation
-    # ------------------------------------------------------------------
-
-    def _init_hardware(self) -> None:
-        """Open the serial port on first use."""
-        if self._serial is not None and self._serial.is_open:
-            return
-
+    def _ping(self) -> None:
         if not _SERIAL_AVAILABLE:
-            raise RuntimeError(
-                "pyserial is not installed. Cannot read from UARTSensor."
-            )
-
-        try:
-            self._serial = serial.Serial(
-                port=self.path,
-                baudrate=self.baudrate,
-                timeout=self.timeout,
-            )
-            logger.info(
-                "UARTSensor '%s': serial port %s opened at %d baud.",
-                self.name,
-                self.path,
-                self.baudrate,
-            )
-        except Exception as exc:
-            logger.error(
-                "UARTSensor '%s': failed to open %s — %s",
-                self.name,
-                self.path,
-                exc,
-            )
-            raise
-
-    # ------------------------------------------------------------------
-    # Sensor ABC implementation
-    # ------------------------------------------------------------------
-
-    def ping(self) -> bool:
-        """
-        Test if the UART/serial port is available and accessible.
-
-        Attempts to open the serial port briefly. If the port exists
-        and is not in use, it will open successfully.
-
-        Returns:
-            True if port is accessible, False otherwise.
-        """
-        if not _SERIAL_AVAILABLE:
-            return False
-
-        try:
-            import serial
-            # Try to open the port with a very short timeout
-            ser = serial.Serial(
-                port=self.path,
-                baudrate=self.baudrate,
-                timeout=0.1,
-            )
-            is_open = ser.is_open
+            raise RuntimeError("pyserial not installed")
+        ser = serial.Serial(port=self.path, baudrate=self.baudrate, timeout=0.1)
+        if not ser.is_open:
             ser.close()
-            return is_open
-        except (Exception,):
-            return False
+            raise IOError(f"UARTSensor '{self.name}': could not open {self.path}")
+        ser.close()
+        self._serial = serial.Serial(port=self.path, baudrate=self.baudrate, timeout=self.timeout)
+        logger.info("UARTSensor '%s': opened %s at %d baud", self.name, self.path, self.baudrate)
 
     def read(self) -> float:
-        """
-        Read one line from the serial port and parse a float from it.
-
-        Protocol:
-          • Reads up to self.timeout seconds for a '\n'-terminated line.
-          • Strips whitespace.
-          • If the line contains ':', only the part after ':' is parsed.
-          • Remaining string is cast to float.
-
-        Returns:
-            float — the parsed sensor value.
-
-        Raises:
-            RuntimeError: if pyserial is not installed.
-            IOError:      on timeout, decode failure, or parse failure.
-        """
         if not _SERIAL_AVAILABLE:
-            raise RuntimeError(
-                "pyserial is not installed. Cannot read from UARTSensor."
-            )
-
-        try:
-            self._init_hardware()
-        except Exception as exc:
-            raise IOError(
-                f"UARTSensor '{self.name}': hardware initialization failed — {exc}"
-            ) from exc
-
-        if not self._serial or not self._serial.is_open:
-            raise IOError(
-                f"UARTSensor '{self.name}': serial port {self.path} not open"
-            )
-
-        try:
-            raw_bytes = self._serial.readline()
-        except Exception as exc:
-            raise IOError(
-                f"UARTSensor '{self.name}': serial read error — {exc}"
-            ) from exc
-
-        if not raw_bytes:
-            raise IOError(
-                f"UARTSensor '{self.name}': read timeout on {self.path}. "
-                f"No data received within {self.timeout} seconds."
-            )
-
-        try:
-            line = raw_bytes.decode("utf-8").strip()
-        except UnicodeDecodeError as exc:
-            raise IOError(
-                f"UARTSensor '{self.name}': failed to decode data — {exc}. "
-                f"Received bytes: {raw_bytes.hex()}"
-            ) from exc
-
-        if not line:
-            raise IOError(
-                f"UARTSensor '{self.name}': received empty line after decoding"
-            )
-
-        # Handle "LABEL:value" format
+            raise RuntimeError("pyserial not installed")
+        if self._serial is None or not self._serial.is_open:
+            raise IOError(f"UARTSensor '{self.name}': port not open")
+        raw = self._serial.readline()
+        if not raw:
+            raise IOError(f"UARTSensor '{self.name}': read timeout on {self.path}")
+        line = raw.decode("utf-8", errors="ignore").strip()
         if ":" in line:
-            parts = line.split(":", 1)
-            if len(parts) != 2:
-                raise IOError(
-                    f"UARTSensor '{self.name}': malformed labelled value: {line!r}"
-                )
-            line = parts[1].strip()
-
+            line = line.split(":", 1)[1].strip()
         if not line:
-            raise IOError(
-                f"UARTSensor '{self.name}': no numeric value found in line"
-            )
-
-        try:
-            value = float(line)
-        except ValueError as exc:
-            raise IOError(
-                f"UARTSensor '{self.name}': cannot parse float from {line!r} — {exc}"
-            ) from exc
-
-        # Validate that the value is a real number
-        if not (-1e308 <= value <= 1e308):
-            raise IOError(
-                f"UARTSensor '{self.name}': parsed value {value} is infinite or NaN"
-            )
-
-        return value
-
-    # ------------------------------------------------------------------
-    # Matrix support (not applicable for UART scalar sensors)
-    # ------------------------------------------------------------------
+            raise IOError(f"UARTSensor '{self.name}': no numeric value in line")
+        return float(line)
 
     def read_matrix(self) -> list[float]:
-        """UART sensors are scalar — always returns an empty list."""
         return []
 
-    # ------------------------------------------------------------------
-    # Cleanup
-    # ------------------------------------------------------------------
-
     def stop(self) -> None:
-        """Close the serial port before stopping the thread."""
-        super().stop()
         if self._serial and self._serial.is_open:
-            try:
-                self._serial.close()
-                logger.info(
-                    "UARTSensor '%s': serial port %s closed.",
-                    self.name,
-                    self.path,
-                )
-            except Exception as exc:
-                logger.warning(
-                    "UARTSensor '%s': error closing port — %s", self.name, exc
-                )
+            self._serial.close()
+            logger.info("UARTSensor '%s': port closed", self.name)

@@ -1,222 +1,62 @@
-"""
-adc_sensor.py — Concrete sensor for ADS1115 ADC over I2C.
-
-Reads an analogue value from a specified channel (pin) of an ADS1115
-16-bit analogue-to-digital converter.  Typical use: MQ-series smoke/gas
-sensors whose output is a 0–3.3 V analogue voltage.
-
-Hardware dependency: adafruit-circuitpython-ads1x15
-  pip install adafruit-circuitpython-ads1x15
-
-The import is guarded so the module can be imported on a development
-machine without the Adafruit library installed; a clear RuntimeError is
-raised only when read() is actually called.
-"""
+# src/sense/sensors/adc_sensor.py
 
 from __future__ import annotations
-
 import logging
-
-from sense.sensor import Sensor
+from sense.sensor_base import Sensor
 
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Optional hardware imports — gracefully absent on non-Pi machines
-# ---------------------------------------------------------------------------
 try:
     import board
     import busio
     import adafruit_ads1x15.ads1115 as ADS
     from adafruit_ads1x15.analog_in import AnalogIn
-
     _ADS_AVAILABLE = True
 except ImportError:
     _ADS_AVAILABLE = False
-    logger.warning(
-        "adafruit-circuitpython-ads1x15 not installed. "
-        "ADCSensor will raise RuntimeError on read()."
-    )
+    logger.warning("adafruit-circuitpython-ads1x15 not installed. ADCSensor unavailable.")
 
-# Map integer channel index → ADS channel constant
-_CHANNEL_MAP = {
-    0: "P0",
-    1: "P1",
-    2: "P2",
-    3: "P3",
-}
-
-# ADS1115 gain options (±voltage range)
-_GAIN_MAP = {
-    1:    2 / 3,   # ±6.144 V  (Adafruit uses 2/3 for GAIN_1)
-    2:    2,        # ±2.048 V  — most common for 3.3 V systems
-    4:    4,
-    8:    8,
-    16:   16,
-}
+_CHANNEL_MAP = {0: "P0", 1: "P1", 2: "P2", 3: "P3"}
+_GAIN_MAP = {1: 2/3, 2: 2, 4: 4, 8: 8, 16: 16}
 
 
 class ADCSensor(Sensor):
     """
-    Reads a single analogue channel from an ADS1115 ADC.
-
-    Args:
-        pin:      ADS1115 channel index (0–3).
-        ads_gain: ADS1115 programmable gain amplifier setting.
-                  Typical values: 1 (±6.144 V), 2 (±2.048 V).
-        **kwargs: Passed directly to Sensor.__init__.
+    Reads an analogue channel from an ADS1115 ADC over I2C.
+    Config keys: pin (channel 0–3), gain (default 1).
     """
 
     def __init__(self, pin: int, ads_gain: int = 1, **kwargs):
         super().__init__(**kwargs)
         self.pin = pin
         self.ads_gain = ads_gain
-
-        # Lazy-initialised hardware handles
         self._i2c = None
         self._ads = None
         self._channel = None
 
-    # ------------------------------------------------------------------
-    # Hardware initialisation (called once on first read)
-    # ------------------------------------------------------------------
-
-    def _init_hardware(self) -> None:
-        """
-        Initialise the I2C bus and ADS1115 chip.
-
-        Deferred until the first read() call so that the object can be
-        constructed safely during config parsing on any machine.
-        """
+    def _ping(self) -> None:
         if not _ADS_AVAILABLE:
-            raise RuntimeError(
-                "adafruit-circuitpython-ads1x15 is not installed. "
-                "Cannot read from ADCSensor."
-            )
-
-        if self._ads is not None:
-            return  # Already initialised
-
-        try:
-            self._i2c = busio.I2C(board.SCL, board.SDA)
-            self._ads = ADS.ADS1115(self._i2c)
-
-            if self.ads_gain not in _GAIN_MAP:
-                logger.warning(
-                    "ADCSensor '%s': unknown gain %d — defaulting to 1.",
-                    self.name,
-                    self.ads_gain,
-                )
-                self.ads_gain = 1
-
-            self._ads.gain = _GAIN_MAP[self.ads_gain]
-
-            if self.pin not in _CHANNEL_MAP:
-                raise ValueError(
-                    f"ADCSensor '{self.name}': invalid pin {self.pin}. "
-                    f"Must be 0–3."
-                )
-
-            channel_attr = _CHANNEL_MAP[self.pin]
-            self._channel = AnalogIn(self._ads, getattr(ADS, channel_attr))
-
-            logger.info(
-                "ADCSensor '%s': initialised on channel %d with gain %d.",
-                self.name,
-                self.pin,
-                self.ads_gain,
-            )
-        except Exception as exc:
-            logger.error(
-                "ADCSensor '%s': hardware init failed — %s", self.name, exc
-            )
-            raise
-
-    # ------------------------------------------------------------------
-    # Sensor ABC implementation
-    # ------------------------------------------------------------------
-
-    def ping(self) -> bool:
-        """
-        Test if the ADS1115 ADC chip is connected and responding.
-
-        Attempts to initialize the I2C bus and communicate with the
-        ADS1115 at its default address. Returns True if the chip ACKs.
-
-        Returns:
-            True if ADS1115 responds, False otherwise.
-        """
-        if not _ADS_AVAILABLE:
-            return False
-
-        try:
-            # Try to initialize the I2C bus and ADS chip
-            import board
-            import busio
-            import adafruit_ads1x15.ads1115 as ADS
-
-            i2c = busio.I2C(board.SCL, board.SDA)
-            ads = ADS.ADS1115(i2c)
-            
-            # If we got here without exception, the chip responded
-            return True
-
-        except Exception:
-            return False
+            raise RuntimeError("adafruit-circuitpython-ads1x15 not installed")
+        if self.pin not in _CHANNEL_MAP:
+            raise ValueError(f"ADCSensor '{self.name}': invalid pin {self.pin}, must be 0–3")
+        i2c = busio.I2C(board.SCL, board.SDA)
+        ads = ADS.ADS1115(i2c)
+        if self.ads_gain in _GAIN_MAP:
+            ads.gain = _GAIN_MAP[self.ads_gain]
+        self._i2c = i2c
+        self._ads = ads
+        self._channel = AnalogIn(ads, getattr(ADS, _CHANNEL_MAP[self.pin]))
+        logger.info("ADCSensor '%s': initialised on channel %d gain %d", self.name, self.pin, self.ads_gain)
 
     def read(self) -> float:
-        """
-        Read the raw ADC value (0–32767 for ADS1115 in single-ended mode).
-
-        Returns the integer value as a float for consistency with the
-        Sensor base class interface.
-
-        Raises:
-            RuntimeError: if the Adafruit library is not installed.
-            IOError:      on any hardware communication failure.
-        """
         if not _ADS_AVAILABLE:
-            raise RuntimeError(
-                "adafruit-circuitpython-ads1x15 is not installed. "
-                "Cannot read from ADCSensor."
-            )
-
-        try:
-            self._init_hardware()
-        except Exception as exc:
-            raise IOError(
-                f"ADCSensor '{self.name}': hardware initialization failed — {exc}"
-            ) from exc
-
-        try:
-            raw_value = self._channel.value  # 16-bit signed integer, 0–32767
-            
-            # Validate that we got a valid number
-            if raw_value is None:
-                raise IOError(f"ADCSensor '{self.name}': read returned None")
-            
-            # Validate range
-            if not (0 <= raw_value <= 32767):
-                raise IOError(
-                    f"ADCSensor '{self.name}': raw value {raw_value} "
-                    f"outside expected range [0, 32767]"
-                )
-            
-            return float(raw_value)
-            
-        except AttributeError as exc:
-            raise IOError(
-                f"ADCSensor '{self.name}': channel not initialized — {exc}"
-            ) from exc
-        except Exception as exc:
-            raise IOError(
-                f"ADCSensor '{self.name}': read failed — {exc}"
-            ) from exc
-
-    # ------------------------------------------------------------------
-    # Matrix support (not applicable for ADC — returns empty)
-    # ------------------------------------------------------------------
+            raise RuntimeError("adafruit-circuitpython-ads1x15 not installed")
+        if self._channel is None:
+            raise IOError(f"ADCSensor '{self.name}': hardware not initialised — ping() must succeed first")
+        raw = self._channel.value
+        if raw is None or not (0 <= raw <= 32767):
+            raise IOError(f"ADCSensor '{self.name}': unexpected raw value {raw}")
+        return float(raw)
 
     def read_matrix(self) -> list[float]:
-        """ADC sensors are scalar — always returns an empty list."""
         return []
