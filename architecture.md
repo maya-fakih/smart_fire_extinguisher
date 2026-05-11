@@ -267,7 +267,7 @@ When running in live stream mode only (`camera_feed_active = True` but `sensor_t
 class Detection:
     label: str
     confidence: float
-    bbox: tuple[int, int, int, int]  # x, y, w, h in pixels
+    bbox: tuple[int, int, int, int]  # x, y, w, h in normalized 0-1 range
     area_ratio: float
 
 @dataclass
@@ -313,6 +313,9 @@ class VisionSnapshot:
 - `SceneClassifier(VisionModel)` — MobileNetV3 scene classification
 - `IMX500Camera` — camera lifecycle, on-chip inference
 - `VisionFuser` — owns camera and models, emits VisionSnapshot to `see_queue`
+
+Note: SEE writes latest_fire_x, latest_fire_y to SystemState in normalized [0, 1] with (0.5, 0.5) being image center.
+
 
 ### 5.6 Config reference (SEE section)
 

@@ -15,3 +15,7 @@ psycopg2-binary
 adafruit-blinka
 adafruit-circuitpython-ads1x15
 adafruit-circuitpython-amg88xx
+
+
+#arm
+gpiozero
