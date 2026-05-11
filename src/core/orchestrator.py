@@ -243,6 +243,8 @@ class SystemOrchestrator:
             "active_sensor_count": self._state.active_sensor_count,
             "faulted_sensors": self._state.faulted_sensors,
             "danger_level": self._state.danger_level,
-            "recommended_action": self._state.recommended_action,
+            "recommended_actions": self._state.recommended_actions,
             "camera_feed_active": self._state.camera_feed_active,
+            "prediction_id": self._state.prediction_id,
+            "copilot_decision": self._state.copilot_decision,
         }

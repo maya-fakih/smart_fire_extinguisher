@@ -102,15 +102,14 @@ class ThinkEngine:
         features = self._db.build_feature_vector(self._db.last_row_id)
         logger.debug(f"ThinkEngine: feature_vector_built | features={features}")
         danger_level = self._model.predict(features)
-        logger.info(
-            f"ThinkEngine: model_prediction | danger_level={danger_level}"
-        )
-        action = self._lookup_action(danger_level)
-        logger.debug(f"ThinkEngine: action_mapped | action={action}")
-        self._db.update_prediction(danger_level, action)
-        self._state.danger_level = danger_level
-        self._state.recommended_action = action
-
+        logger.info(f"ThinkEngine: model_prediction | danger_level={danger_level}")
+        actions = self._lookup_actions(danger_level)
+        logger.debug(f"ThinkEngine: actions_mapped | actions={actions}")
+        self._db.update_prediction(danger_level, ",".join(actions))
+        self._state.danger_level         = danger_level
+        self._state.recommended_actions  = actions
+        self._state.prediction_id        = self._state.prediction_id + 1
+    
     # --- alignment ---
 
     def _align(self):
@@ -145,10 +144,15 @@ class ThinkEngine:
 
     # --- helpers ---
 
-    def _lookup_action(self, danger_level: int) -> str:
+    def _lookup_actions(self, danger_level: int) -> list[str]:
+        """
+        poa_map values are lists of action names (stackable). Single-string
+        legacy values are auto-wrapped in a list for backwards compatibility.
+        """
         poa_map = self._config.get("think", {}).get("poa_map", {})
-        return poa_map.get(str(danger_level), "monitor")
-
+        actions = poa_map.get(str(danger_level), ["monitor"])
+        return actions if isinstance(actions, list) else [actions]
+    
     def _load_model(self):
         active = self._active_model
         logger.debug(f"ThinkEngine: loading model | active_model={active}")

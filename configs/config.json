@@ -88,11 +88,11 @@
     "max_gap_ms": 500,
     "chain_length": 5,
     "poa_map": {
-      "1": "monitor",
-      "2": "monitor",
-      "3": "alert",
-      "4": "suppress",
-      "5": "evacuate"
+      "1": ["monitor"],
+      "2": ["monitor"],
+      "3": ["alert"],
+      "4": ["alert", "suppress"],
+      "5": ["alert", "suppress", "evacuate"]
     },
     "label_encoding": {
       "composite_label": {
@@ -114,6 +114,45 @@
       "learning_rate": 0.1,
       "subsample": 0.8,
       "colsample_bytree": 0.8
+    }
+  },
+  "act": {
+    "system": {
+      "cycle_ms": 100,
+      "danger_threshold_to_act": 3,
+      "copilot_timeout_s": 60
+    },
+    "actions": {
+      "available": ["monitor", "alert", "suppress", "evacuate"],
+      "requires_actuator": {
+        "monitor": null,
+        "alert": null,
+        "suppress": "pump",
+        "evacuate": null
+      }
+    },
+    "actuators": {
+      "pump": {
+        "enabled": true,
+        "type": "pump",
+        "interface": "gpio",
+        "pin": 17,
+        "max_duration_s": 30
+      },
+      "arm": {
+        "enabled": true,
+        "type": "arm",
+        "joints": {
+          "pan":  { "pin": 27, "step_deg": 0.5, "limit_min_deg": -90, "limit_max_deg": 90, "servo_min_deg": -90, "servo_max_deg": 90, "invert": false },
+          "tilt": { "pin": 22, "step_deg": 0.5, "limit_min_deg": -45, "limit_max_deg": 45, "servo_min_deg": -90, "servo_max_deg": 90, "invert": false }
+        },
+        "feedback": {
+          "heat_use_threshold_c": 35,
+          "tolerance_normalized": 0.1
+        },
+        "cycle_active_ms": 100,
+        "cycle_idle_ms": 500
+      }
     }
   }
 }
