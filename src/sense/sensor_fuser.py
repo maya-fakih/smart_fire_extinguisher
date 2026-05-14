@@ -124,6 +124,9 @@ class SensorFuser:
             try:
                 physical, normalized, threshold_hit = sensor.poll()
 
+                if sensor.name == "heat_grid":
+                    self._state.latest_heat_matrix = physical
+
                 with self._lock:
                     self._latest_readings[sensor.name]   = physical
                     self._latest_normalized[sensor.name] = normalized
