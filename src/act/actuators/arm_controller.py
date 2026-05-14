@@ -136,6 +136,7 @@ class ArmController(Actuator):
         logger.debug(f"ArmController {self.name}: tracking loop entered")
         while self._running and self._state.system_running:
             try:
+                # are we sure we should make it sleap instead of in the main loop checking the state? like if we are in manual state only we turn it on?
                 if time.time() < self._state.arm_manual_mode_until:
                     time.sleep(0.1)
                     continue
