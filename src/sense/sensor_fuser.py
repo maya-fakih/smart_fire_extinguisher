@@ -123,6 +123,13 @@ class SensorFuser:
     def _sensor_loop(self, sensor):
         while self._running and self._state.system_running:
             try:
+                # Respect runtime enable/disable from website (soft override).
+                override = self._state.sensor_overrides.get(sensor.name)
+                effective_enabled = override if override is not None else sensor.enabled
+                if not effective_enabled:
+                    time.sleep(1.0)
+                    continue
+
                 physical, normalized, threshold_hit = sensor.poll()
 
                 if sensor.name == "heat_grid":
