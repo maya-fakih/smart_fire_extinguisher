@@ -1,1 +1,2 @@
 from notify.notification_service import NotificationService
+from notify.event_types import EventType, Severity

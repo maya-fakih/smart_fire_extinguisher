@@ -22,7 +22,7 @@ class SensorFuser:
     and writes them to SystemState.sense_queue when thresholds are crossed.
     """
 
-    def __init__(self, config: dict, state: SystemState):
+    def __init__(self, config: dict, state: SystemState, notifier=None):
         system_cfg = config.get("system", {})
         self._polling_idle_ms   = system_cfg.get("polling_interval_idle_ms",   10000) / 1000.0
         self._polling_active_ms = system_cfg.get("polling_interval_active_ms", 1000)  / 1000.0
@@ -34,6 +34,7 @@ class SensorFuser:
         self._sensors = SensorParser.build_sensors(config, self._i2c_buses)
 
         self._state   = state
+        self._notifier = notifier
         self._running = False
         self._threads = []
         self._lock    = threading.Lock()
@@ -124,6 +125,9 @@ class SensorFuser:
             try:
                 physical, normalized, threshold_hit = sensor.poll()
 
+                if sensor.name == "heat_grid":
+                    self._state.latest_heat_matrix = physical
+
                 with self._lock:
                     self._latest_readings[sensor.name]   = physical
                     self._latest_normalized[sensor.name] = normalized
@@ -201,6 +205,21 @@ class SensorFuser:
         logger.info(f"Sensor {sensor.name}: marked as faulted")
         self._state.faulted_sensors = list(self._faulted_sensors)
         self._update_state_sensor_counts()
+        # Fire notification — website/email picks this up
+        if self._notifier is not None:
+            from notify import EventType
+            self._notifier.notify(
+                EventType.SENSOR_FAULTED,
+                payload={"sensor": sensor.name},
+                source_layer="sense",
+            )
+            # Check if every sensor has now faulted — escalates to critical
+            if self._state.active_sensor_count == 0:
+                self._notifier.notify(
+                    EventType.ALL_SENSORS_FAULTED,
+                    payload={"faulted": [f["name"] for f in self._faulted_sensors]},
+                    source_layer="sense",
+                )
 
     def _update_state_sensor_counts(self):
         active_count = sum(
