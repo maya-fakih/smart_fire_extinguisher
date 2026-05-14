@@ -136,6 +136,10 @@ class ArmController(Actuator):
         logger.debug(f"ArmController {self.name}: tracking loop entered")
         while self._running and self._state.system_running:
             try:
+                if time.time() < self._state.arm_manual_mode_until:
+                    time.sleep(0.1)
+                    continue
+
                 triggered = self._state.sensor_triggered
 
                 err = self._compute_error()
@@ -257,3 +261,39 @@ class ArmController(Actuator):
     @staticmethod
     def _clip(v: float, lo: float, hi: float) -> float:
         return max(lo, min(hi, v))
+    
+    # ------------------------------------------------------------------
+    # Manual control (called by ActEngine from manual_commands queue)
+    # ------------------------------------------------------------------
+
+    def nudge(self, direction: str) -> None:
+        """
+        Step the arm one increment in the given direction.
+        direction: 'pan_left' | 'pan_right' | 'tilt_up' | 'tilt_down'
+        """
+        if direction == "pan_left":
+            self._pan_angle = self._clip(
+                self._pan_angle - self._pan_cfg["step_deg"],
+                self._pan_cfg["limit_min_deg"], self._pan_cfg["limit_max_deg"]
+            )
+            self._command_pan(self._pan_angle)
+        elif direction == "pan_right":
+            self._pan_angle = self._clip(
+                self._pan_angle + self._pan_cfg["step_deg"],
+                self._pan_cfg["limit_min_deg"], self._pan_cfg["limit_max_deg"]
+            )
+            self._command_pan(self._pan_angle)
+        elif direction == "tilt_up":
+            self._tilt_angle = self._clip(
+                self._tilt_angle - self._tilt_cfg["step_deg"],
+                self._tilt_cfg["limit_min_deg"], self._tilt_cfg["limit_max_deg"]
+            )
+            self._command_tilt(self._tilt_angle)
+        elif direction == "tilt_down":
+            self._tilt_angle = self._clip(
+                self._tilt_angle + self._tilt_cfg["step_deg"],
+                self._tilt_cfg["limit_min_deg"], self._tilt_cfg["limit_max_deg"]
+            )
+            self._command_tilt(self._tilt_angle)
+        else:
+            logger.warning(f"ArmController.nudge: unknown direction '{direction}'")
