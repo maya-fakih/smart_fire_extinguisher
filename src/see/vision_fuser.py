@@ -6,6 +6,7 @@ Coordinates the entire SEE layer:
 - Runs the continuous capture/analyze loop
 - Assembles VisionSnapshot data contracts
 - Emits processed vision data to THINK layer via queue
+- Writes dominant cluster center to SystemState for ACT arm tracking
 
 The VisionFuser is the main entry point and orchestrator for all vision tasks.
 
@@ -18,9 +19,11 @@ Classes:
 # activated when sensor_triggered = True OR camera_feed_active = True
 
 from datetime import datetime
-from camera import IMX500Camera
-from models.fire_detector import FireDetector, Detection, FireCluster
-from snapshot import VisionSnapshot
+from see.camera import IMX500Camera
+from see.models.fire_detector import FireDetector
+from see.models.detection import Detection
+from see.models.fire_cluster import FireCluster
+from see.snapshot import VisionSnapshot
 import threading
 import os
 import cv2
@@ -33,14 +36,15 @@ import cv2
 class VisionFuser:
     """
     Orchestrator of the SEE (vision/perception) layer.
-    
+
     Manages the complete vision pipeline:
     1. Initializes and controls camera hardware
     2. Builds fire detector for inference analysis
     3. Runs continuous capture loop in background thread
     4. Processes detections and assembles VisionSnapshot outputs
     5. Emits snapshots to THINK layer via see_queue
-    
+    6. Writes dominant cluster center to SystemState for ACT arm tracking
+
     Attributes:
         _camera: IMX500Camera instance
         _fire_detector: FireDetector instance
@@ -56,10 +60,10 @@ class VisionFuser:
     def __init__(self, config: dict, state):
         """
         Initialize VisionFuser with configuration.
-        
+
         Reads vision configuration from config dict and builds child components
         (camera and fire detector). Does not start hardware yet - call start().
-        
+
         Args:
             config: Configuration dict with 'vision' key containing:
                 - camera: resolution, fps settings
@@ -110,16 +114,15 @@ class VisionFuser:
     # ── Start ─────────────────────────────────────────────────────────────────
     # starts the camera, builds fire detector, launches capture loop
     def start(self) -> None:
-
         """
         Start camera and launch capture loop.
-        
+
         This method:
         1. Starts camera hardware (loads YOLO onto IMX500)
         2. Builds FireDetector instance
         3. Launches _capture_loop in background thread
         4. Updates SystemState to indicate layer is running
-        
+
         Returns:
             None
         """
@@ -148,10 +151,10 @@ class VisionFuser:
     def stop(self) -> None:
         """
         Stop capture loop and power off camera.
-        
+
         Signals background thread to exit and stops camera hardware.
         Safe to call multiple times.
-        
+
         Returns:
             None
         """
@@ -161,21 +164,21 @@ class VisionFuser:
 
     # ── Capture Loop ──────────────────────────────────────────────────────────
     # runs continuously in its own thread
-    # capture → analyze → assemble snapshot → emit if sensor triggered
+    # capture → analyze → write state → assemble snapshot → emit if sensor triggered
     def _capture_loop(self) -> None:
-
         """
         Main capture loop (runs in background thread).
-        
+
         Continuous loop that:
         1. Captures frame from camera
         2. Sends to FireDetector for analysis
-        3. Saves frame to disk
-        4. Assembles VisionSnapshot
-        5. Emits to see_queue only if sensor_triggered is True
-        
+        3. Writes dominant cluster center to SystemState (for ACT arm tracking)
+        4. Saves frame to disk
+        5. Assembles VisionSnapshot
+        6. Emits to see_queue only if sensor_triggered is True
+
         Exits when _running becomes False or system_running becomes False.
-        
+
         Returns:
             None
         """
@@ -197,6 +200,19 @@ class VisionFuser:
                 frame_height = frame_height
             )
 
+            # ── Write dominant cluster center to SystemState for ACT ──────────
+            # ACT's arm controller reads latest_fire_x/y as visual servoing feedback
+            # Values are normalized [0, 1] with (0.5, 0.5) = image center
+            # clusters[0] = first cluster (treated as dominant for now)
+            # TODO: verify clusters are sorted by danger_score before this is final
+            if clusters:
+                self._state.latest_fire_x = clusters[0].origin_x
+                self._state.latest_fire_y = clusters[0].origin_y
+            else:
+                # no fire detected → clear state so ACT doesn't act on stale data
+                self._state.latest_fire_x = None
+                self._state.latest_fire_y = None
+
             # ── Save frame to disk ────────────────────────────────────────────
             frame_url = self._save_frame(frame)
 
@@ -212,23 +228,22 @@ class VisionFuser:
     # assembles VisionSnapshot from FireDetector results
     # this is the contract between SEE and THINK — fills every field
     def snapshot(self, clusters: list, raw_detections: list, frame_url: str, frame_width: int, frame_height: int) -> VisionSnapshot:
-
         """
         Assemble VisionSnapshot from fire detection results.
-        
+
         Constructs the output data contract from raw detection data:
         - Counts fire and smoke detections
         - Computes area coverage statistics
         - Determines composite label (fire/smoke/both/none)
         - Packages all into VisionSnapshot for THINK layer
-        
+
         Args:
             clusters: List of FireCluster objects from FireDetector
             raw_detections: All Detection objects (unmerged, unfiltered)
             frame_url: URL where frame was saved
             frame_width: Frame width in pixels
             frame_height: Frame height in pixels
-        
+
         Returns:
             VisionSnapshot: Complete vision output snapshot
         """
@@ -291,13 +306,13 @@ class VisionFuser:
     def emit_trigger(self, snapshot: VisionSnapshot) -> None:
         """
         Emit VisionSnapshot to THINK layer.
-        
+
         Puts snapshot into see_queue where THINK layer will consume it.
         Called only when sensor_triggered is True (not for camera feed only).
-        
+
         Args:
             snapshot: VisionSnapshot to emit
-        
+
         Returns:
             None
         """
@@ -307,16 +322,15 @@ class VisionFuser:
     # saves captured frame to disk and returns its URL
     # URL is stored in VisionSnapshot so THINK can reference the image
     def _save_frame(self, frame) -> str:
-        
         """
         Save captured frame to disk and return its URL.
-        
+
         Creates frame storage directory if needed, saves frame with
         timestamp filename, and returns the web-accessible URL.
-        
+
         Args:
             frame: Numpy array frame from camera
-        
+
         Returns:
             str: Web URL to access the saved frame
         """
