@@ -29,9 +29,10 @@ class ActEngine:
     gates pump/alarm-type actuators.
     """
 
-    def __init__(self, config: dict, state: SystemState):
+    def __init__(self, config: dict, state: SystemState, notifier=None):
         self._config = config
         self._state = state
+        self._notifier = notifier
 
         act_cfg = config.get("act", {})
         sys_cfg = act_cfg.get("system", {})
@@ -227,6 +228,16 @@ class ActEngine:
                 f"pred_id={self._copilot_pending_pred_id}"
             )
             self._copilot_approved_pump = False
+            if self._notifier is not None:
+                from notify import EventType
+                self._notifier.notify(
+                    EventType.COPILOT_TIMEOUT,
+                    payload={
+                        "pred_id": self._copilot_pending_pred_id,
+                        "elapsed_s": elapsed,
+                    },
+                    source_layer="act",
+                )
             self._reset_copilot_wait()
 
     def _reset_copilot_wait(self) -> None:
@@ -241,8 +252,35 @@ class ActEngine:
     # ------------------------------------------------------------------
 
     def _notify(self, danger: int, actions: list, context: str) -> None:
-        # Once NotificationService is implemented, swap this for a real call.
+        """
+        Fire a notification for a fire-related event. The exact EventType
+        depends on the context string set by _handle_new_prediction.
+        """
+        from notify import EventType
+
+        # Map context → event type
+        if "auto-executing" in context:
+            event_type = EventType.PREDICTION_AUTO_EXECUTING
+        elif "copilot approval" in context:
+            event_type = EventType.COPILOT_APPROVAL_REQUESTED
+        elif "manual action required" in context:
+            event_type = EventType.SURVEILLANCE_MANUAL_NEEDED
+        else:
+            event_type = EventType.PREDICTION_AUTO_EXECUTING  # safe default
+
         logger.info(
             f"ActEngine: NOTIFY | danger={danger} | "
             f"actions={actions} | context={context}"
         )
+
+        if self._notifier is not None:
+            self._notifier.notify(
+                event_type,
+                payload={
+                    "danger_level": danger,
+                    "actions": actions,
+                    "context": context,
+                    "mode": self._state.system_mode.value,
+                },
+                source_layer="act",
+            )

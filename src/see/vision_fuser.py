@@ -57,7 +57,7 @@ class VisionFuser:
     # ── Init ──────────────────────────────────────────────────────────────────
     # receives config dict and SystemState from Orchestrator
     # reads vision section of config and builds camera + fire detector
-    def __init__(self, config: dict, state):
+    def __init__(self, config: dict, state, notifier=None):
         """
         Initialize VisionFuser with configuration.
 
@@ -105,6 +105,7 @@ class VisionFuser:
 
         # ── SystemState ───────────────────────────────────────────────────────
         self._state   = state                   # shared blackboard with all layers
+        self._notifier = notifier               # notification service
         self._queue   = state.see_queue         # where we put VisionSnapshot for THINK
 
         # ── Control flags ─────────────────────────────────────────────────────
@@ -128,7 +129,17 @@ class VisionFuser:
         """
 
         # start camera first — loads .rpk onto IMX500 chip
-        self._camera.start()
+        try:
+            self._camera.start()
+        except Exception as e:
+            if self._notifier is not None:
+                from notify import EventType
+                self._notifier.notify(
+                    EventType.CAMERA_FAILED_TO_START,
+                    payload={"error": f"{type(e).__name__}: {e}"},
+                    source_layer="see",
+                )
+            raise
 
         # NOW build fire detector — needs imx500 object from camera
         self._fire_detector = FireDetector(
@@ -343,7 +354,19 @@ class VisionFuser:
         filepath  = os.path.join(self._frame_path, filename)
 
         # save frame as jpg using OpenCV
-        cv2.imwrite(filepath, frame)
+        try:
+            ok = cv2.imwrite(filepath, frame)
+            if not ok:
+                raise IOError(f"cv2.imwrite returned False for {filepath}")
+        except Exception as e:
+            if self._notifier is not None:
+                from notify import EventType
+                self._notifier.notify(
+                    EventType.FRAME_STORAGE_FAILED,
+                    payload={"path": filepath, "error": f"{type(e).__name__}: {e}"},
+                    source_layer="see",
+                )
+            # don't re-raise; degraded but vision keeps running
 
         # return the URL that the website uses to serve this image
         return self._frame_url_prefix + filename

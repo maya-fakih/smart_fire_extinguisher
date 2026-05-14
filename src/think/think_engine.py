@@ -14,9 +14,10 @@ logger = logging.getLogger(__name__)
 
 
 class ThinkEngine:
-    def __init__(self, config: dict, state: SystemState):
+    def __init__(self, config: dict, state: SystemState, notifier=None):
         self._config = config
         self._state = state
+        self._notifier = notifier
         self._model: BaseModel = None
 
         think_cfg = self._config.get("think", {})
@@ -41,6 +42,13 @@ class ThinkEngine:
                 exc_info=True
             )
             self._state.db_connected = False
+            if self._notifier is not None:
+                from notify import EventType
+                self._notifier.notify(
+                    EventType.DATABASE_DISCONNECTED,
+                    payload={"error": str(e)},
+                    source_layer="think",
+                )
             raise
 
         self._load_model()
@@ -73,6 +81,13 @@ class ThinkEngine:
 
             except AlignmentError as e:
                 logger.warning(f"ThinkEngine: alignment error - {e}")
+                if self._notifier is not None:
+                    from notify import EventType
+                    self._notifier.notify(
+                        EventType.ALIGNMENT_DRIFT,
+                        payload={"error": str(e)},
+                        source_layer="think",
+                    )
                 continue
             except DatabaseError as e:
                 logger.error(
@@ -172,6 +187,13 @@ class ThinkEngine:
                 f"ThinkEngine: model loading failed - {type(e).__name__}: {e}",
                 exc_info=True
             )
+            if self._notifier is not None:
+                from notify import EventType
+                self._notifier.notify(
+                    EventType.MODEL_LOAD_FAILED,
+                    payload={"model": self._active_model, "error": str(e)},
+                    source_layer="think",
+                )
             raise
         except Exception as e:
             error_msg = f"Failed to load model '{active}': {e}"
@@ -179,4 +201,11 @@ class ThinkEngine:
                 f"ThinkEngine: model loading failed - {type(e).__name__}: {error_msg}",
                 exc_info=True
             )
+            if self._notifier is not None:
+                from notify import EventType
+                self._notifier.notify(
+                    EventType.MODEL_LOAD_FAILED,
+                    payload={"model": self._active_model, "error": error_msg},
+                    source_layer="think",
+                )
             raise ModelError(error_msg)
