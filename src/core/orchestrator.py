@@ -11,7 +11,7 @@ from sense import SensorFuser
 from see import VisionFuser
 from think import ThinkEngine
 from act import ActEngine
-from notify import NotificationService
+from notify import NotificationService, EventType
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +21,7 @@ class SystemOrchestrator:
     Entry point for the entire system.
     - Loads config.json
     - Creates SystemState (shared across all processes)
+    - Constructs the shared NotificationService and passes it to every layer
     - Spawns each layer as an independent OS process
     - Provides API for dashboard (set_mode, set_camera_feed, get_state_summary, etc.)
     """
@@ -32,11 +33,13 @@ class SystemOrchestrator:
         self._manager = None
         self._state = None
 
+        # Shared notifier — constructed once, passed to every layer.
+        self._notifier = None
+
         self._sensor_fuser = None
         self._vision_fuser = None
         self._think_engine = None
         self._act_engine = None
-        self._notifier = None
 
         self._sense_process = None
         self._see_process = None
@@ -45,6 +48,7 @@ class SystemOrchestrator:
 
         self._init_manager()
         self._init_state()
+        self._init_notifier()
         self._init_layers()
 
     # ------------------------------------------------------------------
@@ -92,12 +96,21 @@ class SystemOrchestrator:
             )
             raise StateInitError(f"Failed to initialize SystemState: {e}")
 
-    def _init_layers(self) -> None:
-        self._sensor_fuser = SensorFuser(self._config, self._state)
-        self._vision_fuser = VisionFuser(self._config, self._state)
-        self._think_engine = ThinkEngine(self._config, self._state)
-        self._act_engine = ActEngine(self._config, self._state)
+    def _init_notifier(self) -> None:
+        """
+        Construct the single NotificationService that all layers share.
+        Does not open the DB connection — that happens lazily on first notify().
+        """
         self._notifier = NotificationService(self._config)
+        logger.info("Orchestrator: NotificationService constructed")
+
+    def _init_layers(self) -> None:
+        # Each layer accepts the notifier so it can fire notifications
+        # directly at the source of any fault.
+        self._sensor_fuser = SensorFuser(self._config, self._state, self._notifier)
+        self._vision_fuser = VisionFuser(self._config, self._state, self._notifier)
+        self._think_engine = ThinkEngine(self._config, self._state, self._notifier)
+        self._act_engine   = ActEngine(self._config, self._state, self._notifier)
 
     # ------------------------------------------------------------------
     # Process lifecycle
@@ -106,6 +119,11 @@ class SystemOrchestrator:
     def start(self) -> None:
         logger.info("Orchestrator: starting system | spawning all processes")
         self._state.system_running = True
+        self._notifier.notify(
+            EventType.SYSTEM_STARTED,
+            payload={"mode": self._state.system_mode.value},
+            source_layer="orchestrator",
+        )
 
         self._sense_process = multiprocessing.Process(
             target=self._sensor_fuser.start,
@@ -150,12 +168,19 @@ class SystemOrchestrator:
                 logger.debug(f"Orchestrator: terminating {process.name}")
                 process.terminate()
                 process.join(timeout=2)
+
+        self._notifier.notify(
+            EventType.SYSTEM_STOPPED,
+            source_layer="orchestrator",
+        )
         logger.info("Orchestrator: all processes stopped")
 
     def shutdown(self) -> None:
         """Full teardown — call once on system exit, not on restarts."""
         logger.info("Orchestrator: full shutdown initiated")
         self.stop()
+        if self._notifier:
+            self._notifier.close()
         if self._manager:
             self._manager.shutdown()
             logger.info("Orchestrator: multiprocessing manager shutdown")
@@ -177,8 +202,14 @@ class SystemOrchestrator:
     def set_mode(self, mode: str) -> None:
         logger.debug(f"Orchestrator: set_mode requested | mode={mode}")
         try:
+            old_mode = self._state.system_mode.value
             self._state.system_mode = mode
             logger.info(f"Orchestrator: mode changed | mode={mode}")
+            self._notifier.notify(
+                EventType.MODE_CHANGED,
+                payload={"from": old_mode, "to": mode},
+                source_layer="orchestrator",
+            )
         except ValueError as e:
             logger.error(f"Orchestrator: invalid mode - {type(e).__name__}: {e}", exc_info=True)
             raise ModeError(f"Invalid mode: {e}")
@@ -223,6 +254,12 @@ class SystemOrchestrator:
         # Write the updated config to disk
         with open(self._config_path, 'w') as f:
             json.dump(self._config, f, indent=2)
+
+        self._notifier.notify(
+            EventType.CONFIG_UPDATED,
+            payload={"changes": list(changes.keys())},
+            source_layer="orchestrator",
+        )
 
         # Restart so layers pick up the new values
         self.restart_all()
