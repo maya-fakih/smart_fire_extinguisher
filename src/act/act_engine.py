@@ -112,6 +112,8 @@ class ActEngine:
             time.sleep(self._cycle_s)
 
     def _tick(self) -> None:
+        # we should dispatch manual commands only if mode is anything but autopilot
+        self._dispatch_manual_commands()
         sensor_active = self._state.sensor_triggered
         danger        = self._state.danger_level
         actions       = list(self._state.recommended_actions)
@@ -284,3 +286,55 @@ class ActEngine:
                 },
                 source_layer="act",
             )
+    # ------------------------------------------------------------------
+    # Manual command dispatch (website → ACT via SystemState queue)
+    # ------------------------------------------------------------------
+
+    def _dispatch_manual_commands(self) -> None:
+        """
+        Drain the manual_commands queue written by the Flask API.
+        Each command: {"action": str, "params": dict}
+
+        Actions:
+          - "pump_fire"  → activate pump
+          - "pump_stop"  → deactivate pump
+          - "arm_nudge"  → nudge arm in params["direction"]
+        """
+        import time as _time
+        try:
+            while not self._state.manual_commands.empty():
+                cmd = self._state.manual_commands.get_nowait()
+                action = cmd.get("action")
+                params = cmd.get("params", {})
+                logger.info(f"ActEngine: manual cmd | action={action} | params={params}")
+
+                if action == "pump_fire":
+                    pump = self._actuators.get("pump")
+                    if pump:
+                        try:
+                            pump.activate()
+                        except Exception as e:
+                            logger.error(f"manual pump_fire failed: {e}")
+
+                elif action == "pump_stop":
+                    pump = self._actuators.get("pump")
+                    if pump:
+                        try:
+                            pump.deactivate()
+                        except Exception as e:
+                            logger.error(f"manual pump_stop failed: {e}")
+
+                elif action == "arm_nudge":
+                    arm = self._actuators.get("arm")
+                    direction = params.get("direction")
+                    if arm and direction:
+                        self._state.arm_manual_mode_until = _time.time() + 3.0
+                        try:
+                            arm.nudge(direction)
+                        except Exception as e:
+                            logger.error(f"arm_nudge failed: {e}")
+                else:
+                    logger.warning(f"ActEngine: unknown manual command '{action}'")
+
+        except Exception as e:
+            logger.error(f"_dispatch_manual_commands error: {e}")
