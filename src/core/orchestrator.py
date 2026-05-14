@@ -265,6 +265,38 @@ class SystemOrchestrator:
         self.restart_all()
 
     # ------------------------------------------------------------------
+    # Manual hardware control (website → hardware via SystemState queue)
+    # ------------------------------------------------------------------
+
+    def manual_pump_fire(self) -> None:
+        self._state.manual_commands.put({"action": "pump_fire", "params": {}})
+        logger.info("Orchestrator: manual pump_fire queued")
+
+    def manual_pump_stop(self) -> None:
+        self._state.manual_commands.put({"action": "pump_stop", "params": {}})
+        logger.info("Orchestrator: manual pump_stop queued")
+
+    def manual_arm_nudge(self, direction: str) -> None:
+        valid = {"pan_left", "pan_right", "tilt_up", "tilt_down"}
+        if direction not in valid:
+            raise ValueError(f"Invalid direction '{direction}'. Must be one of {valid}")
+        self._state.manual_commands.put({"action": "arm_nudge", "params": {"direction": direction}})
+        logger.info(f"Orchestrator: arm_nudge queued | direction={direction}")
+
+    def toggle_sensor(self, sensor_name: str, enabled: bool) -> None:
+        overrides = dict(self._state.sensor_overrides)
+        overrides[sensor_name] = enabled
+        self._state.sensor_overrides.update(overrides)
+        logger.info(f"Orchestrator: sensor override | {sensor_name}={enabled}")
+
+    def set_copilot_decision(self, decision: str) -> None:
+        if decision not in ("approved", "rejected"):
+            raise ValueError(f"decision must be 'approved' or 'rejected', got {decision!r}")
+        self._state.copilot_decision = decision
+        logger.info(f"Orchestrator: copilot_decision set | {decision}")
+    
+    
+    # ------------------------------------------------------------------
     # Dashboard
     # ------------------------------------------------------------------
 
