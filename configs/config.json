@@ -82,6 +82,23 @@
       "max_retries": 3
     }
   },
+  "vision": {
+    "camera": {
+      "resolution": [640, 480],
+      "fps": 30
+    },
+    "models": {
+      "fire": {
+        "rpk": "model_weights/rpk/fire_smoke.rpk",
+        "conf_threshold": 0.5
+      }
+    },
+    "labels": "configs/labels.json",
+    "storage": {
+      "frame_image_path": "data/frames/",
+      "frame_url_prefix": "/frames/"
+    }
+  },
   "think": {
     "active_model": "xgboost",
     "model_weights_path": "model_weights/",
