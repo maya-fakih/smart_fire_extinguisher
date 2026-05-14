@@ -47,6 +47,17 @@ class SystemState:
 
         # ACT ↔ website
         self.copilot_decision = None
+        # Website → ACT: manual command queue (pump_fire, arm_nudge)
+        # Each entry: {"action": str, "params": dict}
+        self.manual_commands = manager.Queue()
+
+        # Website → SENSE: per-sensor soft enable/disable
+        self.sensor_overrides = manager.dict()
+
+        # Website → ACT: arm manual override expiry timestamp
+        # While time.time() < this value, tracking loop pauses.
+        self.arm_manual_mode_until = 0.0
+
 
     # --- bool ---
     @property
@@ -234,3 +245,11 @@ class SystemState:
                 f"{self._VALID_COPILOT_DECISIONS}, got {value!r}"
             )
         self._data['copilot_decision'] = value
+    
+    # --- arm manual override expiry (float timestamp) ---
+    @property
+    def arm_manual_mode_until(self) -> float:
+        return self._data.get('arm_manual_mode_until', 0.0)
+    @arm_manual_mode_until.setter
+    def arm_manual_mode_until(self, value: float):
+        self._data['arm_manual_mode_until'] = float(value)
