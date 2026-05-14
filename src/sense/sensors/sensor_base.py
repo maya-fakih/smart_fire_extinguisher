@@ -4,13 +4,9 @@ from abc import ABC, abstractmethod
 from typing import Any
 import time
 import logging
+from exceptions import SensorFaultError
 
 logger = logging.getLogger(__name__)
-
-
-class SensorFaultError(Exception):
-    """Custom exception raised when a sensor fails after all retries"""
-    pass
 
 
 class Sensor(ABC):
