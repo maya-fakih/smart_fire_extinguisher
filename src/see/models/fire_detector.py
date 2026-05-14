@@ -1,3 +1,16 @@
+"""
+Fire Detector Module - YOLO Inference Analysis.
+
+Analyzes YOLO inference results that come from the IMX500 camera chip.
+The YOLO model runs on-device (on the camera hardware), so this module
+just parses, filters, and clusters the detections into meaningful structures.
+
+Classes:
+    Detection: Single YOLO detection (one bounding box)
+    FireCluster: Group of connected fire/smoke detections
+    FireDetector: Main analyzer - parses YOLO metadata and clusters detections
+"""
+
 # this part is for fire detector, we analyze what we get from our YOLO trained Model
 # YOLO runs on-chip on the IMX500 camera — we just parse the results from metadata
 from dataclasses import dataclass
@@ -12,6 +25,15 @@ from vision_model_base import VisionModel
 # container for one single YOLO detection — one bounding box
 @dataclass
 class Detection:
+    """
+    Single YOLO detection representing one bounding box.
+    
+    Attributes:
+        label: Class name ("fire" or "smoke")
+        confidence: Confidence score from YOLO (0.0 to 1.0)
+        bbox: Bounding box as (x_center, y_center, width, height) in pixels
+        area_ratio: Fraction of frame area covered by this box
+    """
     label: str                              # "fire" or "smoke"
     confidence: float                       # how sure YOLO is, between 0 and 1
     bbox: tuple[int, int, int, int]         # (x, y, w, h) in pixels — x,y is CENTER
@@ -21,6 +43,30 @@ class Detection:
 # container for one fire cluster — a group of connected fire/smoke boxes
 @dataclass
 class FireCluster:
+    """
+    Cluster of connected fire/smoke detections.
+    
+    Uses connected components clustering: boxes are grouped if they intersect.
+    A fire spreading across multiple disconnected areas = multiple clusters.
+    Dangerous as it suggests fire is not localized.
+    
+    Attributes:
+        cluster_id: Unique identifier for this cluster
+        has_fire: Whether cluster contains fire detections
+        has_smoke: Whether cluster contains smoke detections
+        composite_label: Overall label ("fire", "smoke", or "fire_smoke")
+        fire_boxes: List of fire Detection objects in cluster
+        smoke_boxes: List of smoke Detection objects in cluster
+        box_count: Total number of boxes in cluster
+        origin_x: Average X coordinate of all boxes (cluster center)
+        origin_y: Average Y coordinate of all boxes (cluster center)
+        primary_bbox: Bounding box of most confident detection
+        total_area_ratio: Fraction of frame covered by cluster
+        fire_area_ratio: Fraction of frame covered by fire in cluster
+        smoke_area_ratio: Fraction of frame covered by smoke in cluster
+        primary_label: Label of most confident detection
+        primary_confidence: Average confidence across cluster
+    """
 
     # ── Identification ───────────────────────────────────────────────────────
     cluster_id: int                         # unique number for this cluster
@@ -60,11 +106,35 @@ class FireCluster:
 # YOLO runs ON the camera hardware — FireDetector just parses and analyzes results
 # inherits from VisionModel so it is forced to implement load()
 class FireDetector(VisionModel):
+    """
+    Analyzes YOLO fire/smoke detection results from IMX500 camera.
+    
+    The YOLO model runs on the IMX500 chip (on-device inference).
+    FireDetector receives the raw detection outputs and:
+    1. Filters by confidence threshold
+    2. Separates fire from smoke from other classes
+    3. Merges overlapping boxes of the same class
+    4. Clusters connected boxes into fire groups
+    5. Computes spatial and area statistics
+    
+    Attributes:
+        _imx500: IMX500 device object (owned by camera.py)
+        _conf_threshold: Minimum confidence to accept detection
+        _labels: Dict mapping class IDs to class names
+    """
 
     # ── Init ─────────────────────────────────────────────────────────────────
     # receives conf_threshold and labels from VisionFuser (who reads config)
     # imx500 object is passed in from camera.py — FireDetector does not own hardware
     def __init__(self, imx500: IMX500, conf_threshold: float, labels: dict):
+        """
+        Initialize FireDetector with configuration.
+        
+        Args:
+            imx500: IMX500 device object (owned by camera)
+            conf_threshold: Minimum confidence for detections (0.0-1.0)
+            labels: Dict mapping class ID to class name
+        """
         self._imx500        = imx500            # IMX500 object owned by camera.py
         self._conf_threshold = conf_threshold   # minimum confidence to accept a box
         self._labels        = labels            # class id → label name from config
@@ -74,12 +144,39 @@ class FireDetector(VisionModel):
     # nothing to load here — model is loaded by camera.py onto the IMX500 chip
     # we implement load() because VisionModel forces us to, but it does nothing
     def load(self) -> None:
+        """
+        Load model (no-op for FireDetector).
+        
+        The YOLO model is loaded by camera.py onto the IMX500 chip.
+        This method exists only to satisfy VisionModel interface contract.
+        """
         pass                                    # model loading happens in camera.py
 
     # ── Detect ───────────────────────────────────────────────────────────────
     # main method — parses IMX500 metadata, runs full analysis
     # returns (clusters, raw_detections) for VisionFuser to build VisionSnapshot
     def detect(self, metadata, frame_width: int, frame_height: int) -> tuple[list[FireCluster], list[Detection]]:
+
+        """
+        Main detection pipeline: parse YOLO → filter → merge → cluster.
+        
+        This is the primary entry point. It orchestrates the full pipeline:
+        1. Extract YOLO results from IMX500 metadata
+        2. Filter by confidence threshold
+        3. Merge overlapping boxes of same class
+        4. Cluster connected boxes (connected components)
+        5. Compute spatial and area statistics
+        
+        Args:
+            metadata: IMX500 metadata dict from camera capture
+            frame_width: Width of frame in pixels
+            frame_height: Height of frame in pixels
+        
+        Returns:
+            tuple[list[FireCluster], list[Detection]]:
+                - clusters: List of FireCluster objects (may be empty)
+                - raw_detections: All filtered detections (unmerged)
+        """
 
         # total pixel count of the frame — needed for area ratio calculations
         frame_area = frame_width * frame_height
@@ -162,6 +259,20 @@ class FireDetector(VisionModel):
     # used by _merge_boxes and _build_clusters
     def _boxes_intersect(self, a: Detection, b: Detection) -> bool:
 
+        """
+        Check if two bounding boxes intersect.
+        
+        Uses separating axis theorem: boxes overlap if they overlap
+        on both X and Y axes simultaneously.
+        
+        Args:
+            a: First Detection object
+            b: Second Detection object
+        
+        Returns:
+            bool: True if boxes overlap, False otherwise
+        """
+
         # convert center format (x,y,w,h) to edges
         a_left,  a_right  = a.bbox[0] - a.bbox[2]/2,  a.bbox[0] + a.bbox[2]/2
         a_top,   a_bottom = a.bbox[1] - a.bbox[3]/2,  a.bbox[1] + a.bbox[3]/2
@@ -180,6 +291,23 @@ class FireDetector(VisionModel):
     # ── Helper: merge two boxes into one bigger box that contains both ────────
     # takes highest confidence, keeps same label, recomputes area_ratio
     def _merge_two_boxes(self, a: Detection, b: Detection, frame_area: int) -> Detection:
+
+        """
+        Merge two overlapping boxes into one larger box.
+        
+        Creates the minimal bounding box that contains both input boxes.
+        Inherits the label from the input (assumes same label).
+        Takes the higher confidence score.
+        Recomputes area_ratio based on new size.
+        
+        Args:
+            a: First Detection object
+            b: Second Detection object
+            frame_area: Total frame area in pixels (for area_ratio computation)
+        
+        Returns:
+            Detection: Merged bounding box
+        """
 
         # get edges of both boxes
         a_left,  a_right  = a.bbox[0] - a.bbox[2]/2,  a.bbox[0] + a.bbox[2]/2
@@ -211,6 +339,20 @@ class FireDetector(VisionModel):
     # keeps looping until no intersecting pairs remain
     def _merge_boxes(self, boxes: list[Detection], frame_area: int) -> list[Detection]:
 
+        """
+        Merge all overlapping boxes in a list into non-overlapping groups.
+        
+        Iteratively merges pairs of intersecting boxes until no overlaps remain.
+        Boxes of the same class that touch get merged into larger boxes.
+        
+        Args:
+            boxes: List of Detection objects (all same class)
+            frame_area: Total frame area in pixels
+        
+        Returns:
+            list[Detection]: Reduced list of non-overlapping boxes
+        """
+
         merged = True
         while merged:
             merged = False
@@ -240,6 +382,18 @@ class FireDetector(VisionModel):
 
     # ── Helper: compute union area in pixels for a list of non-overlapping boxes
     def _compute_area_pixels(self, boxes: list[Detection]) -> float:
+        """
+        Compute total area covered by a list of non-overlapping boxes.
+        
+        Simple sum of individual box areas (safe since boxes don't overlap).
+        Returned as pixels, not normalized.
+        
+        Args:
+            boxes: List of Detection objects (assumed non-overlapping)
+        
+        Returns:
+            float: Total area in pixels
+        """
         total = 0.0
         for box in boxes:
             total += box.bbox[2] * box.bbox[3]      # w × h
@@ -249,6 +403,22 @@ class FireDetector(VisionModel):
     # ── Helper: compute union area in pixels for mixed boxes (fire + smoke) ───
     # subtracts overlapping regions between every unique pair to avoid double counting
     def _compute_union_area_pixels(self, all_boxes: list[Detection]) -> float:
+
+        """
+        Compute union area for potentially overlapping boxes.
+        
+        Uses inclusion-exclusion principle:
+        - Sum all box areas
+        - Subtract intersection areas to avoid double counting
+        
+        Works for mixed box types (fire + smoke together).
+        
+        Args:
+            all_boxes: List of Detection objects (may overlap)
+        
+        Returns:
+            float: Union area in pixels
+        """
 
         if not all_boxes:
             return 0.0
@@ -282,6 +452,31 @@ class FireDetector(VisionModel):
 
     # ── Helper: group merged fire and smoke boxes into FireCluster objects ────
     def _build_clusters(self, fire_boxes: list[Detection], smoke_boxes: list[Detection], frame_area: int, cluster_id: int = 0) -> list[FireCluster]:
+
+        """
+        Group overlapping fire and smoke boxes into connected components (clusters).
+        
+        Uses connected components algorithm (BFS) where boxes are connected if they
+        overlap. All directly or indirectly connected boxes form one cluster.
+        
+        Example: FireBox A touches SmokeBox B, SmokeBox B touches SmokeBox C
+                 → All three form one cluster even if A and C don't touch directly
+        
+        For each cluster, computes:
+        - Composition (has_fire, has_smoke)
+        - Center point (average of box centers)
+        - Area statistics (union, fire-only, smoke-only)
+        - Confidence metrics (average, primary)
+        
+        Args:
+            fire_boxes: List of fire Detection objects (already merged)
+            smoke_boxes: List of smoke Detection objects (already merged)
+            frame_area: Total frame area in pixels
+            cluster_id: Starting cluster ID (default 0)
+        
+        Returns:
+            list[FireCluster]: List of FireCluster objects (may be empty)
+        """
 
         # ── Connected Components Clustering ───────────────────────────────────────
         # treat ALL boxes (fire + smoke) as nodes in a graph

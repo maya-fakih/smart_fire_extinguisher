@@ -1,3 +1,10 @@
+"""
+Snapshot Data Classes - Output Contracts from SEE Layer.
+
+Defines the structured data types that represent the output of vision processing.
+These classes bridge the SEE (perception) and THINK (decision) layers.
+"""
+
 from dataclasses import dataclass, field
 from datetime import datetime
 
@@ -11,6 +18,22 @@ class VisionSnapshot:
     Built by VisionFuser from the latest readings across all active cameras.
     Labels are dynamic and set in config.json
     ThinkEngine extracts flat values from this to build ThinkSnapshot.
+    
+    Attributes:
+        timestamp: When this snapshot was captured
+        scene_label: Semantic scene classification (e.g., "indoor", "outdoor")
+        scene_confidence: Confidence in scene classification (0-1)
+        composite_label: Overall fire assessment ("fire", "smoke", "fire_smoke", "none")
+        glimpsed_fire: True if any fire box detected, even low confidence
+        human_near_fire: True if human and fire co-exist in same frame
+        fire_count: Number of fire bounding boxes
+        smoke_count: Number of smoke bounding boxes
+        fire_union_area: Fraction of frame covered by fire (corrected for overlap)
+        smoke_union_area: Fraction of frame covered by smoke (corrected for overlap)
+        cluster_count: Number of fire clusters (risk indicator)
+        fire_clusters: List of FireCluster objects ordered by danger score
+        image_url: URL to captured frame on storage
+        raw_detections: All Detection objects from YOLO (for transparency)
     """
 
     # all strings will be transformed to enums at the think layer
