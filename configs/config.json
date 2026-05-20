@@ -103,6 +103,12 @@
     "active_model": "xgboost",
     "model_weights_path": "model_weights/",
     "max_gap_ms": 500,
+    "max_event_gap_ms": 10000,
+    "training": {
+      "test_split": 0.2,
+      "min_rows_to_train": 20,
+      "random_state": 42
+    },
     "chain_length": 5,
     "poa_map": {
       "1": ["monitor"],
