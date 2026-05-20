@@ -16,6 +16,9 @@ class ThinkDatabase:
         self._config = config
         think_cfg = config.get("think", {})
         self._max_gap_ms = think_cfg.get("max_gap_ms", 500)
+        # Gap that separates one fire EVENT from a brand-new one. Much larger
+        # than max_gap_ms (which only covers SENSE↔SEE hardware-delay alignment).
+        self._max_event_gap_ms = think_cfg.get("max_event_gap_ms", 10000)
         self._chain_length = think_cfg.get("chain_length", 5)
         self._sensor_list = list(config.get("sensors", {}).keys())
         self._label_encoding = think_cfg.get("label_encoding", {})
@@ -121,8 +124,10 @@ class ThinkDatabase:
                     cur.execute("SELECT timestamp FROM think_schema WHERE id = %s", (self._last_row_id,))
                     current = cur.fetchone()
                     gap_ms = abs(current["timestamp"] - prev["timestamp"]) * 1000
-                    event_id = prev["event_id"] if gap_ms <= self._max_gap_ms else self._last_row_id
-                    logger.debug(f"Database: event_chain_gap | gap_ms={gap_ms} | max={self._max_gap_ms}")
+                    # New EVENT when the quiet gap exceeds max_event_gap_ms.
+                    # (Not max_gap_ms — that is only SENSE↔SEE alignment.)
+                    event_id = prev["event_id"] if gap_ms <= self._max_event_gap_ms else self._last_row_id
+                    logger.debug(f"Database: event_chain_gap | gap_ms={gap_ms} | max_event={self._max_event_gap_ms}")
                 else:
                     event_id = self._last_row_id
 
@@ -137,6 +142,166 @@ class ThinkDatabase:
                 exc_info=True
             )
             raise DatabaseError(f"Failed to assign event_id: {e}")
+
+    # --- training mode (human-driven, not the live pipeline) -----------------
+
+    def get_latest_event_id(self) -> int:
+        """
+        Return the most recent event_id in the table, or 0 if the table is empty.
+        Used by the training path to decide the default event_id (same as last)
+        or to generate a new one (last + 1).
+        """
+        try:
+            with self._connection.cursor() as cur:
+                cur.execute(
+                    "SELECT event_id FROM think_schema "
+                    "WHERE event_id IS NOT NULL ORDER BY id DESC LIMIT 1"
+                )
+                row = cur.fetchone()
+                return row["event_id"] if row and row["event_id"] is not None else 0
+        except Exception as e:
+            logger.error(f"Database: get_latest_event_id failed - {type(e).__name__}: {e}")
+            raise DatabaseError(f"Failed to read latest event_id: {e}")
+
+    def log_training_capture(self, snap, event_id: int) -> int:
+        """
+        Insert a raw snapshot row for training mode with an EXPLICIT event_id.
+
+        Unlike log_event(), this does NOT call _assign_event_id() — in training
+        mode the human controls event grouping (a 'new event' button on the
+        website), so the time-gap auto-grouping must not run. The caller passes
+        the event_id directly: same as the previous capture, or previous + 1.
+
+        Returns the new row id (needed so the website can later attach a label).
+        """
+        try:
+            params = self._snap_to_params(snap)
+            params["event_id"] = event_id
+            logger.debug(f"Database: inserting training capture | event_id={event_id}")
+            with self._connection.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO think_schema (
+                        event_id, timestamp,
+                        triggered_sensors, sensor_readings, sensor_normalized,
+                        composite_label, glimpsed_fire, human_near_fire,
+                        fire_count, smoke_count, fire_union_area, smoke_union_area,
+                        cluster_count, scene_label, scene_confidence,
+                        fire_clusters, raw_detections, frame_image_url
+                    ) VALUES (
+                        %(event_id)s, %(timestamp)s,
+                        %(triggered_sensors)s, %(sensor_readings)s, %(sensor_normalized)s,
+                        %(composite_label)s, %(glimpsed_fire)s, %(human_near_fire)s,
+                        %(fire_count)s, %(smoke_count)s, %(fire_union_area)s, %(smoke_union_area)s,
+                        %(cluster_count)s, %(scene_label)s, %(scene_confidence)s,
+                        %(fire_clusters)s, %(raw_detections)s, %(frame_image_url)s
+                    ) RETURNING id
+                """, params)
+                row_id = cur.fetchone()["id"]
+            self._connection.commit()
+            logger.info(f"Database: training_capture_inserted | row_id={row_id} | event_id={event_id}")
+            return row_id
+        except Exception as e:
+            self._connection.rollback()
+            logger.error(
+                f"Database: failed to log training capture - {type(e).__name__}: {e}",
+                exc_info=True
+            )
+            raise DatabaseError(f"Failed to log training capture: {e}")
+
+    def log_training_capture_labeled(self, snap, event_id: int,
+                                     true_danger_level: int,
+                                     true_action: str = None) -> int:
+        """
+        Insert a training-capture row with the human label already attached
+        and validated=TRUE — used by stream mode where the label is known at
+        capture time, saving a separate UPDATE roundtrip per row.
+
+        Same INSERT as log_training_capture plus the label columns.
+        """
+        danger_labels = {1: "MINIMAL", 2: "LOW", 3: "MODERATE",
+                         4: "HIGH",     5: "CRITICAL"}
+        danger_label  = danger_labels.get(true_danger_level, "UNKNOWN")
+        try:
+            params = self._snap_to_params(snap)
+            params["event_id"]          = event_id
+            params["true_danger_level"] = true_danger_level
+            params["true_action"]       = true_action
+            params["danger_label"]      = danger_label
+            logger.debug(
+                f"Database: inserting labeled training capture | "
+                f"event_id={event_id} | danger={true_danger_level}"
+            )
+            with self._connection.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO think_schema (
+                        event_id, timestamp,
+                        triggered_sensors, sensor_readings, sensor_normalized,
+                        composite_label, glimpsed_fire, human_near_fire,
+                        fire_count, smoke_count, fire_union_area, smoke_union_area,
+                        cluster_count, scene_label, scene_confidence,
+                        fire_clusters, raw_detections, frame_image_url,
+                        true_danger_level, true_action, danger_label, validated
+                    ) VALUES (
+                        %(event_id)s, %(timestamp)s,
+                        %(triggered_sensors)s, %(sensor_readings)s, %(sensor_normalized)s,
+                        %(composite_label)s, %(glimpsed_fire)s, %(human_near_fire)s,
+                        %(fire_count)s, %(smoke_count)s, %(fire_union_area)s, %(smoke_union_area)s,
+                        %(cluster_count)s, %(scene_label)s, %(scene_confidence)s,
+                        %(fire_clusters)s, %(raw_detections)s, %(frame_image_url)s,
+                        %(true_danger_level)s, %(true_action)s, %(danger_label)s, TRUE
+                    ) RETURNING id
+                """, params)
+                row_id = cur.fetchone()["id"]
+            self._connection.commit()
+            logger.info(
+                f"Database: labeled_capture_inserted | row_id={row_id} | "
+                f"event_id={event_id}"
+            )
+            return row_id
+        except Exception as e:
+            self._connection.rollback()
+            logger.error(
+                f"Database: failed to log labeled capture - {type(e).__name__}: {e}",
+                exc_info=True
+            )
+            raise DatabaseError(f"Failed to log labeled training capture: {e}")
+
+    def save_training_label(self, row_id: int, true_danger_level: int,
+                            true_action: str = None) -> None:
+        """
+        Attach a human label to a training-capture row, matched by the row's
+        unique primary-key id. Capture inserted the row and returned its id;
+        the website echoes that id back on save. Exact match, no ambiguity.
+
+        Sets: true_danger_level, true_action, danger_label, validated = TRUE.
+        """
+        danger_labels = {1: "MINIMAL", 2: "LOW", 3: "MODERATE", 4: "HIGH", 5: "CRITICAL"}
+        danger_label = danger_labels.get(true_danger_level, "UNKNOWN")
+        try:
+            logger.debug(
+                f"Database: saving training label | row_id={row_id} | "
+                f"true_danger_level={true_danger_level} ({danger_label})"
+            )
+            with self._connection.cursor() as cur:
+                cur.execute("""
+                    UPDATE think_schema
+                    SET true_danger_level = %s,
+                        true_action       = %s,
+                        danger_label      = %s,
+                        validated         = TRUE
+                    WHERE id = %s
+                """, (true_danger_level, true_action, danger_label, row_id))
+                if cur.rowcount == 0:
+                    raise DatabaseError(f"No think_schema row with id={row_id}")
+            self._connection.commit()
+            logger.info(f"Database: training_label_saved | row_id={row_id}")
+        except Exception as e:
+            self._connection.rollback()
+            logger.error(
+                f"Database: failed to save training label - {type(e).__name__}: {e}",
+                exc_info=True
+            )
+            raise DatabaseError(f"Failed to save training label: {e}")
 
     def update_prediction(self, danger_level: int, action: str) -> None:
         danger_labels = {1: "MINIMAL", 2: "LOW", 3: "MODERATE", 4: "HIGH", 5: "CRITICAL"}
@@ -162,29 +327,6 @@ class ThinkDatabase:
                 exc_info=True
             )
             raise DatabaseError(f"Failed to update prediction: {e}")
-
-    def update_human_label(self, true_danger: int, true_action: str = None) -> None:
-        try:
-            logger.debug(
-                f"Database: updating human label | row_id={self._last_row_id} | "
-                f"true_danger={true_danger} | true_action={true_action}"
-            )
-            with self._connection.cursor() as cur:
-                cur.execute("""
-                    UPDATE think_schema
-                    SET validated = TRUE,
-                        true_danger_level = %s,
-                        true_action = %s
-                    WHERE id = %s
-                """, (true_danger, true_action, self._last_row_id))
-            self._connection.commit()
-        except Exception as e:
-            self._connection.rollback()
-            logger.error(
-                f"Database: failed to update human label - {type(e).__name__}: {e}",
-                exc_info=True
-            )
-            raise DatabaseError(f"Failed to update human label: {e}")
 
     # --- read operations ---
 
@@ -430,5 +572,5 @@ class ThinkDatabase:
             "scene_confidence": v.scene_confidence if v else None,
             "fire_clusters": v.fire_clusters if v else None,
             "raw_detections": v.raw_detections if v else None,
-            "frame_image_url": v.frame_image_url if v else None,
+            "frame_image_url": v.image_url if v else None,
         }
