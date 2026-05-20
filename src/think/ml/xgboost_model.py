@@ -53,7 +53,12 @@ class XGBoostModel(BaseModel):
             return 1
         try:
             logger.debug(f"XGBoostModel: predicting | feature_count={len(features)}")
-            vals = list(features.values())
+            # Feature-ordering safety: sort by key so the column order here is
+            # identical to the column order used at fit() time. Both paths call
+            # build_feature_vector (same keys) then sorted() — guaranteed match.
+            # Without this, dict insertion order could silently desync train vs
+            # predict and XGBoost would learn garbage.
+            vals = [features[k] for k in sorted(features.keys())]
             X = np.array([vals])
             pred = self._model.predict(X)[0]
             danger_level = int(pred) + 1
@@ -72,6 +77,10 @@ class XGBoostModel(BaseModel):
             raise ModelError("No model to save")
         try:
             logger.debug(f"XGBoostModel: saving model | path={path}")
+            # Defensive: first-run case — the model_weights folder may not
+            # exist yet. xgboost.save_model raises on a missing parent dir.
+            import os
+            os.makedirs(path, exist_ok=True)
             self._model.save_model(f"{path}/xgboost_model.json")
             logger.info(f"XGBoostModel: model saved | path={path}/xgboost_model.json")
         except Exception as e:
