@@ -294,6 +294,215 @@ class SystemOrchestrator:
             raise ValueError(f"decision must be 'approved' or 'rejected', got {decision!r}")
         self._state.copilot_decision = decision
         logger.info(f"Orchestrator: copilot_decision set | {decision}")
+
+    # ------------------------------------------------------------------
+    # Training mode (website → THINK via SystemState queues)
+    # ------------------------------------------------------------------
+
+    def get_system_mode(self) -> str:
+        """Current system mode as a plain string."""
+        return self._state.system_mode.value
+
+    def is_recording(self) -> bool:
+        """Is a training-recording session active right now."""
+        return bool(self._state.training_recording)
+
+    def get_recording_event_id(self) -> int:
+        """event_id of the current/last recording (0 if never started)."""
+        return self._state.training_event_id
+
+    def training_capture(self, same_event: bool, target_ts: float = None,
+                         timeout_s: float = 5.0) -> dict:
+        """
+        Request a training capture from the THINK process and wait for the result.
+
+        target_ts (unix epoch float) anchors the align scan to a moment in
+        time — typically "latest SEE timestamp at the moment of click", read
+        from SystemState by the API route. When omitted, THINK falls back to
+        a live-style align (popping the queues) which is used by tests only.
+
+        Returns the response dict {"ok": bool, "result": dict|None, "error": str|None}.
+        Raises TimeoutError if THINK does not answer within timeout_s.
+        """
+        import uuid, time
+
+        request_id = str(uuid.uuid4())
+        self._state.training_capture_request.put({
+            "request_id": request_id,
+            "same_event": same_event,
+            "target_ts":  target_ts,
+        })
+        logger.debug(f"Orchestrator: training capture queued | request_id={request_id}")
+
+        deadline = time.time() + timeout_s
+        while time.time() < deadline:
+            try:
+                resp = self._state.training_capture_response.get_nowait()
+            except Exception:
+                time.sleep(0.02)
+                continue
+
+            if resp.get("request_id") != request_id:
+                # Not ours — another concurrent capture. Put it back.
+                self._state.training_capture_response.put(resp)
+                time.sleep(0.02)
+                continue
+
+            return resp
+
+        raise TimeoutError(
+            f"training capture timed out after {timeout_s}s "
+            f"(request_id={request_id})"
+        )
+
+    def training_save_label(self, row_id: int, true_danger_level: int,
+                            true_action: str = None) -> None:
+        """
+        Queue a human training label for THINK to write to the DB.
+
+        Fire-and-forget: returns immediately so the website is not blocked on
+        the DB write. THINK drains training_label_queue on its own loop.
+        """
+        self._state.training_label_queue.put({
+            "row_id": row_id,
+            "true_danger_level": true_danger_level,
+            "true_action": true_action,
+        })
+        logger.info(f"Orchestrator: training label queued | row_id={row_id}")
+
+    def training_recording_start(self, same_event: bool,
+                                 timeout_s: float = 5.0) -> dict:
+        """
+        Begin a recording session.
+
+        Decides event_id by asking THINK (it owns the live DB connection) via
+        the existing training_capture queue mechanism — we reuse it as a small
+        round-trip without doing a capture. Then flips recording on.
+        """
+        if self._state.training_recording:
+            raise RuntimeError("recording is already active — stop it first")
+
+        # Ask THINK to compute the next event_id. We piggyback on the capture
+        # queue with a special flag so THINK does NOT actually do a capture —
+        # see ThinkEngine._service_capture_requests.
+        import uuid, time
+        request_id = str(uuid.uuid4())
+        self._state.training_capture_request.put({
+            "request_id":   request_id,
+            "same_event":   same_event,
+            "event_id_only": True,        # do not capture, only return event_id
+        })
+        deadline = time.time() + timeout_s
+        resp = None
+        while time.time() < deadline:
+            try:
+                r = self._state.training_capture_response.get_nowait()
+            except Exception:
+                time.sleep(0.02); continue
+            if r.get("request_id") != request_id:
+                self._state.training_capture_response.put(r)
+                time.sleep(0.02); continue
+            resp = r; break
+        if resp is None:
+            raise TimeoutError("recording_start: THINK did not answer")
+        if not resp.get("ok"):
+            raise RuntimeError(f"recording_start: {resp.get('error')}")
+
+        self._state.training_event_id = resp["result"]["event_id"]
+        self._state.training_recording = True
+        logger.info(
+            f"Orchestrator: recording started | event_id={self._state.training_event_id} "
+            f"| same_event={same_event}"
+        )
+        return {
+            "ok": True,
+            "event_id": self._state.training_event_id,
+            "same_event": same_event,
+            "recording": True,
+        }
+
+    def training_recording_stop(self) -> dict:
+        """
+        Stop the current recording session. THINK stops consuming the queues
+        in training mode (back to capture-only). The label-stream queue is
+        drained so a stale tail label doesn't leak into the next recording.
+        """
+        if not self._state.training_recording:
+            return {"ok": True, "recording": False, "note": "was not recording"}
+
+        self._state.training_recording = False
+        # Drain any unused labels so the next recording starts clean.
+        drained = 0
+        while not self._state.training_label_stream.empty():
+            try:
+                self._state.training_label_stream.get_nowait()
+                drained += 1
+            except Exception:
+                break
+        logger.info(
+            f"Orchestrator: recording stopped | event_id={self._state.training_event_id} "
+            f"| drained_unused_labels={drained}"
+        )
+        return {
+            "ok": True,
+            "recording": False,
+            "event_id": self._state.training_event_id,
+            "drained_unused_labels": drained,
+        }
+
+    def training_recording_push_label(self, true_danger_level: int,
+                                      true_action: str = None,
+                                      valid_until: float = None) -> None:
+        """
+        Push a label onto the recording's label stream. Applies to every row
+        whose timestamp < valid_until. With valid_until=None the label applies
+        until a new label arrives (open-ended head).
+        """
+        self._state.training_label_stream.put({
+            "true_danger_level": true_danger_level,
+            "true_action":       true_action,
+            "valid_until":       valid_until,
+        })
+        logger.info(
+            f"Orchestrator: recording label pushed | danger={true_danger_level} "
+            f"| valid_until={valid_until}"
+        )
+
+    def train_model(self, timeout_s: float = 120.0) -> dict:
+        """
+        Request model training from the THINK process and wait for the result.
+
+        Training runs inside THINK (it owns the DB + model). This pushes a
+        request onto train_request and blocks on train_response until THINK
+        answers. Training can take seconds — timeout is generous (default 120s).
+
+        Returns the response dict {"ok": bool, "result": dict|None, "error": str|None}.
+        Raises TimeoutError if THINK does not answer in time.
+        """
+        import uuid, time
+
+        request_id = str(uuid.uuid4())
+        self._state.train_request.put({"request_id": request_id})
+        logger.info(f"Orchestrator: train request queued | request_id={request_id}")
+
+        deadline = time.time() + timeout_s
+        while time.time() < deadline:
+            try:
+                resp = self._state.train_response.get_nowait()
+            except Exception:
+                time.sleep(0.05)
+                continue
+
+            if resp.get("request_id") != request_id:
+                self._state.train_response.put(resp)
+                time.sleep(0.05)
+                continue
+
+            return resp
+
+        raise TimeoutError(
+            f"model training timed out after {timeout_s}s (request_id={request_id})"
+        )
     
     
     # ------------------------------------------------------------------
