@@ -230,9 +230,14 @@ class VisionFuser:
             # ── Assemble VisionSnapshot ───────────────────────────────────────
             snap = self.snapshot(clusters, raw_detections, frame_url, frame_width, frame_height)
 
-            # ── Emit to see_queue only if sensor is triggered ─────────────────
-            # if only camera_feed_active → stream to website but don't send to THINK
-            if self._state.sensor_triggered:
+            # ── Emit to see_queue when SEE is active for any reason ───────────
+            # sensor_triggered  → live pipeline needs the snapshot
+            # camera_feed_active → user has the camera on (training or just
+            #                      monitoring) — emit so THINK can align for
+            #                      training captures and so SystemState's
+            #                      latest_fire_x/y feed ACT for arm tracking.
+            # The frame is also written to stream.jpg by _save_frame.
+            if self._state.sensor_triggered or self._state.camera_feed_active:
                 self.emit_trigger(snap)
 
     # ── Snapshot ──────────────────────────────────────────────────────────────
@@ -339,6 +344,10 @@ class VisionFuser:
         Creates frame storage directory if needed, saves frame with
         timestamp filename, and returns the web-accessible URL.
 
+        Also overwrites stream.jpg atomically (temp + os.replace) when
+        camera_feed_active is True — this is the rolling buffer that
+        powers the MJPEG feed. One file, always overwritten, no accumulation.
+
         Args:
             frame: Numpy array frame from camera
 
@@ -346,14 +355,12 @@ class VisionFuser:
             str: Web URL to access the saved frame
         """
 
-        # create storage folder if it doesn't exist
         os.makedirs(self._frame_path, exist_ok=True)
 
-        # filename = timestamp so every frame has a unique name
+        # ── Timestamped frame (permanent, tied to sensor-triggered events) ────
         filename  = f"{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jpg"
         filepath  = os.path.join(self._frame_path, filename)
 
-        # save frame as jpg using OpenCV
         try:
             ok = cv2.imwrite(filepath, frame)
             if not ok:
@@ -366,7 +373,19 @@ class VisionFuser:
                     payload={"path": filepath, "error": f"{type(e).__name__}: {e}"},
                     source_layer="see",
                 )
-            # don't re-raise; degraded but vision keeps running
 
-        # return the URL that the website uses to serve this image
+        # ── Stream buffer (rolling, overwrites every frame) ───────────────────
+        # Only written when camera feed is active (toggled from website).
+        # Uses temp + os.replace for atomic write — no torn frames on read.
+        if self._state.camera_feed_active:
+            stream_path = os.path.join(self._frame_path, "stream.jpg")
+            tmp_path    = os.path.join(self._frame_path, "stream.tmp.jpg")
+            try:
+                ok = cv2.imwrite(tmp_path, frame)
+                if ok:
+                    os.replace(tmp_path, stream_path)
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(f"stream.jpg write failed: {e}")
+
         return self._frame_url_prefix + filename
