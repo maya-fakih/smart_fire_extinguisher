@@ -80,12 +80,51 @@ def label_prediction(pred_id: int):
 @predictions_bp.route("/api/train", methods=["POST"])
 def train_model():
     """
-    Trigger XGBoost training on all validated rows.
-    TODO (deferred): wire into XGBoostModel.fit() — requires loading
-    labeled rows, building feature matrix, calling fit, saving weights.
-    Stub for now so frontend can be built against it.
+    Asynchronously trigger model training.
+
+    Returns 202 Accepted with {"job_id": ..., "status": "running"} so the
+    frontend can poll /api/train/status/<job_id> instead of holding the HTTP
+    connection open for up to ~120s.
+
+    Returns 409 Conflict if another training job is already running. Only
+    one job at a time is allowed — the underlying THINK queue serializes
+    them anyway, returning a fresh job_id for one that's secretly queued
+    would just confuse the UI.
     """
-    return jsonify({
-        "ok": False,
-        "error": "training pipeline not yet wired — see project_state_overview.md"
-    }), 501
+    try:
+        registry = current_app.config["TRAIN_JOBS"]
+        job_id = registry.submit()
+        return jsonify({"job_id": job_id, "status": "running"}), 202
+    except Exception as e:
+        # TrainingAlreadyRunning lives in train_jobs.py — checked by class name
+        # to avoid an import that pulls the registry module into route-import time.
+        if type(e).__name__ == "TrainingAlreadyRunning":
+            running_id = getattr(e, "running_job_id", None)
+            return jsonify({
+                "error": "training already running",
+                "running_job_id": running_id,
+            }), 409
+        logger.error(f"POST /api/train: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+@predictions_bp.route("/api/train/status/<job_id>", methods=["GET"])
+def train_status(job_id):
+    """
+    Poll the state of a training job.
+
+    Response shapes:
+      running -> 200 {"job_id", "status": "running", "started_at"}
+      done    -> 200 {"job_id", "status": "done",    "started_at", "ended_at", "result": {...metrics, rows_used, ...}}
+      failed  -> 200 {"job_id", "status": "failed",  "started_at", "ended_at", "error": "..."}
+      not found / evicted -> 404
+    """
+    try:
+        registry = current_app.config["TRAIN_JOBS"]
+        job = registry.get(job_id)
+        if job is None:
+            return jsonify({"error": "job not found", "job_id": job_id}), 404
+        return jsonify(job), 200
+    except Exception as e:
+        logger.error(f"GET /api/train/status/{job_id}: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500

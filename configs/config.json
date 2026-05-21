@@ -177,5 +177,9 @@
         "cycle_idle_ms": 500
       }
     }
+  },
+  "api": {
+    "train_job_history_size": 50,
+    "train_job_timeout_s": 120.0
   }
 }

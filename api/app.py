@@ -11,11 +11,22 @@ from routes.predictions import predictions_bp
 from routes.analytics import analytics_bp
 from routes.camera import camera_bp
 from db import init_app as init_db
+from train_jobs import TrainJobRegistry
 
 
 def create_app(orchestrator) -> Flask:
     app = Flask(__name__)
     app.config["ORCHESTRATOR"] = orchestrator
+
+    # Async-training jobs registry. Read sizing from the orchestrator's
+    # already-loaded config so we don't reparse config.json here.
+    api_cfg = orchestrator.get_config_section("api")
+    app.config["TRAIN_JOBS"] = TrainJobRegistry(
+        orchestrator,
+        history_size      = api_cfg.get("train_job_history_size", 50),
+        default_timeout_s = api_cfg.get("train_job_timeout_s", 120.0),
+    )
+
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     init_db(app)
