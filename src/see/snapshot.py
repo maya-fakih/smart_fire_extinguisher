@@ -40,8 +40,6 @@ class VisionSnapshot:
     # since xgboost works only with numeric data
     # all labels are defined in config.json so all models know what to expect
 
-    timestamp: datetime = field(default_factory=datetime.now)
-
     # scene understanding
     scene_label: str
     scene_confidence: str
@@ -71,6 +69,7 @@ class VisionSnapshot:
 
     raw_detections: list    # list of type Detection includes everything yolo returns for all selected bbxs
     
+    timestamp: datetime = field(default_factory=datetime.now)
 
 
     
