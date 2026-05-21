@@ -16,7 +16,7 @@ class ThinkEngine:
     def __init__(self, config: dict, state: SystemState, notifier=None):
         self._config        = config
         self._state         = state
-        self._notifiaer      = notifier
+        self._notifier      = notifier
         self._model: BaseModel = None
 
         think_cfg            = self._config.get("think", {})
