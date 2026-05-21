@@ -53,8 +53,8 @@ def label_prediction(pred_id: int):
         if "true_danger_level" not in body:
             return jsonify({"error": "missing 'true_danger_level'"}), 400
         tdl = int(body["true_danger_level"])
-        if tdl not in range(0, 6):
-            return jsonify({"error": "true_danger_level must be 0-5"}), 400
+        if tdl not in range(1, 6):
+            return jsonify({"error": "true_danger_level must be 1-5"}), 400
         ta = body.get("true_action")
 
         db = get_db()
