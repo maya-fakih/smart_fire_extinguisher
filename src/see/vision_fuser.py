@@ -101,8 +101,7 @@ class VisionFuser:
 
         # ── Storage settings ──────────────────────────────────────────────────
         self._frame_path       = storage_cfg["frame_image_path"]
-        self._frame_url_prefix = storage_cfg["frame_image_url_prefix"]
-
+        self._frame_url_prefix = storage_cfg["frame_url_prefix"]
         # ── SystemState ───────────────────────────────────────────────────────
         self._state   = state                   # shared blackboard with all layers
         self._notifier = notifier               # notification service
