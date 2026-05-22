@@ -287,10 +287,9 @@ class ThinkDatabase:
                     UPDATE think_schema
                     SET true_danger_level = %s,
                         true_action       = %s,
-                        danger_label      = %s,
                         validated         = TRUE
                     WHERE id = %s
-                """, (true_danger_level, true_action, danger_label, row_id))
+                """, (true_danger_level, true_action, row_id))
                 if cur.rowcount == 0:
                     raise DatabaseError(f"No think_schema row with id={row_id}")
             self._connection.commit()
