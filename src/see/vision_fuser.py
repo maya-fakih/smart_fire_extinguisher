@@ -269,14 +269,14 @@ class VisionFuser:
         fire_count  = sum(1 for d in raw_detections if d.label == "fire")
         smoke_count = sum(1 for d in raw_detections if d.label == "smoke")
 
-        # ── Union areas across ALL detections ─────────────────────────────────
-        fire_union_area  = sum(
-            d.bbox[2] * d.bbox[3] for d in raw_detections if d.label == "fire"
-        ) / frame_area
-
-        smoke_union_area = sum(
-            d.bbox[2] * d.bbox[3] for d in raw_detections if d.label == "smoke"
-        ) / frame_area
+        # ── Union areas across ALL detections (overlap-corrected) ─────────────
+        # Delegates to FireDetector's union helper (Shapely-backed plane sweep).
+        # The previous implementation summed raw areas which double-counted
+        # any overlap — fixed as part of BUG-8.
+        fire_boxes       = [d for d in raw_detections if d.label == "fire"]
+        smoke_boxes      = [d for d in raw_detections if d.label == "smoke"]
+        fire_union_area  = self._fire_detector._compute_union_area_pixels(fire_boxes)  / frame_area
+        smoke_union_area = self._fire_detector._compute_union_area_pixels(smoke_boxes) / frame_area
 
         # ── Composite label ───────────────────────────────────────────────────
         # what did we find overall in this frame?
