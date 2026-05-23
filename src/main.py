@@ -25,6 +25,10 @@ def parse_args():
 
 
 def setup_logging(config_path: str) -> None:
+    # BUG-11 fix: ensure the logs directory exists before logging.dictConfig
+    # tries to open the RotatingFileHandler. Without this, the file handler
+    # silently fails on fresh deployments and we lose all file logging.
+    os.makedirs("logs", exist_ok=True)
     try:
         with open(config_path, "r") as f:
             config = json.load(f)
