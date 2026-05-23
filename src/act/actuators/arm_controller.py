@@ -53,6 +53,17 @@ class ArmController(Actuator):
         self._heat_use_threshold = float(feedback.get("heat_use_threshold_c", 35.0))
         self._tolerance          = float(feedback.get("tolerance_normalized", 0.1))
 
+        # Per-sensor bias in normalized space (added to that sensor's error
+        # vector before fusion). Calibrate by trial and error — these are
+        # corrections, not physical offsets.
+        offsets = feedback.get("sensor_offsets", {}) or {}
+        heat_off   = offsets.get("heat",   {}) or {}
+        camera_off = offsets.get("camera", {}) or {}
+        self._heat_bias_x   = float(heat_off.get("x_bias",   0.0))
+        self._heat_bias_y   = float(heat_off.get("y_bias",   0.0))
+        self._camera_bias_x = float(camera_off.get("x_bias", 0.0))
+        self._camera_bias_y = float(camera_off.get("y_bias", 0.0))
+
         self._cycle_active_ms = int(config.get("cycle_active_ms", 100))
         self._cycle_idle_ms   = int(config.get("cycle_idle_ms",   500))
 
@@ -176,17 +187,39 @@ class ArmController(Actuator):
 
     def _compute_error(self) -> Optional[tuple]:
         """
-        Hierarchical: heat first if it has a real peak, else camera, else None.
+        Three-mode fusion of heat and camera signals:
+          - both available    → average of (heat + heat_bias) and (camera + camera_bias)
+          - heat only         → heat + heat_bias
+          - camera only       → camera + camera_bias
+          - neither           → None
+
+        "Available" = the sensor's error function returned non-None.
+        For heat that means a peak above heat_use_threshold_c.
+        For camera that means latest_fire_x/y are both not None (SEE is
+        running AND a fire cluster was detected).
+
         Returns (err_x, err_y) normalized to [-1, +1] or None.
         """
-        heat_err = self._heat_error(self._state.latest_heat_matrix)
-        if heat_err is not None:
-            return heat_err
-
-        cam_err = self._camera_error(
+        heat_raw   = self._heat_error(self._state.latest_heat_matrix)
+        camera_raw = self._camera_error(
             self._state.latest_fire_x, self._state.latest_fire_y
         )
-        return cam_err
+
+        if heat_raw is not None and camera_raw is not None:
+            heat_corr   = (heat_raw[0]   + self._heat_bias_x,   heat_raw[1]   + self._heat_bias_y)
+            camera_corr = (camera_raw[0] + self._camera_bias_x, camera_raw[1] + self._camera_bias_y)
+            return (
+                (heat_corr[0] + camera_corr[0]) / 2.0,
+                (heat_corr[1] + camera_corr[1]) / 2.0,
+            )
+
+        if heat_raw is not None:
+            return (heat_raw[0] + self._heat_bias_x, heat_raw[1] + self._heat_bias_y)
+
+        if camera_raw is not None:
+            return (camera_raw[0] + self._camera_bias_x, camera_raw[1] + self._camera_bias_y)
+
+        return None
 
     def _heat_error(self, heat) -> Optional[tuple]:
         if heat is None or len(heat) == 0:
