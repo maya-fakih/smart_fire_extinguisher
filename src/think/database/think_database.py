@@ -2,6 +2,7 @@
 
 import os
 import time
+import shutil
 import logging
 import psycopg2
 import numpy as np
@@ -22,6 +23,15 @@ class ThinkDatabase:
         self._chain_length = think_cfg.get("chain_length", 5)
         self._sensor_list = list(config.get("sensors", {}).keys())
         self._label_encoding = think_cfg.get("label_encoding", {})
+
+        # Permanent frame storage (SSD / external drive). Empty string means
+        # "no permanent storage configured" — DB rows get frame_image_url=NULL
+        # and we log a soft warning. See _persist_frame() below.
+        storage_cfg = config.get("vision", {}).get("storage", {})
+        self._frame_permanent_path = storage_cfg.get("frame_permanent_path", "") or ""
+        self._frame_url_prefix     = storage_cfg.get("frame_url_prefix",     "/frames/")
+        # Source location where SEE wrote the frame (also where _save_frame lives).
+        self._frame_source_path    = storage_cfg.get("frame_image_path",     "data/frames/")
 
         self._connection = None
         self._connected = False
@@ -273,7 +283,7 @@ class ThinkDatabase:
         unique primary-key id. Capture inserted the row and returned its id;
         the website echoes that id back on save. Exact match, no ambiguity.
 
-        Sets: true_danger_level, true_action, danger_label, validated = TRUE.
+        Sets: true_danger_level, true_action, validated = TRUE.
         """
         danger_labels = {1: "MINIMAL", 2: "LOW", 3: "MODERATE", 4: "HIGH", 5: "CRITICAL"}
         danger_label = danger_labels.get(true_danger_level, "UNKNOWN")
@@ -549,9 +559,76 @@ class ThinkDatabase:
 
     # --- helpers ---
 
+    def _persist_frame(self, image_url: str) -> "str | None":
+        """
+        Copy the temp frame at image_url to the configured permanent path.
+
+        image_url is whatever SEE put into VisionSnapshot.image_url — currently
+        '{frame_url_prefix}{filename}' (e.g. '/frames/2026...jpg'). We strip
+        the prefix to get the bare filename, look it up under frame_source_path,
+        and copy it to frame_permanent_path.
+
+        Soft-fail behavior (per your design call):
+          - frame_permanent_path empty → return None silently (no SSD configured)
+          - source file missing       → log warning, return None
+          - permanent dir missing     → try to create it; if that fails, log + None
+          - copy fails for any reason → log warning, return None
+
+        Returns the permanent URL (frame_url_prefix + filename) on success,
+        or None on any failure. The caller writes None into frame_image_url.
+        """
+        if not image_url:
+            return None
+        if not self._frame_permanent_path:
+            # Permanent storage not configured. Quietly skip — this is the
+            # documented "I don't care about the images" mode.
+            return None
+
+        # Strip URL prefix to get the bare filename. The url shape is
+        # '{frame_url_prefix}{filename}', so a safe way is to take basename().
+        filename = os.path.basename(image_url)
+        if not filename:
+            logger.warning(f"Database: cannot persist frame, empty filename from url={image_url!r}")
+            return None
+
+        src = os.path.join(self._frame_source_path, filename)
+        if not os.path.exists(src):
+            # Source has already rolled out of SEE's working dir, or never
+            # existed (URL points at a frame that wasn't actually saved).
+            logger.warning(f"Database: frame source missing | src={src}")
+            return None
+
+        # Make sure destination dir exists. If the SSD isn't mounted this will
+        # often fail with PermissionError or OSError — soft-fail to NULL.
+        try:
+            os.makedirs(self._frame_permanent_path, exist_ok=True)
+        except Exception as e:
+            logger.warning(
+                f"Database: cannot create permanent frame dir | "
+                f"path={self._frame_permanent_path} | error={type(e).__name__}: {e}"
+            )
+            return None
+
+        dst = os.path.join(self._frame_permanent_path, filename)
+        try:
+            shutil.copy2(src, dst)
+        except Exception as e:
+            logger.warning(
+                f"Database: frame copy failed | src={src} dst={dst} | "
+                f"error={type(e).__name__}: {e}"
+            )
+            return None
+
+        return self._frame_url_prefix + filename
+
     def _snap_to_params(self, snap) -> dict:
         s = snap.sensor_snapshot
         v = snap.vision_snapshot
+
+        # Persist the frame (copy from SEE's temp dir to permanent SSD path)
+        # exactly once, when we're about to write the row. If persistence fails
+        # for any reason the row still goes in — just with frame_image_url=NULL.
+        permanent_url = self._persist_frame(v.image_url) if v else None
 
         return {
             "event_id": None,
@@ -571,5 +648,5 @@ class ThinkDatabase:
             "scene_confidence": v.scene_confidence if v else None,
             "fire_clusters": v.fire_clusters if v else None,
             "raw_detections": v.raw_detections if v else None,
-            "frame_image_url": v.image_url if v else None,
+            "frame_image_url": permanent_url,
         }
