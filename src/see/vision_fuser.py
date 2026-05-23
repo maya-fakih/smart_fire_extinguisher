@@ -102,6 +102,7 @@ class VisionFuser:
         # ── Storage settings ──────────────────────────────────────────────────
         self._frame_path       = storage_cfg["frame_image_path"]
         self._frame_url_prefix = storage_cfg["frame_url_prefix"]
+
         # ── SystemState ───────────────────────────────────────────────────────
         self._state   = state                   # shared blackboard with all layers
         self._notifier = notifier               # notification service
@@ -275,8 +276,8 @@ class VisionFuser:
         # any overlap — fixed as part of BUG-8.
         fire_boxes       = [d for d in raw_detections if d.label == "fire"]
         smoke_boxes      = [d for d in raw_detections if d.label == "smoke"]
-        fire_union_area  = self._fire_detector._compute_union_area_pixels(fire_boxes)  / frame_area
-        smoke_union_area = self._fire_detector._compute_union_area_pixels(smoke_boxes) / frame_area
+        fire_union_area  = self._fire_detector.compute_union_area_pixels(fire_boxes)  / frame_area
+        smoke_union_area = self._fire_detector.compute_union_area_pixels(smoke_boxes) / frame_area
 
         # ── Composite label ───────────────────────────────────────────────────
         # what did we find overall in this frame?
