@@ -1,5 +1,5 @@
 -include .env
-export DB_HOST DB_PORT DB_NAME DB_USER DB_PASS
+export DB_HOST DB_PORT DB_NAME DB_USER DB_PASS YOLO_MODEL_REPO
 
 VENV_DIR := $(abspath ../fyp_env)
 VENV := $(VENV_DIR)
@@ -52,17 +52,19 @@ re: fclean install-dev
 setup:
 	@echo "Create a .env file in the project root with the following variables:"
 	@echo ""
-	@echo "  DB_HOST=localhost"
+	@echo "  DB_HOST=db.xxx.supabase.co     ← your Supabase DB host"
 	@echo "  DB_PORT=5432"
-	@echo "  DB_NAME=smart_fire"
-	@echo "  DB_USER=your_db_user          ← change this"
-	@echo "  DB_PASS=your_db_password      ← change this, do NOT use something obvious"
+	@echo "  DB_NAME=postgres"
+	@echo "  DB_USER=postgres"
+	@echo "  DB_PASS=your_db_password       ← your Supabase DB password"
+	@echo ""
+	@echo "  YOLO_MODEL_REPO=https://github.com/youruser/your-model-repo.git"
+	@echo "                                 ← repo with .rpk file at root"
 	@echo ""
 	@echo "Then run:"
-	@echo "  make db-install"
-	@echo "  make db-start"
-	@echo "  make db-setup"
-	@echo "  make db-migrate"
+	@echo "  make install-pi"
+	@echo "  make download-model"
+	@echo "  make run"
 
 db-install:
 	@which psql > /dev/null 2>&1 && echo "✅ PostgreSQL already installed" || (sudo apt update && sudo apt install -y postgresql postgresql-contrib)
@@ -157,3 +159,71 @@ help:
 	@echo "  make setup_cam    - Install IMX500 camera tools and Ultralytics on Pi"
 	@echo "  make package_model MODEL=path/to/best.pt"
 	@echo "                    - Export trained YOLO model to IMX500 .rpk format"
+	@echo "  make download-model - Download .rpk model from YOLO_MODEL_REPO (set in .env)"
+	@echo ""
+	@echo "  make tunnel-install - Install cloudflared for public URL tunneling"
+	@echo "  make tunnel         - Start tunnel (prints your public Pi URL)"
+	@echo "  make tunnel-stop    - Stop the tunnel"
+
+# ── Model Download ──────────────────────────────────────────────────────
+# Downloads the YOLO model from the repo specified in .env (YOLO_MODEL_REPO).
+# Looks for .rpk file at the root of that repo and copies it to model_weights/rpk/.
+
+MODEL_DEST := model_weights/rpk
+
+download-model:
+	@if [ -z "$(YOLO_MODEL_REPO)" ]; then \
+		echo "❌ YOLO_MODEL_REPO not set in .env"; \
+		echo "   Add: YOLO_MODEL_REPO=https://github.com/youruser/your-model-repo.git"; \
+		exit 1; \
+	fi
+	@echo "📦 Downloading model from $(YOLO_MODEL_REPO)..."
+	@rm -rf /tmp/fire_model_repo
+	@git clone --depth 1 $(YOLO_MODEL_REPO) /tmp/fire_model_repo
+	@mkdir -p $(MODEL_DEST)
+	@RPK_FILE=$$(find /tmp/fire_model_repo -maxdepth 1 -name "*.rpk" | head -1); \
+	if [ -z "$$RPK_FILE" ]; then \
+		echo "❌ No .rpk file found at root of $(YOLO_MODEL_REPO)"; \
+		echo "   Make sure the .rpk file is at the top level of the repo"; \
+		rm -rf /tmp/fire_model_repo; \
+		exit 1; \
+	fi; \
+	cp "$$RPK_FILE" $(MODEL_DEST)/fire_smoke.rpk && \
+	echo "✅ Model copied to $(MODEL_DEST)/fire_smoke.rpk"
+	@rm -rf /tmp/fire_model_repo
+
+# ── Tunnel (expose Pi's Flask API to the internet) ─────────────────────
+# Uses cloudflared (free, no account needed, no signup).
+# Gives you a public https URL like https://xxx-yyy.trycloudflare.com
+# that forwards to your Flask API on port 5000.
+
+tunnel-install:
+	@echo "Installing cloudflared..."
+	@if command -v cloudflared > /dev/null 2>&1; then \
+		echo "✅ cloudflared already installed"; \
+	else \
+		curl -L --output /tmp/cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64.deb && \
+		sudo dpkg -i /tmp/cloudflared.deb && \
+		rm /tmp/cloudflared.deb && \
+		echo "✅ cloudflared installed"; \
+	fi
+
+tunnel:
+	@echo ""
+	@echo "🔥 Starting tunnel to Flask API on port 5000..."
+	@echo "   Copy the URL below and paste it into your FIRECTRL dashboard."
+	@echo ""
+	@cloudflared tunnel --url http://localhost:5000 2>&1 | grep -o 'https://[^ ]*\.trycloudflare\.com' | head -1 | while read url; do \
+		echo ""; \
+		echo "╔══════════════════════════════════════════════════════════════╗"; \
+		echo "║  Your Pi is live at:                                        ║"; \
+		echo "║  $$url"; \
+		echo "╚══════════════════════════════════════════════════════════════╝"; \
+		echo ""; \
+		echo "Paste this URL into your FIRECTRL project settings."; \
+		echo "Press Ctrl+C to stop the tunnel."; \
+	done &
+	@cloudflared tunnel --url http://localhost:5000
+
+tunnel-stop:
+	@pkill -f "cloudflared tunnel" 2>/dev/null && echo "✅ Tunnel stopped" || echo "No tunnel running"
