@@ -166,7 +166,11 @@ class FireDetector(VisionModel):
         # pass width + height so origin_x/y can be normalized to [0, 1]
         clusters = self._build_clusters(fire_boxes, smoke_boxes, frame_width, frame_height)
 
-        # ── Step 7: Return ────────────────────────────────────────────────────
+        # ── Step 7: Sort + Return ─────────────────────────────────────────────
+        # sort clusters by total_area_ratio descending — largest fire first
+        # this ensures VisionFuser and ThinkEngine always see the biggest threat first
+        clusters.sort(key=lambda c: c.total_area_ratio, reverse=True)
+
         # clusters → VisionFuser uses to build VisionSnapshot
         # raw_detections → VisionSnapshot needs them as is
         return clusters, raw_detections
