@@ -12,6 +12,8 @@ Classes:
 # this part is for fire detector, we analyze what we get from our YOLO trained Model
 # YOLO runs on-chip on the IMX500 camera — we just parse the results from metadata
 from picamera2.devices.imx500 import IMX500
+from shapely.geometry import box as shapely_box
+from shapely.ops import unary_union
 from see.models.vision_model_base import VisionModel
 from see.models.detection import Detection
 from see.models.fire_cluster import FireCluster
@@ -164,7 +166,11 @@ class FireDetector(VisionModel):
         # pass width + height so origin_x/y can be normalized to [0, 1]
         clusters = self._build_clusters(fire_boxes, smoke_boxes, frame_width, frame_height)
 
-        # ── Step 7: Return ────────────────────────────────────────────────────
+        # ── Step 7: Sort + Return ─────────────────────────────────────────────
+        # sort clusters by total_area_ratio descending — largest fire first
+        # this ensures VisionFuser and ThinkEngine always see the biggest threat first
+        clusters.sort(key=lambda c: c.total_area_ratio, reverse=True)
+
         # clusters → VisionFuser uses to build VisionSnapshot
         # raw_detections → VisionSnapshot needs them as is
         return clusters, raw_detections
@@ -315,51 +321,35 @@ class FireDetector(VisionModel):
 
     # ── Helper: compute union area in pixels for mixed boxes (fire + smoke) ───
     # subtracts overlapping regions between every unique pair to avoid double counting
-    def _compute_union_area_pixels(self, all_boxes: list[Detection]) -> float:
+    def compute_union_area_pixels(self, all_boxes: list[Detection]) -> float:
         """
-        Compute union area for potentially overlapping boxes.
+        Compute the union area (in pixels) of a set of axis-aligned bounding
+        boxes. Each pixel is counted at most once, regardless of how many
+        boxes overlap or whether one box is fully contained in another.
 
-        Uses inclusion-exclusion principle:
-        - Sum all box areas
-        - Subtract intersection areas to avoid double counting
-
-        Works for mixed box types (fire + smoke together).
+        Uses Shapely's unary_union (plane-sweep polygon union via GEOS).
+        Correct for any n ≥ 0 — including nested boxes and 3+ box overlap
+        at the same region — without inclusion-exclusion combinatorics.
 
         Args:
-            all_boxes: List of Detection objects (may overlap)
+            all_boxes: List of Detection objects (may overlap or be empty)
 
         Returns:
-            float: Union area in pixels
+            float: Union area in pixels (0.0 if input is empty)
         """
-
         if not all_boxes:
             return 0.0
 
-        total = 0.0
-        for box in all_boxes:
-            total += box.bbox[2] * box.bbox[3]
-
-        for i in range(len(all_boxes)):
-            for j in range(i + 1, len(all_boxes)):
-                a = all_boxes[i]
-                b = all_boxes[j]
-
-                a_left   = a.bbox[0] - a.bbox[2] / 2
-                a_right  = a.bbox[0] + a.bbox[2] / 2
-                a_top    = a.bbox[1] - a.bbox[3] / 2
-                a_bottom = a.bbox[1] + a.bbox[3] / 2
-                b_left   = b.bbox[0] - b.bbox[2] / 2
-                b_right  = b.bbox[0] + b.bbox[2] / 2
-                b_top    = b.bbox[1] - b.bbox[3] / 2
-                b_bottom = b.bbox[1] + b.bbox[3] / 2
-
-                inter_w = min(a_right, b_right)   - max(a_left, b_left)
-                inter_h = min(a_bottom, b_bottom) - max(a_top,  b_top)
-
-                if inter_w > 0 and inter_h > 0:
-                    total -= inter_w * inter_h
-
-        return total
+        polygons = [
+            shapely_box(
+                b.bbox[0] - b.bbox[2] / 2,   # left
+                b.bbox[1] - b.bbox[3] / 2,   # top
+                b.bbox[0] + b.bbox[2] / 2,   # right
+                b.bbox[1] + b.bbox[3] / 2,   # bottom
+            )
+            for b in all_boxes
+        ]
+        return float(unary_union(polygons).area)
 
 
     # ── Helper: group merged fire and smoke boxes into FireCluster objects ────
@@ -474,7 +464,7 @@ class FireDetector(VisionModel):
             # compute area ratios
             fire_area_pixels  = self._compute_area_pixels(group_fire)
             smoke_area_pixels = self._compute_area_pixels(group_smoke)
-            total_area_pixels = self._compute_union_area_pixels(group_boxes)
+            total_area_pixels = self.compute_union_area_pixels(group_boxes)
 
             clusters.append(FireCluster(
                 cluster_id         = cluster_id,

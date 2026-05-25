@@ -25,8 +25,12 @@ from see.models.detection import Detection
 from see.models.fire_cluster import FireCluster
 from see.snapshot import VisionSnapshot
 import threading
+import time
 import os
 import cv2
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # ── VisionFuser ───────────────────────────────────────────────────────────────
@@ -101,7 +105,13 @@ class VisionFuser:
 
         # ── Storage settings ──────────────────────────────────────────────────
         self._frame_path       = storage_cfg["frame_image_path"]
-        self._frame_url_prefix = storage_cfg["frame_image_url_prefix"]
+        self._frame_url_prefix = storage_cfg["frame_url_prefix"]
+
+        # ── Activation gate settings ──────────────────────────────────────────
+        # SEE only does work when sensor_triggered or camera_feed_active.
+        # When neither, the loop sleeps this many ms then re-checks.
+        activation_cfg     = vision_cfg.get("activation", {})
+        self._idle_sleep_s = activation_cfg.get("idle_sleep_ms", 50) / 1000.0
 
         # ── SystemState ───────────────────────────────────────────────────────
         self._state   = state                   # shared blackboard with all layers
@@ -196,44 +206,71 @@ class VisionFuser:
 
         while self._running and self._state.system_running:
 
-            # ── Capture frame + metadata from IMX500 camera ──────────────────
-            result = self._camera.capture()
-            if result is None:
-                continue                        # camera not ready, try again
+            # ── Activation gate ──────────────────────────────────────────────
+            # SEE only does work when sensor_triggered or camera_feed_active.
+            # Otherwise idle — saves power on the IMX500 + arm.
+            # Camera signal is cleared on entry to idle so ACT's fusion never
+            # averages stale camera coords with fresh heat data.
+            if not (self._state.sensor_triggered or self._state.camera_feed_active):
+                if self._state.latest_fire_x is not None or self._state.latest_fire_y is not None:
+                    self._state.latest_fire_x = None
+                    self._state.latest_fire_y = None
+                time.sleep(self._idle_sleep_s)
+                continue
 
-            frame, metadata = result
-            frame_height, frame_width = frame.shape[:2]  # numpy array → (h, w, channels)
+            # ── BUG-7: wrap the full work cycle so an exception in any step
+            # doesn't silently kill the thread and leave see_running=True.
+            try:
+                # ── Capture frame + metadata from IMX500 camera ──────────────────
+                result = self._camera.capture()
+                if result is None:
+                    continue                        # camera not ready, try again
 
-            # ── Analyze with FireDetector ─────────────────────────────────────
-            clusters, raw_detections = self._fire_detector.detect(
-                metadata     = metadata,
-                frame_width  = frame_width,
-                frame_height = frame_height
-            )
+                frame, metadata = result
+                frame_height, frame_width = frame.shape[:2]  # numpy array → (h, w, channels)
 
-            # ── Write dominant cluster center to SystemState for ACT ──────────
-            # ACT's arm controller reads latest_fire_x/y as visual servoing feedback
-            # Values are normalized [0, 1] with (0.5, 0.5) = image center
-            # clusters[0] = first cluster (treated as dominant for now)
-            # TODO: verify clusters are sorted by danger_score before this is final
-            if clusters:
-                self._state.latest_fire_x = clusters[0].origin_x
-                self._state.latest_fire_y = clusters[0].origin_y
-            else:
-                # no fire detected → clear state so ACT doesn't act on stale data
-                self._state.latest_fire_x = None
-                self._state.latest_fire_y = None
+                # ── Analyze with FireDetector ─────────────────────────────────────
+                clusters, raw_detections = self._fire_detector.detect(
+                    metadata     = metadata,
+                    frame_width  = frame_width,
+                    frame_height = frame_height
+                )
 
-            # ── Save frame to disk ────────────────────────────────────────────
-            frame_url = self._save_frame(frame)
+                # ── Write dominant cluster center to SystemState for ACT ──────────
+                # ACT's arm controller reads latest_fire_x/y as visual servoing feedback
+                # Values are normalized [0, 1] with (0.5, 0.5) = image center
+                # clusters[0] = first cluster (treated as dominant for now)
+                # TODO: verify clusters are sorted by danger_score before this is final
+                if clusters:
+                    self._state.latest_fire_x = clusters[0].origin_x
+                    self._state.latest_fire_y = clusters[0].origin_y
+                else:
+                    # no fire detected → clear state so ACT doesn't act on stale data
+                    self._state.latest_fire_x = None
+                    self._state.latest_fire_y = None
 
-            # ── Assemble VisionSnapshot ───────────────────────────────────────
-            snap = self.snapshot(clusters, raw_detections, frame_url, frame_width, frame_height)
+                # ── Save frame to disk ────────────────────────────────────────────
+                frame_url = self._save_frame(frame)
 
-            # ── Emit to see_queue only if sensor is triggered ─────────────────
-            # if only camera_feed_active → stream to website but don't send to THINK
-            if self._state.sensor_triggered:
+                # ── Assemble VisionSnapshot ───────────────────────────────────────
+                snap = self.snapshot(clusters, raw_detections, frame_url, frame_width, frame_height)
+
+                # ── Emit to see_queue ─────────────────────────────────────────────
+                # Gate above already ensured one of (sensor_triggered, camera_feed_active) is true.
                 self.emit_trigger(snap)
+
+            except Exception as e:
+                logger.error(
+                    f"VisionFuser: capture loop iteration failed - {type(e).__name__}: {e}",
+                    exc_info=True
+                )
+                # Note: we deliberately don't notify here — none of the existing
+                # EventType values cleanly describe "arbitrary exception in the
+                # capture loop". Adding a new SEE_LAYER_ERROR event type is a
+                # follow-up. The logger.error above already records the failure
+                # with full traceback.
+                # Brief back-off so a persistent failure doesn't spin at 100% CPU.
+                time.sleep(0.5)
 
     # ── Snapshot ──────────────────────────────────────────────────────────────
     # assembles VisionSnapshot from FireDetector results
@@ -265,14 +302,14 @@ class VisionFuser:
         fire_count  = sum(1 for d in raw_detections if d.label == "fire")
         smoke_count = sum(1 for d in raw_detections if d.label == "smoke")
 
-        # ── Union areas across ALL detections ─────────────────────────────────
-        fire_union_area  = sum(
-            d.bbox[2] * d.bbox[3] for d in raw_detections if d.label == "fire"
-        ) / frame_area
-
-        smoke_union_area = sum(
-            d.bbox[2] * d.bbox[3] for d in raw_detections if d.label == "smoke"
-        ) / frame_area
+        # ── Union areas across ALL detections (overlap-corrected) ─────────────
+        # Delegates to FireDetector's union helper (Shapely-backed plane sweep).
+        # The previous implementation summed raw areas which double-counted
+        # any overlap — fixed as part of BUG-8.
+        fire_boxes       = [d for d in raw_detections if d.label == "fire"]
+        smoke_boxes      = [d for d in raw_detections if d.label == "smoke"]
+        fire_union_area  = self._fire_detector.compute_union_area_pixels(fire_boxes)  / frame_area
+        smoke_union_area = self._fire_detector.compute_union_area_pixels(smoke_boxes) / frame_area
 
         # ── Composite label ───────────────────────────────────────────────────
         # what did we find overall in this frame?
@@ -339,6 +376,10 @@ class VisionFuser:
         Creates frame storage directory if needed, saves frame with
         timestamp filename, and returns the web-accessible URL.
 
+        Also overwrites stream.jpg atomically (temp + os.replace) when
+        camera_feed_active is True — this is the rolling buffer that
+        powers the MJPEG feed. One file, always overwritten, no accumulation.
+
         Args:
             frame: Numpy array frame from camera
 
@@ -346,14 +387,12 @@ class VisionFuser:
             str: Web URL to access the saved frame
         """
 
-        # create storage folder if it doesn't exist
         os.makedirs(self._frame_path, exist_ok=True)
 
-        # filename = timestamp so every frame has a unique name
+        # ── Timestamped frame (permanent, tied to sensor-triggered events) ────
         filename  = f"{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jpg"
         filepath  = os.path.join(self._frame_path, filename)
 
-        # save frame as jpg using OpenCV
         try:
             ok = cv2.imwrite(filepath, frame)
             if not ok:
@@ -366,7 +405,19 @@ class VisionFuser:
                     payload={"path": filepath, "error": f"{type(e).__name__}: {e}"},
                     source_layer="see",
                 )
-            # don't re-raise; degraded but vision keeps running
 
-        # return the URL that the website uses to serve this image
+        # ── Stream buffer (rolling, overwrites every frame) ───────────────────
+        # Only written when camera feed is active (toggled from website).
+        # Uses temp + os.replace for atomic write — no torn frames on read.
+        if self._state.camera_feed_active:
+            stream_path = os.path.join(self._frame_path, "stream.jpg")
+            tmp_path    = os.path.join(self._frame_path, "stream.tmp.jpg")
+            try:
+                ok = cv2.imwrite(tmp_path, frame)
+                if ok:
+                    os.replace(tmp_path, stream_path)
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(f"stream.jpg write failed: {e}")
+
         return self._frame_url_prefix + filename

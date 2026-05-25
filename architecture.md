@@ -92,16 +92,26 @@ A strict ownership rule applies: each field in `SystemState` has exactly one wri
 | `faulted_sensors` | List[dict] | SensorFuser | NotificationService |
 | `system_mode` | SystemMode | SystemOrchestrator | All layers |
 | `system_running` | bool | SystemOrchestrator | All layers |
-| `sense_running` | bool | SensorFuser | Orchestrator |
-| `see_running` | bool | VisionFuser | Orchestrator |
+| `sense_running` | bool | SensorFuser | Orchestrator, ThinkEngine |
+| `see_running` | bool | VisionFuser | Orchestrator, ThinkEngine |
 | `think_running` | bool | ThinkEngine | Orchestrator |
 | `act_running` | bool | ActEngine | Orchestrator |
 | `camera_feed_active` | bool | SystemOrchestrator | VisionFuser |
 | `db_connected` | bool | ThinkEngine | Dashboard |
 | `danger_level` | int | ThinkEngine | ActEngine |
 | `recommended_action` | str | ThinkEngine | ActEngine |
+| `training_label_queue` | Queue | API (via Orchestrator) | ThinkEngine |
+| `training_capture_request` | Queue | API (via Orchestrator) | ThinkEngine |
+| `training_capture_response` | Queue | ThinkEngine | API (via Orchestrator) |
+| `train_request` | Queue | API (via Orchestrator) | ThinkEngine |
+| `train_response` | Queue | ThinkEngine | API (via Orchestrator) |
+| `training_recording` | bool | API (via Orchestrator) | ThinkEngine |
+| `training_event_id` | int | Orchestrator | ThinkEngine, API |
+| `training_label_stream` | Queue | API (via Orchestrator) | ThinkEngine (peek-not-pop) |
 
 `faulted_sensors` entries must be dicts with `name` and `faulted_at` keys — enforced by the setter.
+
+The three `training_*` queues carry the training-mode website→THINK traffic (see §6.7.1). `sense_running` / `see_running` are read by ThinkEngine so a faulted layer does not stall alignment — THINK proceeds with that side as `None` rather than waiting on an empty queue.
 
 `danger_level` accepts 0–5. 0 means no prediction yet (system just started).
 
@@ -258,7 +268,7 @@ The IMX500 camera performs inference on-chip using `.rpk` model packages. Two mo
 
 `FireDetector` and `SceneClassifier` both inherit from `VisionModel(ABC)`. `VisionFuser` owns the camera and both models. The clustering algorithm groups spatially proximate fire/smoke boxes into `FireCluster` objects sorted descending by `danger_score = primary_confidence × total_area_ratio`. Index 0 is always the most dangerous cluster.
 
-When running in live stream mode only (`camera_feed_active = True` but `sensor_triggered = False`), VisionFuser streams frames to the website but does NOT emit VisionSnapshot to `see_queue`.
+When running in live stream mode only (`camera_feed_active = True` but `sensor_triggered = False`), VisionFuser streams frames to the website but does NOT emit VisionSnapshot to `see_queue`. The live feed is served from a single rolling buffer file, `data/frames/stream.jpg`, which `_save_frame()` overwrites every frame whenever `camera_feed_active` is True. The write is atomic (write to a temp file, then `os.replace`) so a reader never sees a torn frame. This `stream.jpg` buffer is independent of the timestamped permanent frames tied to logged events.
 
 ### 5.4 Dataclasses
 
@@ -356,18 +366,31 @@ THINK can operate with SENSE only, SEE only, or both — controlled by `enabled`
 
 ### 6.3 ThinkEngine loop — one cycle
 
-1. Pull `SensorSnapshot` from `sense_queue` and `VisionSnapshot` from `see_queue`. If a snapshot is missing on one side while the other is present, drop the partial — misaligned data is worse than no data.
-2. Check timestamp gap < `max_gap_ms` — raise `AlignmentError` if exceeded, ThinkEngine catches and skips cycle
-3. Create `ThinkSnapshot` (thin alignment object). If both snapshots are None, return None and skip.
-4. Call `ThinkDatabase.log_event(snap)` — DB writes the row and immediately assigns `event_id` internally. ThinkEngine never sees or handles a row ID.
-5. Call `ThinkDatabase.build_feature_vector(last_row_id)` → walks back DB chain bounded by `chain_length`, returns feature dict.
-6. Pass feature dict to `XGBoostModel.predict()` → returns `danger_level` (int 1–5). Returns 1 (MINIMAL) as safe default when feature dict is empty.
-7. Lookup `recommended_action` from `poa_map` in config
-8. Call `ThinkDatabase.update_prediction(danger_level, action)` — uses internally stored `last_row_id`
-9. Write `danger_level` + `recommended_action` to SystemState
-10. Repeat
+The loop behaves differently depending on `system_mode`. There are two paths:
+the **prediction path** (autopilot / copilot / surveillance) and the
+**training path**.
 
-In **training mode** step 6 is replaced by: display current chain stats on website, wait for human to label `true_danger_level`, call `ThinkDatabase.update_human_label(true_danger, true_action)`.
+**Prediction path (one cycle):**
+
+1. Drain the training-label queue (no-op outside training mode if empty).
+2. Pull `SensorSnapshot` from `sense_queue` and `VisionSnapshot` from `see_queue`. The loop does **not** gate on `sensor_triggered` — whether SEE produces snapshots is SEE's concern, not THINK's. THINK only waits until it has data to align. If a layer is faulted (`sense_running` / `see_running` is False), THINK does not wait on that layer's queue — it aligns with that side as `None`.
+3. Check timestamp gap < `max_gap_ms` — raise `AlignmentError` if exceeded, ThinkEngine catches and skips cycle.
+4. Create `ThinkSnapshot` (thin alignment object). If both snapshots are None, return None and skip.
+5. Call `ThinkDatabase.log_event(snap)` — DB writes the row and immediately assigns `event_id` internally. ThinkEngine never sees or handles a row ID.
+6. Call `ThinkDatabase.build_feature_vector(last_row_id)` → walks back DB chain bounded by `chain_length`, returns feature dict.
+7. Pass feature dict to `XGBoostModel.predict()` → returns `danger_level` (int 1–5). Returns 1 (MINIMAL) as safe default when feature dict is empty.
+8. Lookup `recommended_action` from `poa_map` in config.
+9. Call `ThinkDatabase.update_prediction(danger_level, action)`.
+10. Write `danger_level` + `recommended_action` to SystemState. Repeat.
+
+**Training path (one cycle):**
+
+In training mode the loop does **not** consume `sense_queue` / `see_queue` and does **not** predict. The human drives the system through the website; the loop only:
+
+1. Drains the training-label queue — for each `{row_id, true_danger_level, true_action}`, calls `ThinkDatabase.save_training_label(...)`.
+2. Services capture requests — for each `{request_id, same_event}` on `training_capture_request`, runs `capture_training_snapshot()` and pushes the result onto `training_capture_response` tagged with the same `request_id`.
+
+This split exists because in training mode the API process must own the capture round-trip and THINK must not also consume the queues — see §6.8.
 
 ### 6.4 ThinkSnapshot
 
@@ -385,7 +408,9 @@ ThinkEngine never holds or passes row IDs. `ThinkDatabase` stores `last_row_id` 
 
 ### 6.5 Event chain and feature vector
 
-`ThinkDatabase` assigns `event_id` atomically at the end of every `log_event()` call — ThinkEngine is not involved. The logic: look at the previous row in the DB. If its timestamp is within `max_gap_ms` of the current row, inherit its `event_id` (same event continues). If not, or if there is no previous row, use the current row's own `id` as the new `event_id` (new event starts here).
+`ThinkDatabase` assigns `event_id` atomically at the end of every `log_event()` call — ThinkEngine is not involved. The logic: look at the previous row in the DB. If its timestamp is within `max_event_gap_ms` of the current row, inherit its `event_id` (same event continues). If not, or if there is no previous row, use the current row's own `id` as the new `event_id` (new event starts here).
+
+> **Two distinct gap thresholds — do not confuse them.** `max_gap_ms` (small, ~500ms) is *only* the SENSE↔SEE snapshot alignment tolerance — it covers hardware delay between the two layers producing a reading for the same moment. `max_event_gap_ms` (large, seconds) is the quiet-period threshold that separates one fire *event* from a brand-new one. An earlier edit collapsed these into a single value by mistake; they are now separate config keys. Event grouping must use `max_event_gap_ms`.
 
 `build_feature_vector(row_id)` walks back from the given `row_id` (not `_last_row_id`) so it works for both live prediction and offline training over historical rows. It fetches the last N rows of the event ending at `row_id`, where N is `chain_length` from config. From this bounded chain it computes:
 
@@ -428,15 +453,48 @@ All three implement `BaseModel(ABC)`. Switching phases requires one line change 
 
 ### 6.7 Offline training flow
 
-Triggered from website by admin. System keeps running normally.
+Triggered from the website (`POST /api/train`). The system keeps running normally — training does not stop the pipeline.
 
-1. Pull all rows with `validated = True` from DB via `ThinkDatabase.get_validated_rows()`
-2. Call `ThinkDatabase.build_feature_vector(row_id)` for each row
-3. Assemble DataFrame — each row is one feature vector, label column is `true_danger_level`
-4. Save CSV to disk via `ThinkDatabase.export_csv(path)`
-5. Call `XGBoostModel.fit(X, y)`
-6. Save model weights via `XGBoostModel.save(path)`
-7. Hot-swap the model in ThinkEngine — next prediction cycle uses new model
+Implemented as `ThinkEngine.train_model()`, run inside the THINK process (it owns the DB + model). The route reaches it through the orchestrator via a `train_request` / `train_response` queue pair, the same round-trip pattern as training capture. Steps:
+
+1. `ThinkDatabase.get_validated_rows()` — all rows with `validated = TRUE`.
+2. `build_feature_vector(row['id'])` per row → feature dict.
+3. Assemble `X` and `y = true_danger_level`. **Each `X` row is built as `[vec[k] for k in sorted(vec.keys())]`** — the same `sorted()` that `XGBoostModel.predict()` applies, so training and live-prediction column order are identical. This is the guard for the feature-ordering landmine: `build_feature_vector` returns a dict, and dict insertion order must never be relied on to line up `fit` and `predict`.
+4. Train/test split — ratio from `config['think']['training']` (`test_split`, `min_rows_to_train`, `random_state`). Stratified when every class has ≥2 samples.
+5. `XGBoostModel.fit(X_train, y_train)`, then `evaluate()` on the test split.
+6. `XGBoostModel.save(model_weights_path)`, then hot-swap the model into the running engine.
+
+The route returns sample counts + metrics (accuracy, F1) for the website to display. If there are fewer than `min_rows_to_train` usable rows, `train_model` raises and the route returns `422`.
+
+A separate `ThinkDatabase.export_csv(path)` dumps the raw validated rows to CSV. Note this exports **raw DB columns, not feature vectors** — it is a raw-data dump, not the training matrix. The training matrix is assembled in-memory by `train_model` and is not persisted.
+
+### 6.7.1 Training-mode flow (online labeling)
+
+Section 6.7 covers *offline* training (assembling a CSV and fitting the model from already-validated rows). This section covers how those validated rows are *collected* — the human-in-the-loop labeling that happens in **training mode**.
+
+**Mental model.** Training mode does not halt the system. SENSE keeps polling, SEE keeps producing frames, ACT keeps doing visual-servoing (the arm still tracks heat/fire). What changes is the *decision-maker*: in prediction modes XGBoost produces `danger_level`; in training mode a **human** does. Training mode swaps the decider, nothing else.
+
+**Two flows exist in training mode**, used for different situations:
+
+#### A. Single-shot capture
+For one-off labeling. Two API calls:
+- `POST /api/training/capture` — body `{target_ts, same_event}`. `target_ts` is the unix-epoch timestamp of the frame the human was looking at when they hit capture. THINK's `_align(target_ts=...)` scans both queues **non-destructively** (drain to a list, search for the closest pair within `max_gap_ms`, restore everything). Live loops downstream — the arm tracking via `SystemState.latest_fire_x/y` — are unaffected. THINK inserts an unlabeled row and returns it.
+- `POST /api/training/save` — body `{row_id, danger, action}`. Drops the label on `training_label_queue`; THINK drains and `UPDATE`s the row. 202, never blocks the human.
+
+#### B. Continuous recording (the candle / kitchen / wildfire demos)
+For real fire sessions where the human wants to capture a stream of frames with labels that *change over time* (fire grew, bumped 2→3→4 mid-recording). No batch round-trip — labels apply live, rows are written as they stream.
+
+- `POST /api/training/recording/start` — body `{same_event}`. Decides `event_id` once for the whole session, flips `state.training_recording = True`. From this point THINK in training mode consumes `sense_queue`/`see_queue` like the live pipeline (`_align_live`, destructive pop).
+- `POST /api/training/recording/label` — body `{danger, action, valid_until}`. Pushes a label onto `training_label_stream`. The label applies to every row whose timestamp is `< valid_until`; when a row's timestamp crosses it, the next label takes over. Labels are reused for many rows. `valid_until=None` = open-ended (applies until a new label arrives).
+- `POST /api/training/recording/stop` — flips recording off, drains any unused tail labels.
+
+THINK's recording loop, per iteration: align (live pop) → look up the current label by row timestamp (peek, not pop — `_current_label`) → `log_training_capture_labeled` (one INSERT, label already attached, `validated=TRUE`). If no label is current, the row is dropped rather than written unlabeled (no firehose).
+
+**Event grouping.** A recording = one event. The `same_event` decision is made at `recording/start` and held in `state.training_event_id` for the whole session. Inside the session every row reuses that `event_id`. This gives `build_feature_vector` real chains (velocity/acceleration features have real values), not length-1 chains.
+
+**Why capture goes through THINK and not the API directly.** `_align` and the live DB connection belong to the THINK process. Running them in the API process would mean either duplicating the aligner or having two processes consume `sense_queue`/`see_queue` — a race. So capture is a round trip into the THINK process via the `training_capture_request`/`training_capture_response` queue pair. Save needs no round trip (fire-and-forget). Recording start needs only the event_id round-trip; pushing labels and stopping are one-way flag/queue writes.
+
+Once enough rows have `validated = TRUE`, the offline flow in §6.7 assembles them into a training set and fits the model.
 
 ### 6.8 Danger level scale
 

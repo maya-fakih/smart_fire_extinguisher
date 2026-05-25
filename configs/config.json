@@ -96,13 +96,23 @@
     "labels": "configs/labels.json",
     "storage": {
       "frame_image_path": "data/frames/",
-      "frame_url_prefix": "/frames/"
+      "frame_url_prefix": "/frames/",
+      "frame_permanent_path": ""
+    },
+    "activation": {
+      "idle_sleep_ms": 50
     }
   },
   "think": {
     "active_model": "xgboost",
     "model_weights_path": "model_weights/",
     "max_gap_ms": 500,
+    "max_event_gap_ms": 10000,
+    "training": {
+      "test_split": 0.2,
+      "min_rows_to_train": 20,
+      "random_state": 42
+    },
     "chain_length": 5,
     "poa_map": {
       "1": ["monitor"],
@@ -165,11 +175,19 @@
         },
         "feedback": {
           "heat_use_threshold_c": 35,
-          "tolerance_normalized": 0.1
+          "tolerance_normalized": 0.1,
+          "sensor_offsets": {
+            "heat":   { "x_bias": 0.0, "y_bias": 0.0 },
+            "camera": { "x_bias": 0.0, "y_bias": 0.0 }
+          }
         },
         "cycle_active_ms": 100,
         "cycle_idle_ms": 500
       }
     }
+  },
+  "api": {
+    "train_job_history_size": 50,
+    "train_job_timeout_s": 120.0
   }
 }

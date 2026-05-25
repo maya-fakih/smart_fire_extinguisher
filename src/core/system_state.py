@@ -47,6 +47,62 @@ class SystemState:
 
         # ACT ↔ website
         self.copilot_decision = None
+        # Website → ACT: manual command queue (pump_fire, arm_nudge)
+        # Each entry: {"action": str, "params": dict}
+        self.manual_commands = manager.Queue()
+
+        # Website → THINK: training labels (training mode only)
+        # Each entry: {"row_id": int, "true_danger_level": int,
+        #              "true_action": str|None}
+        # THINK drains this each loop iteration and writes the label to the
+        # matching DB row (the row inserted at capture time).
+        self.training_label_queue = manager.Queue()
+
+        # Website ↔ THINK: training capture request/response (training mode only)
+        # Capture must run inside the THINK process (it owns _align + the DB).
+        # The API route pushes a request and blocks on the response queue.
+        #   request entry : {"request_id": str, "same_event": bool}
+        #   response entry: {"request_id": str, "ok": bool, "result": dict|None,
+        #                    "error": str|None}
+        self.training_capture_request  = manager.Queue()
+        self.training_capture_response = manager.Queue()
+
+        # Website ↔ THINK: model-training request/response (any mode)
+        # Training is offline glue — assemble validated rows, fit, save weights.
+        # Runs in the THINK process (owns the DB + model). Serviced every loop
+        # iteration regardless of mode, unlike capture which is training-only.
+        #   request entry : {"request_id": str}
+        #   response entry: {"request_id": str, "ok": bool, "result": dict|None,
+        #                    "error": str|None}
+        self.train_request  = manager.Queue()
+        self.train_response = manager.Queue()
+
+        # ── Training-mode recording (continuous label-while-streaming) ────────
+        # When training_recording = True, THINK consumes sense_queue/see_queue
+        # in training mode (just like the live pipeline) and writes rows to
+        # DB tagged with the current label from training_label_stream.
+        #
+        # training_label_stream entries:
+        #   {"true_danger_level": int, "true_action": str|None,
+        #    "valid_until": float (unix epoch) | None}
+        # The head label applies to every incoming row whose timestamp < valid_until.
+        # When a row's timestamp >= valid_until, the head label is popped and
+        # the next one becomes current. A label with valid_until=None applies
+        # to all subsequent rows until a new label is pushed.
+        self.training_recording    = False
+        self.training_label_stream = manager.Queue()
+        # training_event_id: explicit event_id for the current recording.
+        # Set when the human starts a recording (new event or continue last);
+        # used directly so we don't ping the DB on every row.
+        self.training_event_id = 0
+
+        # Website → SENSE: per-sensor soft enable/disable
+        self.sensor_overrides = manager.dict()
+
+        # Website → ACT: arm manual override expiry timestamp
+        # While time.time() < this value, tracking loop pauses.
+        self.arm_manual_mode_until = 0.0
+
 
     # --- bool ---
     @property
@@ -234,3 +290,11 @@ class SystemState:
                 f"{self._VALID_COPILOT_DECISIONS}, got {value!r}"
             )
         self._data['copilot_decision'] = value
+    
+    # --- arm manual override expiry (float timestamp) ---
+    @property
+    def arm_manual_mode_until(self) -> float:
+        return self._data.get('arm_manual_mode_until', 0.0)
+    @arm_manual_mode_until.setter
+    def arm_manual_mode_until(self, value: float):
+        self._data['arm_manual_mode_until'] = float(value)

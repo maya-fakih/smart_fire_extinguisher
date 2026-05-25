@@ -12,7 +12,7 @@ Scene classification could provide context like:
 Would be used by THINK layer to adjust risk scoring based on context.
 """
 
-from vision_model_base import VisionModel
+from see.models.vision_model_base import VisionModel
 
 
 class SceneClassifier(VisionModel):

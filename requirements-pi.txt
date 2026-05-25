@@ -17,3 +17,8 @@ adafruit-circuitpython-amg88xx
 
 #arm
 gpiozero
+
+flask>=3.0
+flask-cors>=4.0
+psycopg2-binary>=2.9
+shapely>=2.0opencv-python-headless
