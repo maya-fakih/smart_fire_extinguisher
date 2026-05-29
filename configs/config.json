@@ -58,7 +58,7 @@
       "channel": 0,
       "gain": 1,
       "equation": "A * (((3.3 - (raw / 32767.0) * 3.3) / ((raw / 32767.0) * 3.3)) * RL / Ro) ** B",
-      "eq_params": { "RL": 10000, "Ro": 9500, "A": 574.25, "B": -2.222 },
+      "eq_params": { "RL": 8200, "Ro": 9500, "A": 574.25, "B": -2.222 },
       "raw_min": 0,
       "raw_max": 32767,
       "physical_min": 0,
