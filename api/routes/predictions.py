@@ -40,7 +40,8 @@ def list_predictions():
         return jsonify({"predictions": rows, "count": len(rows)}), 200
     except Exception as e:
         logger.error(f"GET /api/predictions: {e}", exc_info=True)
-        return jsonify({"error": str(e)}), 500
+        msg = "Database unavailable" if "psycopg2" in type(e).__module__ else str(e)
+        return jsonify({"error": msg}), 500
 
 
 @predictions_bp.route("/api/predictions/<int:pred_id>/label", methods=["POST"])
@@ -74,7 +75,8 @@ def label_prediction(pred_id: int):
         return jsonify({"ok": True, "id": pred_id}), 200
     except Exception as e:
         logger.error(f"label: {e}", exc_info=True)
-        return jsonify({"error": str(e)}), 500
+        msg = "Database unavailable" if "psycopg2" in type(e).__module__ else str(e)
+        return jsonify({"error": msg}), 500
 
 
 @predictions_bp.route("/api/train", methods=["POST"])
@@ -105,7 +107,8 @@ def train_model():
                 "running_job_id": running_id,
             }), 409
         logger.error(f"POST /api/train: {e}", exc_info=True)
-        return jsonify({"error": str(e)}), 500
+        msg = "Database unavailable" if "psycopg2" in type(e).__module__ else str(e)
+        return jsonify({"error": msg}), 500
 
 
 @predictions_bp.route("/api/train/status/<job_id>", methods=["GET"])
@@ -127,4 +130,5 @@ def train_status(job_id):
         return jsonify(job), 200
     except Exception as e:
         logger.error(f"GET /api/train/status/{job_id}: {e}", exc_info=True)
-        return jsonify({"error": str(e)}), 500
+        msg = "Database unavailable" if "psycopg2" in type(e).__module__ else str(e)
+        return jsonify({"error": msg}), 500

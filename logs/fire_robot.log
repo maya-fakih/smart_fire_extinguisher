@@ -1,0 +1,625 @@
+[2026-06-02 17:14:37] __main__ [INFO] [main:59] ============================================================
+[2026-06-02 17:14:37] __main__ [INFO] [main:60] Fire Robot starting up
+[2026-06-02 17:14:37] __main__ [INFO] [main:61] ============================================================
+[2026-06-02 17:14:37] core.orchestrator [DEBUG] [_load_config:60] Orchestrator: loading config | path=configs/config.json
+[2026-06-02 17:14:37] core.orchestrator [INFO] [_load_config:63] Orchestrator: config loaded successfully
+[2026-06-02 17:14:37] core.orchestrator [DEBUG] [_init_manager:78] Orchestrator: initializing multiprocessing manager
+[2026-06-02 17:14:37] core.orchestrator [DEBUG] [_init_state:90] Orchestrator: initializing SystemState | mode=surveillance
+[2026-06-02 17:14:37] core.orchestrator [INFO] [_init_notifier:105] Orchestrator: NotificationService constructed
+[2026-06-02 17:14:37] __main__ [CRITICAL] [main:66] Init failed: module 'adafruit_ads1x15.ads1115' has no attribute 'P0'
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/main.py", line 64, in main
+    orchestrator = SystemOrchestrator(args.config)
+  File "/home/mj/Desktop/fire_robot/src/core/orchestrator.py", line 52, in __init__
+    self._init_layers()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/home/mj/Desktop/fire_robot/src/core/orchestrator.py", line 110, in _init_layers
+    self._sensor_fuser = SensorFuser(self._config, self._state, self._notifier)
+                         ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/src/sense/sensor_fuser.py", line 34, in __init__
+    self._sensors = SensorParser.build_sensors(config, self._i2c_buses)
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/src/sense/sensor_parser.py", line 64, in build_sensors
+    sensors.append(sensor_class(sensor_cfg))
+                   ~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/src/sense/sensors/i2c_sensor.py", line 46, in __init__
+    setup_method(sensor_cfg)
+    ~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/src/sense/sensors/i2c_sensor.py", line 62, in _setup_ads1115
+    channel_map = {0: ADS.P0, 1: ADS.P1, 2: ADS.P2, 3: ADS.P3}
+                      ^^^^^^
+AttributeError: module 'adafruit_ads1x15.ads1115' has no attribute 'P0'
+[2026-06-02 17:15:29] __main__ [INFO] [main:59] ============================================================
+[2026-06-02 17:15:29] __main__ [INFO] [main:60] Fire Robot starting up
+[2026-06-02 17:15:29] __main__ [INFO] [main:61] ============================================================
+[2026-06-02 17:15:29] core.orchestrator [DEBUG] [_load_config:60] Orchestrator: loading config | path=configs/config.json
+[2026-06-02 17:15:29] core.orchestrator [INFO] [_load_config:63] Orchestrator: config loaded successfully
+[2026-06-02 17:15:29] core.orchestrator [DEBUG] [_init_manager:78] Orchestrator: initializing multiprocessing manager
+[2026-06-02 17:15:29] core.orchestrator [DEBUG] [_init_state:90] Orchestrator: initializing SystemState | mode=surveillance
+[2026-06-02 17:15:29] core.orchestrator [INFO] [_init_notifier:105] Orchestrator: NotificationService constructed
+[2026-06-02 17:15:29] __main__ [CRITICAL] [main:66] Init failed: module 'adafruit_ads1x15.ads1115' has no attribute 'AIN0'
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/main.py", line 64, in main
+    orchestrator = SystemOrchestrator(args.config)
+  File "/home/mj/Desktop/fire_robot/src/core/orchestrator.py", line 52, in __init__
+    self._init_layers()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/home/mj/Desktop/fire_robot/src/core/orchestrator.py", line 110, in _init_layers
+    self._sensor_fuser = SensorFuser(self._config, self._state, self._notifier)
+                         ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/src/sense/sensor_fuser.py", line 34, in __init__
+    self._sensors = SensorParser.build_sensors(config, self._i2c_buses)
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/src/sense/sensor_parser.py", line 64, in build_sensors
+    sensors.append(sensor_class(sensor_cfg))
+                   ~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/src/sense/sensors/i2c_sensor.py", line 46, in __init__
+    setup_method(sensor_cfg)
+    ~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/src/sense/sensors/i2c_sensor.py", line 62, in _setup_ads1115
+    channel_map = {0: ADS.AIN0, 1: ADS.AIN1, 2: ADS.AIN2, 3: ADS.AIN3}
+                      ^^^^^^^^
+AttributeError: module 'adafruit_ads1x15.ads1115' has no attribute 'AIN0'
+[2026-06-02 17:16:58] __main__ [INFO] [main:59] ============================================================
+[2026-06-02 17:16:58] __main__ [INFO] [main:60] Fire Robot starting up
+[2026-06-02 17:16:58] __main__ [INFO] [main:61] ============================================================
+[2026-06-02 17:16:58] core.orchestrator [DEBUG] [_load_config:60] Orchestrator: loading config | path=configs/config.json
+[2026-06-02 17:16:58] core.orchestrator [INFO] [_load_config:63] Orchestrator: config loaded successfully
+[2026-06-02 17:16:58] core.orchestrator [DEBUG] [_init_manager:78] Orchestrator: initializing multiprocessing manager
+[2026-06-02 17:16:58] core.orchestrator [DEBUG] [_init_state:90] Orchestrator: initializing SystemState | mode=surveillance
+[2026-06-02 17:16:58] core.orchestrator [INFO] [_init_notifier:105] Orchestrator: NotificationService constructed
+[2026-06-02 17:16:58] __main__ [CRITICAL] [main:66] Init failed: type object 'ADS1115' has no attribute 'P0'
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/main.py", line 64, in main
+    orchestrator = SystemOrchestrator(args.config)
+  File "/home/mj/Desktop/fire_robot/src/core/orchestrator.py", line 52, in __init__
+    self._init_layers()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/home/mj/Desktop/fire_robot/src/core/orchestrator.py", line 110, in _init_layers
+    self._sensor_fuser = SensorFuser(self._config, self._state, self._notifier)
+                         ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/src/sense/sensor_fuser.py", line 34, in __init__
+    self._sensors = SensorParser.build_sensors(config, self._i2c_buses)
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/src/sense/sensor_parser.py", line 64, in build_sensors
+    sensors.append(sensor_class(sensor_cfg))
+                   ~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/src/sense/sensors/i2c_sensor.py", line 46, in __init__
+    setup_method(sensor_cfg)
+    ~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/src/sense/sensors/i2c_sensor.py", line 62, in _setup_ads1115
+    channel_map = {0: ADS.ADS1115.P0, 1: ADS.ADS1115.P1, 2: ADS.ADS1115.P2, 3: ADS.ADS1115.P3}
+                      ^^^^^^^^^^^^^^
+AttributeError: type object 'ADS1115' has no attribute 'P0'
+[2026-06-02 17:18:03] __main__ [INFO] [main:59] ============================================================
+[2026-06-02 17:18:03] __main__ [INFO] [main:60] Fire Robot starting up
+[2026-06-02 17:18:03] __main__ [INFO] [main:61] ============================================================
+[2026-06-02 17:18:03] core.orchestrator [DEBUG] [_load_config:60] Orchestrator: loading config | path=configs/config.json
+[2026-06-02 17:18:03] core.orchestrator [INFO] [_load_config:63] Orchestrator: config loaded successfully
+[2026-06-02 17:18:03] core.orchestrator [DEBUG] [_init_manager:78] Orchestrator: initializing multiprocessing manager
+[2026-06-02 17:18:03] core.orchestrator [DEBUG] [_init_state:90] Orchestrator: initializing SystemState | mode=surveillance
+[2026-06-02 17:18:03] core.orchestrator [INFO] [_init_notifier:105] Orchestrator: NotificationService constructed
+[2026-06-02 17:18:03] core.orchestrator [INFO] [start:120] Orchestrator: starting system | spawning all processes
+[2026-06-02 17:18:03] notify.notification_service [INFO] [_log_notification:173] [orchestrator] NOTIFY | event=system_started | severity=info | payload={'mode': 'surveillance'}
+[2026-06-02 17:18:03] notify.notification_service [ERROR] [_ensure_connected:89] NotificationService: DB unreachable, falling back to log-only mode - OperationalError: connection to server at "db.kszkxbhfuaoblayzhumf.supabase.co" (2a05:d018:65a:e200:a496:af17:d567:572c), port 5432 failed: Network is unreachable
+	Is the server running on that host and accepting TCP/IP connections?
+
+[2026-06-02 17:18:03] core.orchestrator [INFO] [start:146] Orchestrator: SenseProcess started
+[2026-06-02 17:18:03] core.orchestrator [INFO] [start:148] Orchestrator: SeeProcess started
+[2026-06-02 17:18:03] core.orchestrator [INFO] [start:150] Orchestrator: ThinkProcess started
+[2026-06-02 17:18:03] core.orchestrator [INFO] [start:152] Orchestrator: ActProcess started
+[2026-06-02 17:18:03] __main__ [INFO] [main:93] Flask API listening on port 5000
+[2026-06-02 17:18:03] sense.sensor_fuser [INFO] [start:73] SensorFuser: starting
+[2026-06-02 17:18:03] sense.sensor_fuser [INFO] [start:78] SensorFuser: spawned 2 sensor threads
+[2026-06-02 17:18:03] think.think_engine [INFO] [start:33] ThinkEngine: starting
+[2026-06-02 17:18:03] think.database.think_database [DEBUG] [connect:46] Database: connect attempt 1/3
+[2026-06-02 17:18:03] think.database.think_database [WARNING] [connect:67] Database: connection attempt 1 failed - OperationalError: connection to server at "db.kszkxbhfuaoblayzhumf.supabase.co" (2a05:d018:65a:e200:a496:af17:d567:572c), port 5432 failed: Network is unreachable
+	Is the server running on that host and accepting TCP/IP connections?
+. Retrying...
+[2026-06-02 17:18:03] act.act_engine [INFO] [start:63] ActEngine: starting
+[2026-06-02 17:18:03] act.actuator_parser [ERROR] [build_actuators:62] ActuatorParser: failed to build 'pump' - ActuatorFaultError: pump: failed to init GPIO pin 17: Cannot determine SOC peripheral base address
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/act/actuators/pump_actuator.py", line 44, in __init__
+    GPIO.setup(self._pin, GPIO.OUT, initial=GPIO.LOW)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Cannot determine SOC peripheral base address
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/act/actuator_parser.py", line 59, in build_actuators
+    actuators.append(actuator_class(actuator_cfg))
+                     ~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/src/act/actuators/pump_actuator.py", line 46, in __init__
+    raise ActuatorFaultError(
+        f"{self.name}: failed to init GPIO pin {self._pin}: {e}"
+    )
+exceptions.exceptions.ActuatorFaultError: pump: failed to init GPIO pin 17: Cannot determine SOC peripheral base address
+[2026-06-02 17:18:03] act.actuator_parser [ERROR] [build_actuators:62] ActuatorParser: failed to build 'arm' - KeyError: 'interface'
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/act/actuator_parser.py", line 57, in build_actuators
+    actuators.append(actuator_class(actuator_cfg, state))
+                     ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/src/act/actuators/arm_controller.py", line 38, in __init__
+    super().__init__(config)
+    ~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/src/act/actuators/actuator_base.py", line 30, in __init__
+    self.interface = config['interface']
+                     ~~~~~~^^^^^^^^^^^^^
+KeyError: 'interface'
+[2026-06-02 17:18:03] act.act_engine [INFO] [start:67] ActEngine: built actuators []
+[2026-06-02 17:18:03] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.0, 26.25, 21.0, 20.0, 20.25, 19.5, 20.0, 20.25], [31.75, 26.25, 20.25, 20.0, 19.75, 19.5, 20.25, 20.0], [33.5, 25.0, 20.25, 20.0, 20.25, 20.0, 20.0, 19.75], [28.5, 22.25, 20.5, 20.25, 20.0, 20.25, 20.0, 20.0], [22.5, 21.25, 20.0, 19.75, 19.75, 19.75, 20.5, 20.25], [21.75, 21.25, 20.5, 20.0, 19.75, 20.0, 20.75, 20.25], [23.0, 21.0, 21.5, 20.0, 20.0, 20.5, 20.25, 19.75], [21.5, 20.75, 20.5, 20.5, 20.25, 21.0, 20.25, 20.25]] C | normalized=0.419 | threshold_hit=False
+[2026-06-02 17:18:03] sense.sensors.sensor_base [WARNING] [poll:177] Sensor smoke: Read failed (attempt 1/3): TypeError: float() argument must be a string or a real number, not 'complex'
+[2026-06-02 17:18:03] sense.sensors.sensor_base [WARNING] [poll:177] Sensor smoke: Read failed (attempt 2/3): TypeError: float() argument must be a string or a real number, not 'complex'
+[2026-06-02 17:18:03] werkzeug [INFO] [_log:97] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.105.123.122:5000
+[2026-06-02 17:18:03] werkzeug [INFO] [_log:97] [33mPress CTRL+C to quit[0m
+[2026-06-02 17:18:03] sense.sensors.sensor_base [ERROR] [poll:187] Sensor smoke: Sensor smoke: failed after 3 retries: float() argument must be a string or a real number, not 'complex'
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/sense/sensors/sensor_base.py", line 138, in poll
+    physical_value = self.read()
+  File "/home/mj/Desktop/fire_robot/src/sense/sensors/i2c_sensor.py", line 96, in read
+    return read_method()
+  File "/home/mj/Desktop/fire_robot/src/sense/sensors/i2c_sensor.py", line 106, in _read_ads1115
+    return float(eval(self._equation, context))
+TypeError: float() argument must be a string or a real number, not 'complex'
+[2026-06-02 17:18:03] sense.sensor_fuser [ERROR] [_sensor_loop:161] Sensor smoke: exception in _sensor_loop - SensorFaultError: Sensor smoke: failed after 3 retries: float() argument must be a string or a real number, not 'complex'
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/sense/sensors/sensor_base.py", line 138, in poll
+    physical_value = self.read()
+  File "/home/mj/Desktop/fire_robot/src/sense/sensors/i2c_sensor.py", line 96, in read
+    return read_method()
+  File "/home/mj/Desktop/fire_robot/src/sense/sensors/i2c_sensor.py", line 106, in _read_ads1115
+    return float(eval(self._equation, context))
+TypeError: float() argument must be a string or a real number, not 'complex'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/sense/sensor_fuser.py", line 133, in _sensor_loop
+    physical, normalized, threshold_hit = sensor.poll()
+                                          ~~~~~~~~~~~^^
+  File "/home/mj/Desktop/fire_robot/src/sense/sensors/sensor_base.py", line 191, in poll
+    raise SensorFaultError(error_msg)
+exceptions.exceptions.SensorFaultError: Sensor smoke: failed after 3 retries: float() argument must be a string or a real number, not 'complex'
+[2026-06-02 17:18:03] sense.sensor_fuser [INFO] [_mark_sensor_faulted:212] Sensor smoke: marked as faulted
+[2026-06-02 17:18:03] notify.notification_service [WARNING] [_log_notification:171] [sense] NOTIFY | event=sensor_faulted | severity=warn | payload={'sensor': 'smoke'}
+[2026-06-02 17:18:04] picamera2.picamera2 [INFO] [_initialize_camera:555] Initialization successful.
+[2026-06-02 17:18:04] picamera2.picamera2 [INFO] [_open_camera:577] Camera now open.
+[2026-06-02 17:18:04] picamera2.picamera2 [DEBUG] [__init__:357] <libcamera._libcamera.CameraManager object at 0x7ffef26fa9b0>
+[2026-06-02 17:18:04] picamera2.picamera2 [DEBUG] [configure_:1212] Requesting configuration: {'use_case': 'preview', 'transform': <libcamera.Transform 'identity'>, 'colour_space': <libcamera.ColorSpace 'sYCC'>, 'buffer_count': 4, 'queue': True, 'main': {'format': 'XBGR8888', 'size': (640, 480), 'preserve_ar': True, 'stride': 2560, 'framesize': 1228800}, 'lores': None, 'raw': {'format': 'RGGB_PISP_COMP1', 'size': (2028, 1520), 'stride': 2048, 'framesize': 3112960}, 'controls': {'NoiseReductionMode': <NoiseReductionModeEnum.Minimal: 3>, 'FrameDurationLimits': (100, 83333), 'FrameRate': 30}, 'sensor': {'bit_depth': 10, 'output_size': (2028, 1520)}, 'display': 'main', 'encode': 'main'}
+[2026-06-02 17:18:04] picamera2.picamera2 [INFO] [configure_:1216] Camera configuration has been adjusted!
+[2026-06-02 17:18:04] picamera2.picamera2 [INFO] [configure_:1221] Configuration successful!
+[2026-06-02 17:18:04] picamera2.picamera2 [DEBUG] [configure_:1222] Final configuration: {'use_case': 'preview', 'transform': <libcamera.Transform 'identity'>, 'colour_space': <libcamera.ColorSpace 'sYCC'>, 'buffer_count': 4, 'queue': True, 'main': {'format': 'XBGR8888', 'size': (640, 480), 'preserve_ar': True, 'stride': 2560, 'framesize': 1228800}, 'lores': None, 'raw': {'format': 'RGGB_PISP_COMP1', 'size': (2028, 1520), 'stride': 2048, 'framesize': 3112960}, 'controls': {'NoiseReductionMode': <NoiseReductionModeEnum.Minimal: 3>, 'FrameDurationLimits': (100, 83333), 'FrameRate': 30}, 'sensor': {'bit_depth': 10, 'output_size': (2028, 1520)}, 'display': 'main', 'encode': 'main'}
+[2026-06-02 17:18:04] picamera2.picamera2 [DEBUG] [configure_:1236] Streams: {'main': <libcamera._libcamera.Stream object at 0x7ffef270cbb0>, 'lores': None, 'raw': <libcamera._libcamera.Stream object at 0x7ffef270cbf0>}
+[2026-06-02 17:18:04] picamera2 [DEBUG] [allocate:70] Allocated 4 buffers for stream 0 with fds [43, 46, 49, 52]
+[2026-06-02 17:18:04] picamera2 [DEBUG] [allocate:70] Allocated 4 buffers for stream 1 with fds [55, 58, 61, 64]
+[2026-06-02 17:18:04] picamera2.picamera2 [INFO] [start_:1323] Camera started
+[2026-06-02 17:18:04] think.database.think_database [DEBUG] [connect:46] Database: connect attempt 2/3
+[2026-06-02 17:18:04] think.database.think_database [WARNING] [connect:67] Database: connection attempt 2 failed - OperationalError: connection to server at "db.kszkxbhfuaoblayzhumf.supabase.co" (2a05:d018:65a:e200:a496:af17:d567:572c), port 5432 failed: Network is unreachable
+	Is the server running on that host and accepting TCP/IP connections?
+. Retrying...
+[2026-06-02 17:18:05] think.database.think_database [DEBUG] [connect:46] Database: connect attempt 3/3
+[2026-06-02 17:18:05] think.database.think_database [ERROR] [connect:62] Database: connection failed - OperationalError: Failed to connect after 3 attempts: connection to server at "db.kszkxbhfuaoblayzhumf.supabase.co" (2a05:d018:65a:e200:a496:af17:d567:572c), port 5432 failed: Network is unreachable
+	Is the server running on that host and accepting TCP/IP connections?
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/think/database/think_database.py", line 47, in connect
+    self._connection = psycopg2.connect(
+                       ~~~~~~~~~~~~~~~~^
+        host=os.getenv("DB_HOST"),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        cursor_factory=RealDictCursor
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+psycopg2.OperationalError: connection to server at "db.kszkxbhfuaoblayzhumf.supabase.co" (2a05:d018:65a:e200:a496:af17:d567:572c), port 5432 failed: Network is unreachable
+	Is the server running on that host and accepting TCP/IP connections?
+
+[2026-06-02 17:18:05] think.think_engine [ERROR] [start:41] ThinkEngine: database connection failed - DatabaseError: Failed to connect after 3 attempts: connection to server at "db.kszkxbhfuaoblayzhumf.supabase.co" (2a05:d018:65a:e200:a496:af17:d567:572c), port 5432 failed: Network is unreachable
+	Is the server running on that host and accepting TCP/IP connections?
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/think/database/think_database.py", line 47, in connect
+    self._connection = psycopg2.connect(
+                       ~~~~~~~~~~~~~~~~^
+        host=os.getenv("DB_HOST"),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        cursor_factory=RealDictCursor
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+psycopg2.OperationalError: connection to server at "db.kszkxbhfuaoblayzhumf.supabase.co" (2a05:d018:65a:e200:a496:af17:d567:572c), port 5432 failed: Network is unreachable
+	Is the server running on that host and accepting TCP/IP connections?
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/think/think_engine.py", line 37, in start
+    self._db.connect()
+    ~~~~~~~~~~~~~~~~^^
+  File "/home/mj/Desktop/fire_robot/src/think/database/think_database.py", line 66, in connect
+    raise DatabaseError(error_msg)
+exceptions.exceptions.DatabaseError: Failed to connect after 3 attempts: connection to server at "db.kszkxbhfuaoblayzhumf.supabase.co" (2a05:d018:65a:e200:a496:af17:d567:572c), port 5432 failed: Network is unreachable
+	Is the server running on that host and accepting TCP/IP connections?
+
+[2026-06-02 17:18:05] notify.notification_service [WARNING] [_log_notification:171] [think] NOTIFY | event=database_disconnected | severity=warn | payload={'error': 'Failed to connect after 3 attempts: connection to server at "db.kszkxbhfuaoblayzhumf.supabase.co" (2a05:d018:65a:e200:a496:af17:d567:572c), port 5432 failed: Network is unreachable\n\tIs the server running on that host and accepting TCP/IP connections?\n'}
+[2026-06-02 17:18:13] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.25, 25.5, 20.75, 19.5, 19.5, 18.75, 19.5, 20.0], [31.0, 26.25, 20.25, 19.5, 19.0, 19.25, 19.75, 19.25], [32.75, 24.5, 20.25, 19.75, 19.5, 19.25, 19.0, 18.75], [28.0, 21.5, 19.75, 19.75, 19.5, 19.25, 20.0, 19.5], [22.25, 20.75, 19.5, 19.25, 19.25, 19.5, 19.5, 19.75], [21.75, 21.0, 20.25, 19.75, 19.5, 19.25, 19.75, 19.5], [22.25, 21.25, 20.5, 19.5, 19.75, 20.0, 20.0, 20.0], [21.25, 20.0, 20.0, 19.75, 20.25, 21.0, 19.5, 20.0]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:18:23] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.5, 25.75, 20.25, 19.25, 19.0, 18.75, 19.0, 19.0], [30.75, 26.0, 19.75, 19.25, 19.25, 19.0, 19.0, 19.0], [33.0, 24.0, 19.25, 19.0, 19.75, 18.75, 19.25, 18.75], [27.75, 20.5, 19.5, 19.25, 19.25, 19.0, 19.25, 19.25], [22.0, 21.0, 19.5, 19.0, 19.0, 19.5, 19.5, 20.0], [21.0, 21.0, 19.75, 19.5, 19.0, 19.25, 19.0, 19.25], [22.25, 20.75, 19.5, 19.0, 19.5, 19.75, 19.5, 19.5], [20.5, 19.5, 20.0, 19.5, 19.5, 20.25, 19.5, 20.0]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:18:33] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 24.75, 20.75, 19.75, 19.5, 18.75, 19.75, 19.5], [31.5, 25.5, 20.25, 19.75, 19.5, 19.0, 19.5, 19.0], [32.5, 24.5, 19.5, 19.75, 19.25, 19.0, 19.25, 18.75], [28.0, 21.75, 20.0, 19.25, 20.0, 19.5, 20.0, 19.75], [22.0, 20.75, 19.75, 19.5, 19.25, 19.25, 19.75, 19.75], [21.5, 21.0, 19.5, 19.0, 19.5, 19.25, 20.0, 19.5], [22.75, 21.0, 20.75, 20.0, 19.75, 20.0, 19.25, 19.75], [20.75, 20.25, 20.5, 20.25, 19.5, 20.0, 20.0, 20.25]] C | normalized=0.406 | threshold_hit=False
+[2026-06-02 17:18:37] picamera2.picamera2 [INFO] [stop_:1391] Camera stopped
+[2026-06-02 17:18:37] picamera2.picamera2 [INFO] [close:734] Camera closed successfully.
+[2026-06-02 17:18:43] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 25.25, 20.5, 19.5, 19.5, 19.25, 19.75, 19.75], [31.5, 25.5, 19.75, 19.75, 19.25, 19.0, 19.5, 19.25], [33.0, 24.5, 19.5, 19.25, 19.5, 19.25, 19.0, 18.75], [27.75, 21.5, 20.0, 19.5, 19.5, 18.75, 19.0, 19.0], [22.25, 20.75, 19.5, 19.25, 19.5, 19.75, 20.0, 19.75], [21.25, 21.0, 19.75, 19.75, 19.5, 19.25, 19.5, 19.5], [22.25, 21.25, 20.25, 19.0, 19.5, 20.0, 19.5, 19.75], [20.5, 20.0, 20.5, 19.25, 20.0, 20.0, 20.0, 20.0]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:18:53] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 24.75, 20.25, 19.5, 19.0, 18.75, 19.75, 20.0], [31.5, 25.25, 20.0, 19.75, 19.75, 18.5, 19.75, 18.5], [32.75, 24.0, 19.75, 19.25, 19.75, 18.75, 18.75, 18.75], [27.25, 21.0, 19.75, 19.25, 19.0, 19.25, 19.25, 19.0], [22.0, 20.75, 19.25, 18.75, 19.0, 19.25, 20.0, 19.0], [21.25, 20.75, 19.75, 19.25, 19.25, 19.25, 19.75, 19.75], [22.75, 20.75, 20.25, 19.75, 18.75, 20.0, 19.5, 19.0], [20.75, 20.0, 19.5, 20.0, 19.75, 20.0, 19.25, 20.0]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:19:03] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.0, 23.75, 20.0, 19.25, 19.5, 19.0, 19.25, 19.5], [31.0, 25.0, 19.75, 19.25, 19.25, 19.0, 19.0, 19.5], [32.75, 24.5, 19.75, 19.5, 19.5, 19.0, 19.25, 18.25], [27.75, 21.25, 20.0, 19.5, 19.5, 18.75, 19.5, 19.25], [22.0, 20.75, 19.5, 19.0, 19.25, 19.25, 20.0, 19.75], [21.0, 21.0, 19.75, 19.25, 19.25, 19.25, 20.0, 19.5], [22.5, 20.75, 20.0, 19.5, 19.25, 19.75, 19.5, 19.75], [20.0, 19.5, 20.25, 19.5, 19.75, 20.25, 19.75, 20.0]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:19:13] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.5, 24.0, 20.75, 20.0, 19.5, 19.5, 19.25, 19.75], [31.25, 25.5, 20.25, 20.0, 19.75, 19.25, 19.75, 19.5], [33.25, 24.5, 20.25, 19.5, 19.75, 19.25, 19.75, 19.25], [28.0, 21.5, 19.75, 19.5, 19.25, 19.5, 19.75, 19.75], [22.25, 21.0, 19.5, 19.25, 19.75, 19.5, 20.25, 20.0], [21.5, 21.25, 19.5, 19.75, 20.0, 19.5, 20.25, 20.25], [22.75, 21.0, 20.25, 19.75, 20.0, 19.75, 20.0, 19.5], [20.25, 20.0, 20.5, 19.5, 19.75, 20.5, 20.0, 19.75]] C | normalized=0.416 | threshold_hit=False
+[2026-06-02 17:19:24] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.75, 24.0, 22.0, 22.0, 21.75, 23.0, 27.0, 26.25], [33.5, 27.25, 21.75, 22.0, 21.75, 22.25, 26.0, 27.75], [35.5, 26.5, 22.25, 21.75, 22.25, 22.25, 26.5, 28.5], [31.25, 23.75, 22.5, 22.0, 22.0, 23.25, 28.0, 29.25], [24.75, 23.0, 22.0, 21.75, 22.25, 24.5, 27.75, 26.25], [23.5, 23.0, 22.25, 22.0, 22.25, 25.75, 28.0, 27.0], [23.5, 24.25, 22.75, 22.0, 22.5, 27.25, 28.0, 27.75], [22.5, 23.75, 22.25, 22.25, 23.25, 26.5, 26.75, 27.0]] C | normalized=0.444 | threshold_hit=False
+[2026-06-02 17:19:34] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.25, 26.0, 21.5, 19.75, 20.25, 19.75, 20.75, 20.75], [31.75, 26.5, 20.5, 20.75, 20.5, 20.0, 20.0, 19.25], [34.0, 25.5, 21.0, 20.5, 20.25, 19.75, 20.25, 19.75], [28.75, 22.0, 20.75, 20.5, 20.25, 20.25, 20.0, 20.5], [23.0, 21.75, 20.75, 20.25, 19.75, 20.0, 20.5, 20.5], [21.75, 21.5, 20.5, 20.25, 20.25, 20.0, 20.75, 20.75], [23.0, 21.75, 21.25, 20.0, 20.75, 20.5, 20.5, 20.0], [21.0, 20.5, 21.25, 20.5, 20.25, 21.25, 20.0, 20.5]] C | normalized=0.425 | threshold_hit=False
+[2026-06-02 17:19:44] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.5, 25.75, 20.75, 19.75, 19.75, 19.5, 20.0, 20.25], [32.0, 26.25, 21.0, 20.0, 20.0, 19.75, 20.25, 19.25], [33.5, 25.25, 20.75, 20.5, 20.25, 20.25, 19.75, 19.75], [28.5, 22.0, 20.5, 20.0, 20.25, 20.25, 20.0, 20.0], [22.75, 21.5, 20.5, 20.25, 20.0, 19.75, 20.75, 20.0], [22.0, 21.5, 20.75, 19.75, 19.75, 20.25, 20.5, 20.25], [23.0, 21.75, 20.25, 20.75, 20.5, 20.75, 20.5, 20.5], [21.25, 20.5, 20.75, 20.5, 20.75, 20.25, 20.75, 21.25]] C | normalized=0.419 | threshold_hit=False
+[2026-06-02 17:19:54] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.0, 25.75, 22.75, 21.0, 20.25, 19.25, 19.5, 20.0], [31.5, 25.25, 20.0, 20.25, 19.75, 19.5, 19.75, 19.5], [33.25, 24.25, 20.0, 20.0, 20.0, 19.25, 20.0, 19.5], [28.0, 21.75, 20.25, 19.5, 19.5, 19.5, 19.5, 19.0], [22.0, 20.75, 19.75, 19.5, 19.25, 19.25, 20.25, 20.0], [21.5, 20.75, 20.5, 19.25, 19.75, 19.25, 19.75, 19.75], [22.5, 21.25, 20.0, 19.25, 19.75, 19.75, 19.75, 19.5], [20.75, 20.0, 20.0, 19.75, 20.25, 20.25, 20.0, 20.25]] C | normalized=0.416 | threshold_hit=False
+[2026-06-02 17:20:04] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.0, 25.5, 22.0, 19.0, 19.25, 18.75, 18.75, 19.5], [31.25, 26.0, 20.25, 19.0, 18.75, 19.0, 19.5, 18.75], [32.75, 24.5, 19.75, 19.5, 19.5, 19.0, 19.25, 18.5], [27.5, 21.5, 19.75, 19.25, 19.5, 19.0, 19.5, 19.25], [22.25, 20.25, 19.5, 19.25, 19.5, 19.25, 19.75, 19.5], [21.0, 20.75, 19.75, 19.25, 19.25, 18.75, 19.5, 19.25], [22.0, 20.75, 20.5, 19.75, 19.75, 19.25, 19.5, 19.75], [20.75, 20.25, 20.0, 19.75, 19.5, 20.25, 19.75, 19.75]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:20:14] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 25.5, 21.75, 19.25, 19.0, 18.5, 18.5, 19.0], [31.25, 27.5, 20.0, 19.25, 19.0, 19.0, 19.0, 19.0], [32.5, 25.0, 19.25, 19.25, 19.5, 18.75, 18.5, 18.75], [27.25, 20.75, 19.5, 19.25, 18.75, 18.75, 19.25, 18.5], [22.0, 20.0, 19.0, 19.0, 19.0, 19.0, 19.5, 19.75], [21.0, 20.25, 19.0, 19.0, 19.0, 18.75, 19.75, 19.5], [22.0, 20.75, 19.75, 18.75, 19.5, 19.25, 19.5, 19.0], [20.75, 20.0, 19.75, 19.5, 19.5, 20.25, 19.0, 20.0]] C | normalized=0.406 | threshold_hit=False
+[2026-06-02 17:20:24] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 26.0, 21.25, 19.75, 19.5, 19.0, 19.5, 19.5], [31.5, 26.5, 20.5, 19.75, 19.0, 19.5, 19.5, 19.5], [33.0, 25.0, 20.25, 19.75, 20.25, 19.5, 19.5, 19.25], [27.5, 21.75, 20.25, 19.5, 19.75, 20.0, 19.5, 19.25], [22.5, 21.0, 19.75, 19.75, 19.25, 19.25, 19.75, 19.75], [21.5, 21.25, 20.0, 19.5, 19.75, 19.5, 20.0, 20.0], [22.75, 21.0, 20.5, 19.5, 19.75, 20.0, 19.5, 19.5], [20.75, 20.25, 20.5, 20.0, 20.0, 20.5, 19.5, 20.25]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:20:34] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.25, 26.0, 23.25, 20.0, 19.75, 19.25, 19.5, 19.75], [31.75, 28.25, 22.0, 20.0, 19.5, 19.5, 19.75, 19.25], [33.0, 25.75, 20.25, 20.0, 20.0, 19.75, 19.0, 19.5], [28.0, 21.5, 20.5, 20.0, 20.0, 20.0, 19.75, 19.75], [23.0, 21.25, 19.5, 19.5, 19.75, 19.5, 20.0, 20.0], [21.5, 21.0, 20.0, 19.75, 19.5, 19.25, 20.0, 20.25], [22.5, 21.25, 21.0, 20.0, 20.0, 20.0, 19.75, 20.25], [20.75, 20.5, 20.0, 19.75, 20.0, 20.0, 20.25, 20.5]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:20:44] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.0, 26.0, 22.5, 19.75, 19.25, 18.75, 19.25, 19.75], [31.5, 27.5, 20.5, 20.0, 19.5, 19.75, 19.25, 19.5], [33.0, 24.5, 20.5, 19.75, 20.0, 19.25, 19.5, 18.75], [27.75, 21.5, 19.75, 19.25, 19.25, 19.5, 19.25, 19.25], [22.5, 21.0, 19.5, 19.25, 19.0, 19.25, 20.0, 19.25], [21.25, 20.5, 20.0, 19.25, 19.75, 19.25, 20.0, 19.75], [22.5, 21.5, 20.0, 19.75, 19.5, 19.75, 19.5, 19.25], [20.5, 20.0, 19.75, 20.0, 20.25, 20.5, 19.75, 20.5]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:20:54] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.5, 26.0, 23.25, 20.0, 19.5, 18.75, 19.75, 19.5], [31.5, 27.25, 20.75, 19.5, 19.25, 19.75, 19.5, 19.25], [33.0, 24.75, 19.75, 20.0, 19.75, 19.25, 19.25, 19.25], [28.0, 21.5, 19.75, 19.75, 19.25, 19.5, 19.75, 19.0], [22.25, 20.75, 19.5, 19.25, 19.0, 19.25, 20.25, 19.5], [21.25, 20.5, 19.5, 19.75, 19.25, 19.5, 19.75, 19.75], [22.0, 21.25, 19.75, 19.5, 19.5, 19.25, 19.5, 19.25], [20.75, 19.5, 20.0, 20.0, 19.5, 20.25, 19.75, 20.25]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:21:04] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.0, 26.0, 23.0, 20.0, 19.25, 19.25, 19.25, 20.0], [31.5, 27.75, 21.0, 19.75, 19.5, 19.25, 20.0, 19.0], [33.25, 25.0, 20.0, 20.25, 20.0, 19.75, 19.75, 19.0], [28.0, 21.5, 20.0, 19.5, 19.5, 19.5, 20.0, 19.25], [22.5, 21.0, 19.5, 19.75, 19.5, 19.25, 20.0, 19.75], [21.5, 20.75, 20.0, 19.25, 19.5, 19.75, 19.75, 19.75], [22.5, 21.0, 20.5, 20.25, 19.5, 19.5, 19.5, 19.25], [20.5, 20.0, 20.0, 20.0, 19.75, 20.25, 20.25, 19.25]] C | normalized=0.416 | threshold_hit=False
+[2026-06-02 17:21:14] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.25, 26.0, 23.5, 21.0, 20.25, 19.25, 19.5, 19.75], [31.75, 27.25, 20.5, 20.25, 19.75, 19.25, 19.5, 19.25], [33.0, 24.75, 20.0, 20.25, 20.0, 19.75, 19.25, 19.25], [27.75, 21.75, 20.0, 20.0, 19.5, 19.75, 20.0, 19.5], [22.75, 21.25, 19.75, 19.5, 19.25, 19.5, 20.0, 20.0], [21.5, 21.0, 20.0, 19.75, 20.0, 19.75, 20.0, 19.75], [22.75, 21.0, 20.5, 20.25, 20.0, 20.0, 20.25, 19.75], [21.0, 20.25, 20.5, 19.5, 19.5, 20.75, 19.75, 19.75]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:21:24] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.5, 26.25, 23.25, 19.75, 19.25, 19.0, 18.75, 19.5], [31.75, 27.25, 20.25, 19.75, 19.0, 19.25, 19.5, 19.75], [33.25, 24.5, 19.75, 19.75, 20.0, 19.25, 18.5, 18.75], [27.75, 21.75, 19.75, 19.5, 19.5, 19.0, 19.5, 19.25], [22.25, 21.0, 19.5, 19.25, 19.25, 19.25, 19.75, 20.0], [21.75, 20.75, 19.5, 19.25, 19.25, 19.25, 19.75, 20.0], [22.5, 21.0, 19.75, 19.5, 19.5, 19.5, 19.75, 19.5], [20.25, 20.25, 20.25, 19.75, 19.25, 20.25, 20.25, 19.75]] C | normalized=0.416 | threshold_hit=False
+[2026-06-02 17:21:34] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 25.5, 22.25, 20.25, 19.25, 18.75, 19.25, 19.5], [31.25, 26.0, 19.75, 19.5, 19.25, 19.0, 19.0, 18.75], [32.75, 24.25, 19.75, 19.5, 19.5, 19.0, 18.75, 18.5], [27.75, 21.25, 19.5, 19.0, 19.0, 19.0, 19.0, 18.75], [21.5, 20.25, 19.25, 18.75, 19.0, 19.0, 19.25, 19.75], [21.25, 20.75, 19.5, 19.0, 19.25, 19.25, 19.5, 19.75], [22.5, 20.5, 20.0, 19.5, 19.75, 19.25, 19.25, 18.75], [20.5, 19.5, 20.25, 19.5, 19.75, 20.0, 19.75, 19.75]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:21:44] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.25, 26.75, 22.25, 20.5, 19.75, 19.5, 19.5, 20.0], [31.5, 27.5, 20.5, 20.5, 19.75, 19.75, 20.0, 19.25], [33.5, 24.75, 20.25, 20.5, 20.25, 20.0, 19.75, 19.25], [28.0, 22.0, 20.5, 20.25, 19.5, 20.0, 19.75, 19.75], [22.5, 21.25, 20.0, 19.5, 19.75, 20.0, 20.0, 19.5], [21.5, 21.5, 19.75, 19.75, 20.0, 19.5, 19.75, 20.0], [22.75, 21.25, 20.25, 19.75, 19.75, 20.25, 20.0, 19.75], [21.0, 20.25, 20.75, 20.25, 20.25, 20.5, 19.5, 20.5]] C | normalized=0.419 | threshold_hit=False
+[2026-06-02 17:21:54] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 26.0, 22.0, 19.75, 19.0, 18.75, 19.75, 19.5], [31.25, 26.75, 19.75, 19.75, 19.25, 18.75, 19.25, 19.25], [32.75, 24.0, 19.75, 19.5, 19.75, 19.25, 18.75, 18.5], [27.5, 21.25, 20.0, 19.25, 18.75, 18.75, 19.0, 19.25], [22.25, 20.5, 19.5, 19.25, 19.0, 19.0, 19.25, 19.75], [21.0, 20.5, 19.5, 19.25, 19.0, 18.75, 19.5, 19.75], [22.25, 20.5, 19.5, 19.75, 19.5, 20.0, 19.25, 19.5], [20.5, 19.5, 19.75, 19.0, 18.75, 20.0, 19.25, 19.75]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:22:04] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.25, 26.25, 22.5, 19.75, 19.25, 19.0, 19.25, 19.5], [31.75, 26.75, 20.0, 20.0, 19.5, 19.25, 20.0, 19.75], [33.25, 24.5, 20.25, 19.75, 19.75, 19.5, 19.0, 18.75], [28.0, 21.25, 20.0, 19.5, 19.75, 19.75, 20.0, 19.25], [22.5, 20.5, 19.5, 19.25, 19.75, 19.25, 20.0, 20.0], [21.25, 21.0, 20.25, 19.5, 19.0, 19.25, 19.75, 20.25], [23.0, 20.75, 20.25, 19.25, 19.5, 20.0, 20.0, 19.5], [21.0, 20.25, 20.25, 20.0, 20.25, 20.5, 20.25, 20.5]] C | normalized=0.416 | threshold_hit=False
+[2026-06-02 17:22:14] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[30.0, 27.0, 23.75, 21.25, 20.5, 20.0, 20.75, 21.0], [32.25, 28.0, 21.75, 21.0, 20.5, 20.75, 20.75, 21.0], [34.0, 25.75, 21.25, 21.0, 21.0, 20.75, 20.25, 20.0], [28.75, 22.75, 21.5, 20.75, 20.5, 20.5, 20.75, 21.0], [23.5, 22.25, 20.75, 20.75, 21.0, 20.5, 21.5, 21.0], [22.25, 22.0, 21.5, 20.75, 21.0, 20.75, 20.25, 21.0], [23.25, 22.0, 21.5, 20.75, 20.75, 21.5, 21.25, 20.75], [22.0, 21.25, 21.25, 21.0, 21.0, 21.5, 21.0, 20.75]] C | normalized=0.425 | threshold_hit=False
+[2026-06-02 17:22:24] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.0, 26.5, 22.5, 20.0, 20.25, 19.5, 20.0, 19.75], [31.75, 26.75, 20.5, 20.5, 19.75, 19.75, 20.0, 19.5], [33.75, 24.75, 20.5, 19.75, 20.25, 20.0, 19.75, 18.5], [28.25, 21.75, 20.5, 20.0, 20.0, 19.5, 20.0, 19.25], [22.5, 21.0, 19.75, 19.75, 19.75, 19.5, 20.5, 20.0], [22.0, 21.0, 20.0, 20.0, 19.75, 19.5, 20.0, 20.25], [22.5, 21.5, 20.75, 20.25, 20.25, 20.0, 19.75, 20.0], [21.25, 20.25, 20.75, 20.0, 20.75, 20.75, 20.5, 20.75]] C | normalized=0.422 | threshold_hit=False
+[2026-06-02 17:22:34] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.25, 26.75, 23.0, 20.75, 20.5, 19.75, 20.75, 20.75], [32.25, 27.5, 21.25, 21.0, 20.5, 20.25, 20.5, 20.5], [33.75, 25.25, 20.75, 20.75, 21.25, 20.75, 19.75, 19.75], [28.75, 22.75, 21.0, 20.75, 20.75, 20.5, 20.5, 20.5], [23.5, 21.5, 20.5, 20.5, 20.25, 20.5, 21.0, 21.25], [22.0, 21.5, 20.75, 20.5, 20.25, 20.75, 20.75, 21.0], [23.25, 21.5, 21.0, 20.75, 20.25, 20.75, 21.0, 20.5], [21.25, 21.0, 20.75, 20.75, 21.25, 21.5, 20.5, 21.0]] C | normalized=0.422 | threshold_hit=False
+[2026-06-02 17:22:44] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.75, 27.0, 23.0, 20.75, 20.25, 19.75, 20.25, 20.0], [32.25, 28.25, 21.0, 20.5, 20.5, 20.25, 20.5, 20.25], [33.25, 25.0, 20.75, 20.75, 20.75, 20.0, 19.75, 20.0], [29.0, 22.25, 21.0, 20.5, 20.0, 20.25, 20.25, 20.0], [23.25, 21.25, 20.25, 20.5, 20.0, 20.0, 20.5, 20.5], [21.75, 21.75, 20.5, 20.0, 20.5, 20.5, 20.5, 21.0], [23.0, 21.5, 21.0, 20.25, 20.25, 20.5, 20.25, 20.25], [21.25, 20.5, 20.75, 20.5, 20.25, 20.75, 20.25, 20.75]] C | normalized=0.416 | threshold_hit=False
+[2026-06-02 17:22:54] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 25.75, 22.0, 19.25, 18.75, 18.25, 19.25, 18.75], [31.25, 26.5, 20.0, 19.75, 18.75, 18.75, 19.0, 18.75], [33.0, 24.5, 19.5, 19.5, 19.25, 19.0, 18.75, 18.75], [27.5, 21.0, 19.75, 19.0, 19.0, 18.75, 19.5, 18.75], [22.0, 20.25, 19.0, 19.0, 19.0, 18.5, 19.25, 19.25], [21.25, 20.25, 19.75, 18.75, 18.75, 19.0, 19.75, 19.25], [22.0, 20.75, 20.0, 19.25, 19.25, 19.25, 19.25, 19.0], [20.75, 19.5, 19.5, 19.5, 19.5, 19.75, 19.5, 19.5]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:23:04] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 26.0, 22.25, 19.5, 19.25, 18.75, 19.25, 19.25], [31.25, 26.5, 20.0, 19.5, 19.0, 19.25, 19.25, 19.0], [32.75, 24.25, 19.75, 19.5, 19.75, 18.5, 18.75, 19.0], [27.0, 21.0, 20.0, 19.0, 18.75, 19.0, 19.0, 19.0], [22.0, 20.5, 19.0, 19.0, 19.25, 19.0, 19.5, 19.0], [20.5, 20.25, 19.5, 18.75, 18.75, 19.0, 19.5, 18.75], [22.0, 20.75, 20.25, 19.25, 19.0, 19.0, 19.0, 18.75], [19.75, 19.5, 19.5, 19.5, 19.75, 20.0, 19.25, 19.5]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:23:14] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.0, 25.75, 22.5, 19.5, 19.0, 18.25, 19.0, 18.75], [31.5, 26.75, 20.0, 20.0, 19.0, 18.5, 19.0, 19.25], [32.5, 24.25, 19.0, 19.0, 19.5, 19.0, 18.75, 18.25], [27.25, 20.75, 19.75, 18.5, 19.25, 18.75, 19.0, 18.25], [21.75, 20.25, 19.0, 18.75, 19.0, 19.0, 19.5, 19.25], [21.0, 20.25, 19.5, 18.75, 19.0, 18.75, 19.5, 18.5], [21.5, 21.0, 19.75, 19.25, 19.5, 19.5, 19.5, 19.0], [20.25, 20.0, 19.0, 19.25, 19.5, 19.75, 19.0, 19.25]] C | normalized=0.406 | threshold_hit=False
+[2026-06-02 17:23:24] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.25, 26.25, 23.0, 20.25, 20.0, 19.75, 19.75, 19.75], [31.75, 27.25, 20.25, 20.0, 19.75, 19.5, 19.75, 19.25], [33.0, 25.0, 20.25, 20.25, 20.0, 19.5, 19.25, 19.0], [28.5, 21.75, 20.5, 20.25, 19.75, 19.5, 19.75, 19.75], [22.25, 20.75, 19.75, 19.75, 19.5, 19.75, 20.25, 20.5], [21.25, 21.0, 20.0, 19.5, 19.5, 19.25, 20.0, 19.75], [22.5, 21.0, 20.75, 20.0, 20.0, 20.0, 20.0, 19.75], [20.75, 20.0, 19.75, 20.0, 20.25, 20.75, 20.5, 20.25]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:23:35] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.0, 25.75, 21.5, 19.5, 19.25, 18.75, 19.5, 19.0], [31.25, 26.0, 20.0, 19.5, 19.25, 19.0, 19.5, 19.0], [33.0, 24.0, 19.75, 19.5, 19.5, 19.0, 19.0, 18.75], [27.75, 21.25, 19.75, 19.25, 19.25, 19.25, 19.5, 19.0], [21.75, 20.75, 19.5, 19.0, 19.0, 19.25, 20.25, 19.75], [21.0, 20.25, 19.75, 19.25, 19.5, 19.25, 19.25, 19.75], [22.25, 20.75, 20.5, 19.5, 19.5, 19.5, 19.75, 19.5], [20.75, 19.25, 19.75, 19.75, 19.25, 20.5, 19.75, 19.5]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:23:45] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.0, 26.75, 22.25, 20.0, 19.5, 19.25, 19.5, 19.5], [32.5, 27.0, 20.25, 19.5, 19.75, 19.75, 20.0, 19.25], [33.75, 25.25, 20.0, 20.0, 20.5, 19.5, 19.25, 19.0], [28.75, 22.0, 20.5, 19.75, 19.75, 19.25, 19.5, 20.0], [22.0, 20.5, 19.75, 19.5, 19.25, 19.25, 19.75, 19.75], [21.5, 21.5, 20.25, 19.75, 20.0, 20.25, 19.5, 20.0], [22.5, 21.25, 20.75, 19.75, 20.0, 20.25, 20.25, 19.5], [20.75, 20.0, 20.25, 19.75, 20.0, 20.75, 20.0, 20.25]] C | normalized=0.422 | threshold_hit=False
+[2026-06-02 17:23:55] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.25, 26.5, 22.5, 19.75, 19.5, 19.0, 19.5, 19.75], [31.75, 27.25, 20.5, 19.75, 19.5, 19.25, 19.25, 19.25], [33.0, 24.5, 20.0, 20.25, 19.75, 19.25, 19.0, 19.0], [28.0, 21.25, 20.0, 19.5, 19.5, 19.25, 19.5, 18.75], [22.25, 20.5, 19.0, 19.5, 19.25, 19.5, 20.0, 19.75], [21.5, 20.75, 19.5, 19.25, 19.25, 19.5, 19.5, 20.0], [22.0, 21.0, 20.25, 19.75, 20.0, 19.75, 19.75, 20.0], [20.5, 20.0, 20.0, 19.75, 19.75, 20.25, 19.5, 20.25]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:24:05] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 26.0, 21.5, 20.0, 19.0, 18.75, 19.25, 19.5], [31.0, 26.25, 20.0, 19.5, 19.0, 19.0, 19.5, 19.0], [32.75, 24.25, 19.75, 19.75, 19.5, 19.5, 19.25, 18.5], [28.0, 21.25, 19.75, 19.25, 19.0, 19.0, 19.75, 19.0], [22.0, 20.25, 19.5, 18.75, 18.75, 19.25, 20.0, 19.25], [21.0, 20.75, 19.75, 19.25, 19.5, 19.5, 19.75, 19.5], [22.0, 20.5, 20.0, 19.0, 19.0, 19.75, 19.25, 19.0], [20.0, 19.75, 19.75, 19.5, 20.0, 20.25, 19.75, 20.0]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:24:15] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 26.25, 22.25, 19.5, 19.0, 19.0, 19.25, 19.75], [31.5, 26.75, 20.25, 20.25, 19.25, 18.75, 19.25, 18.5], [32.75, 24.25, 19.75, 19.75, 19.25, 19.0, 19.0, 18.75], [27.75, 21.0, 19.5, 19.25, 19.25, 19.0, 19.5, 19.25], [22.25, 20.25, 19.25, 19.25, 18.75, 19.0, 19.25, 19.5], [21.5, 21.0, 19.5, 19.25, 19.5, 19.0, 20.25, 19.75], [21.75, 21.25, 20.0, 20.0, 19.25, 19.5, 19.0, 19.25], [20.5, 19.75, 20.0, 19.25, 19.75, 20.0, 19.75, 20.0]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:24:25] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.25, 26.0, 21.5, 19.75, 19.25, 18.5, 19.75, 19.25], [31.25, 26.5, 20.25, 19.75, 19.0, 19.25, 19.25, 19.25], [33.25, 24.5, 19.5, 19.5, 19.25, 19.0, 19.25, 18.5], [27.5, 21.5, 19.75, 19.25, 19.5, 19.25, 19.5, 19.0], [21.75, 20.5, 19.75, 19.0, 19.25, 19.0, 20.0, 19.25], [21.25, 20.5, 19.5, 19.0, 19.0, 19.25, 19.75, 19.75], [22.5, 20.5, 20.0, 19.5, 19.25, 20.0, 19.75, 19.25], [20.5, 20.25, 20.25, 19.75, 19.75, 20.0, 20.0, 19.75]] C | normalized=0.416 | threshold_hit=False
+[2026-06-02 17:24:27] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:24:27] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:24:27] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:24:27] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:24:35] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 26.25, 22.0, 19.75, 19.0, 19.0, 19.75, 19.5], [31.75, 26.25, 19.75, 19.25, 19.25, 19.5, 19.75, 18.75], [33.0, 24.5, 20.25, 20.0, 19.5, 19.25, 19.0, 19.0], [27.25, 20.75, 20.0, 19.25, 19.25, 19.25, 19.25, 18.75], [22.5, 20.25, 19.75, 19.5, 19.0, 18.75, 19.75, 19.5], [21.25, 21.0, 19.25, 19.0, 19.0, 19.25, 19.75, 19.75], [21.75, 21.0, 19.75, 19.5, 19.5, 19.5, 19.75, 19.25], [20.75, 20.0, 19.5, 19.5, 19.5, 20.25, 20.0, 19.75]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:24:35] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:24:35] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:24:35] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:24:35] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:24:45] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 25.75, 21.75, 19.75, 19.5, 18.5, 19.5, 19.5], [31.0, 26.5, 20.25, 19.25, 19.25, 19.0, 19.5, 18.75], [33.0, 24.25, 19.25, 19.5, 19.5, 19.0, 19.0, 18.75], [28.0, 21.25, 19.5, 19.25, 19.5, 19.25, 19.25, 18.75], [22.0, 20.25, 19.0, 19.25, 19.25, 18.75, 19.5, 19.0], [20.75, 20.5, 19.25, 19.0, 19.0, 19.5, 20.0, 19.5], [21.75, 20.75, 20.0, 19.25, 19.25, 19.5, 19.5, 19.25], [20.5, 20.0, 19.75, 19.25, 19.75, 19.75, 19.5, 20.0]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:24:55] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 26.0, 22.0, 19.5, 19.0, 19.0, 19.5, 19.25], [31.5, 26.5, 19.75, 19.5, 19.0, 19.25, 19.25, 19.0], [32.5, 24.0, 19.5, 19.5, 19.75, 19.0, 18.75, 18.25], [27.75, 20.75, 19.5, 19.25, 19.25, 18.75, 19.5, 18.5], [22.0, 20.5, 19.5, 18.75, 19.0, 19.0, 19.5, 19.25], [21.25, 20.25, 19.5, 18.75, 19.25, 18.75, 19.75, 19.0], [21.75, 20.5, 19.75, 19.25, 19.0, 19.25, 19.5, 18.75], [20.25, 19.75, 20.25, 18.75, 19.75, 19.75, 19.75, 19.5]] C | normalized=0.406 | threshold_hit=False
+[2026-06-02 17:25:05] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.0, 25.25, 22.0, 19.75, 19.25, 18.25, 19.25, 20.0], [31.5, 26.25, 20.0, 20.0, 19.25, 19.25, 19.5, 19.25], [32.75, 24.0, 20.0, 20.0, 20.0, 19.25, 19.25, 18.75], [27.75, 21.5, 20.0, 19.25, 19.25, 19.5, 19.5, 19.0], [22.5, 21.0, 19.25, 19.25, 19.0, 18.75, 19.75, 20.0], [21.0, 20.5, 19.75, 19.5, 19.25, 19.25, 19.5, 20.0], [22.5, 20.75, 20.0, 19.75, 19.25, 20.0, 19.5, 19.5], [20.25, 19.5, 19.5, 19.5, 19.75, 20.0, 19.5, 19.75]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:25:15] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.25, 26.0, 22.25, 20.5, 20.0, 19.75, 20.0, 20.0], [32.0, 26.0, 20.5, 20.25, 20.0, 19.75, 20.0, 20.25], [33.0, 24.5, 20.5, 20.25, 20.25, 20.0, 20.25, 19.5], [28.25, 21.75, 20.5, 20.0, 19.75, 19.75, 20.0, 19.5], [22.25, 21.25, 20.0, 20.0, 19.5, 19.5, 20.5, 20.25], [21.25, 21.25, 20.5, 19.75, 19.5, 19.5, 20.0, 20.25], [22.75, 21.5, 20.0, 20.25, 20.0, 21.0, 20.0, 20.0], [21.0, 20.25, 20.75, 20.0, 20.5, 20.75, 20.0, 20.25]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:25:25] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 25.75, 21.75, 19.75, 19.0, 19.0, 19.5, 19.5], [31.5, 26.0, 20.0, 20.0, 19.5, 19.25, 19.75, 19.25], [32.75, 24.0, 20.25, 19.5, 19.75, 19.25, 19.0, 19.25], [28.0, 21.25, 20.0, 19.5, 19.25, 19.25, 19.75, 18.5], [22.25, 20.75, 19.5, 19.25, 19.5, 19.5, 19.75, 19.25], [21.5, 20.75, 19.75, 19.25, 19.25, 19.25, 19.75, 20.0], [22.5, 20.75, 20.0, 19.75, 19.75, 19.5, 19.5, 19.25], [21.0, 20.25, 20.0, 19.25, 19.75, 20.5, 19.5, 20.25]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:25:35] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 26.25, 22.0, 20.25, 19.5, 19.0, 19.25, 19.75], [31.5, 25.75, 20.25, 19.75, 19.25, 19.75, 19.75, 19.5], [33.25, 24.5, 20.25, 20.0, 19.75, 19.5, 19.25, 19.25], [27.5, 21.25, 20.0, 19.5, 19.5, 19.0, 19.5, 19.0], [22.25, 20.5, 19.5, 19.5, 19.75, 19.0, 20.0, 19.75], [21.25, 20.75, 19.75, 19.5, 19.5, 19.25, 19.75, 20.0], [22.5, 21.0, 20.25, 19.75, 19.5, 20.25, 20.0, 19.5], [20.75, 19.75, 20.0, 20.25, 19.5, 20.5, 19.5, 20.75]] C | normalized=0.416 | threshold_hit=False
+[2026-06-02 17:25:45] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.0, 25.75, 22.0, 20.25, 20.0, 19.25, 19.75, 19.5], [31.75, 26.0, 20.25, 20.0, 19.75, 19.0, 19.5, 19.0], [33.0, 24.25, 20.0, 20.0, 20.0, 19.5, 19.25, 19.25], [28.0, 21.25, 20.0, 19.75, 20.0, 19.75, 19.5, 19.5], [22.5, 21.0, 19.75, 19.75, 19.5, 19.75, 20.0, 19.5], [21.5, 21.0, 19.75, 19.5, 19.25, 19.25, 20.0, 19.75], [22.5, 21.25, 20.25, 20.0, 19.25, 20.25, 20.0, 20.0], [20.5, 20.75, 20.5, 20.0, 20.25, 20.25, 20.0, 20.5]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:25:55] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.5, 26.25, 21.75, 20.25, 19.75, 19.75, 20.0, 19.75], [31.75, 26.5, 20.5, 20.25, 19.5, 19.5, 20.25, 19.75], [33.25, 24.25, 20.5, 20.25, 20.25, 19.75, 19.0, 19.5], [28.25, 21.5, 20.25, 20.0, 20.25, 20.0, 19.75, 19.5], [22.75, 21.5, 19.75, 19.75, 20.0, 19.25, 20.25, 20.0], [22.0, 21.0, 20.25, 19.75, 20.0, 19.5, 20.5, 20.0], [22.75, 21.25, 20.75, 20.0, 20.0, 20.0, 20.25, 19.75], [20.75, 21.0, 20.25, 20.25, 19.75, 21.0, 20.0, 20.25]] C | normalized=0.416 | threshold_hit=False
+[2026-06-02 17:26:05] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.5, 26.5, 22.25, 20.0, 19.75, 19.25, 19.5, 19.75], [31.75, 26.25, 20.5, 20.0, 19.5, 19.5, 19.75, 19.25], [33.0, 24.5, 20.5, 20.0, 19.5, 19.5, 19.25, 19.0], [27.5, 21.5, 20.0, 19.75, 19.5, 19.5, 19.75, 19.75], [22.5, 21.0, 19.5, 19.75, 19.25, 19.0, 20.25, 19.25], [21.75, 20.75, 19.5, 19.5, 19.25, 19.5, 20.5, 20.0], [22.25, 21.25, 20.0, 19.5, 20.0, 20.0, 19.75, 19.75], [20.5, 20.25, 20.25, 19.75, 20.0, 20.25, 20.0, 20.25]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:26:15] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.5, 26.25, 21.75, 19.5, 19.25, 18.5, 19.75, 19.25], [31.25, 26.25, 20.0, 19.5, 19.0, 19.0, 19.5, 19.25], [32.75, 24.25, 19.75, 19.75, 19.5, 18.75, 19.0, 18.5], [27.5, 21.25, 19.5, 19.25, 18.75, 19.0, 19.75, 19.25], [22.25, 20.5, 19.25, 19.0, 18.5, 18.5, 19.5, 19.75], [21.0, 20.75, 19.5, 19.0, 19.25, 19.25, 19.5, 19.25], [22.0, 21.0, 19.75, 19.75, 19.25, 19.75, 19.25, 19.5], [20.5, 20.25, 20.25, 19.25, 20.0, 20.25, 19.5, 19.75]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:26:25] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.0, 25.75, 22.0, 19.5, 19.25, 19.0, 19.5, 19.0], [31.0, 25.75, 20.0, 20.25, 18.75, 19.0, 19.25, 19.0], [32.75, 24.25, 19.5, 19.5, 19.5, 19.0, 18.25, 18.75], [27.5, 21.25, 20.0, 19.75, 19.5, 19.25, 19.25, 19.25], [22.0, 20.25, 19.5, 19.25, 19.25, 19.0, 19.75, 19.25], [21.0, 20.5, 19.5, 19.25, 19.0, 19.5, 20.0, 19.5], [22.25, 20.75, 20.25, 19.75, 19.5, 19.5, 19.5, 19.75], [20.75, 20.0, 20.5, 19.75, 19.75, 20.5, 18.75, 19.5]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:26:35] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.5, 26.0, 21.75, 19.75, 19.5, 18.25, 19.5, 19.5], [31.0, 26.25, 20.25, 19.75, 19.25, 18.75, 19.5, 18.75], [32.75, 24.0, 19.75, 19.5, 19.5, 19.25, 19.0, 18.5], [27.75, 21.5, 19.5, 19.25, 19.0, 19.0, 19.25, 19.25], [22.25, 20.5, 19.0, 19.5, 19.0, 18.5, 19.5, 19.5], [21.25, 20.75, 19.5, 19.25, 19.25, 18.75, 19.5, 19.75], [22.5, 21.0, 19.75, 19.25, 19.5, 19.5, 19.75, 19.25], [20.5, 20.0, 19.5, 19.5, 20.0, 19.5, 20.0, 19.75]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:26:45] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.5, 25.75, 22.0, 19.75, 19.25, 19.0, 19.25, 19.5], [31.25, 26.0, 20.0, 20.0, 19.5, 19.0, 19.5, 18.5], [33.0, 24.25, 20.0, 19.75, 19.5, 19.5, 19.25, 18.5], [27.5, 21.0, 19.5, 19.0, 19.0, 19.25, 19.5, 19.25], [22.25, 20.25, 19.5, 19.0, 19.25, 19.0, 20.0, 19.75], [21.0, 20.75, 19.5, 18.75, 19.0, 19.25, 19.5, 19.25], [22.5, 20.5, 20.5, 19.0, 19.75, 19.75, 19.75, 19.0], [21.0, 19.75, 19.5, 19.25, 20.0, 20.25, 19.75, 20.0]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:26:55] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.0, 26.0, 22.25, 19.75, 19.0, 19.0, 19.5, 19.25], [31.25, 26.25, 19.75, 19.75, 19.75, 19.0, 19.5, 19.0], [33.0, 24.25, 19.75, 19.75, 19.25, 19.75, 19.0, 18.25], [27.5, 21.0, 19.75, 19.5, 19.75, 19.0, 19.25, 18.75], [22.25, 20.5, 19.5, 18.75, 19.0, 18.75, 20.0, 19.75], [21.25, 20.5, 19.75, 19.25, 19.0, 19.0, 19.5, 20.0], [22.25, 21.0, 19.75, 19.5, 19.75, 19.5, 19.75, 18.75], [20.75, 20.0, 20.0, 19.75, 19.75, 20.0, 19.5, 19.5]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:27:00] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:27:00] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:27:00] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:27:00] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:27:05] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 26.25, 22.25, 20.0, 19.5, 19.0, 19.75, 19.25], [31.5, 25.75, 20.5, 20.0, 19.25, 19.0, 19.5, 19.5], [33.0, 24.75, 19.75, 20.0, 19.75, 19.5, 18.75, 19.0], [27.5, 21.5, 20.25, 19.75, 19.25, 19.5, 19.5, 18.75], [22.5, 20.5, 19.75, 19.25, 19.75, 19.25, 19.75, 19.5], [21.5, 21.0, 19.75, 19.5, 19.5, 19.0, 20.25, 19.25], [22.0, 20.75, 20.25, 20.25, 19.25, 19.75, 19.75, 19.75], [20.25, 20.25, 20.0, 19.25, 19.75, 20.25, 19.5, 20.25]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:27:15] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.0, 26.25, 22.5, 20.25, 20.0, 19.0, 20.25, 20.25], [31.5, 26.75, 20.75, 20.5, 20.0, 20.0, 20.0, 19.75], [33.25, 24.75, 21.0, 20.5, 20.0, 19.75, 19.75, 19.5], [28.25, 21.75, 20.5, 20.0, 20.0, 20.0, 20.0, 19.75], [22.5, 21.25, 19.5, 20.0, 19.5, 19.5, 20.25, 20.25], [21.75, 21.25, 20.25, 19.75, 19.75, 19.75, 20.5, 20.25], [22.5, 21.5, 20.75, 20.0, 20.5, 20.25, 19.75, 20.0], [21.0, 20.25, 20.75, 20.25, 20.0, 20.5, 20.25, 20.75]] C | normalized=0.416 | threshold_hit=False
+[2026-06-02 17:27:25] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.0, 26.0, 22.5, 20.0, 19.5, 19.25, 19.75, 19.5], [31.25, 26.5, 20.5, 20.25, 19.0, 20.0, 19.75, 19.0], [33.0, 24.5, 20.25, 19.75, 19.5, 19.25, 19.25, 19.0], [27.75, 21.5, 20.25, 19.5, 19.5, 19.5, 19.75, 19.0], [22.5, 20.75, 19.75, 19.5, 19.0, 19.5, 19.75, 20.0], [21.25, 21.0, 19.5, 19.25, 19.25, 19.25, 19.5, 19.75], [22.75, 20.75, 19.75, 19.5, 19.5, 19.25, 19.25, 19.25], [20.75, 20.0, 19.75, 19.75, 19.5, 20.25, 19.0, 19.75]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:27:35] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 26.0, 22.0, 20.25, 19.5, 18.75, 19.25, 19.25], [31.5, 26.0, 19.75, 19.5, 19.5, 18.75, 19.0, 18.75], [32.5, 23.75, 19.5, 19.75, 19.5, 19.5, 18.5, 18.25], [27.75, 21.0, 20.0, 18.75, 19.5, 18.75, 19.25, 18.25], [22.0, 20.25, 19.0, 19.25, 19.25, 18.75, 19.5, 19.25], [21.0, 20.25, 19.5, 19.25, 19.0, 19.25, 19.25, 19.0], [22.0, 21.0, 19.75, 19.25, 19.25, 19.75, 19.5, 19.0], [20.0, 20.0, 19.75, 19.25, 19.75, 20.0, 19.25, 19.75]] C | normalized=0.406 | threshold_hit=False
+[2026-06-02 17:27:45] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 25.5, 21.75, 19.75, 18.75, 19.0, 19.25, 19.5], [30.75, 25.75, 20.0, 19.5, 18.75, 18.5, 19.0, 18.75], [32.5, 24.0, 19.5, 19.25, 19.0, 18.25, 18.75, 18.25], [27.0, 21.0, 19.5, 18.5, 18.75, 18.5, 19.25, 18.75], [21.75, 19.75, 19.0, 19.0, 18.5, 19.0, 19.0, 19.25], [21.0, 20.5, 19.25, 19.0, 18.75, 18.75, 19.75, 19.25], [21.75, 20.5, 19.5, 19.5, 19.0, 19.25, 19.0, 19.5], [20.5, 19.75, 19.25, 19.0, 19.5, 20.0, 19.0, 19.75]] C | normalized=0.406 | threshold_hit=False
+[2026-06-02 17:27:55] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 25.5, 21.5, 19.75, 19.25, 18.5, 19.0, 19.5], [31.5, 25.25, 20.0, 19.75, 19.0, 19.0, 19.0, 18.25], [32.75, 23.75, 19.75, 19.5, 19.5, 18.75, 18.5, 18.5], [27.5, 21.0, 19.5, 19.0, 19.25, 19.0, 19.5, 18.75], [22.0, 20.25, 19.25, 18.75, 18.5, 19.0, 19.25, 19.25], [21.25, 20.5, 19.5, 18.75, 19.25, 19.0, 19.5, 19.0], [22.0, 20.25, 19.75, 19.0, 19.25, 19.0, 19.0, 18.75], [20.5, 19.75, 19.5, 19.5, 19.0, 19.75, 19.5, 20.25]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:28:05] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 25.25, 21.75, 19.75, 19.5, 19.0, 19.0, 18.75], [31.25, 25.5, 19.5, 19.5, 19.25, 19.0, 19.0, 19.0], [32.5, 24.0, 19.75, 19.5, 19.5, 19.0, 18.75, 18.25], [27.5, 21.0, 19.75, 19.0, 18.75, 19.0, 19.25, 18.75], [21.5, 20.0, 19.25, 18.75, 19.0, 19.0, 19.75, 19.5], [21.0, 20.25, 19.5, 19.25, 18.75, 19.0, 19.0, 19.5], [21.75, 20.75, 20.0, 19.5, 19.0, 18.75, 19.25, 19.25], [19.75, 20.0, 19.5, 19.25, 19.5, 19.75, 19.25, 19.75]] C | normalized=0.406 | threshold_hit=False
+[2026-06-02 17:28:16] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.5, 25.25, 21.5, 19.25, 19.0, 19.0, 18.75, 19.25], [31.0, 25.5, 20.25, 19.75, 18.75, 19.25, 19.0, 18.5], [33.0, 24.0, 20.0, 19.0, 19.5, 19.0, 19.25, 18.5], [27.75, 21.0, 19.75, 19.25, 19.25, 19.5, 18.75, 19.0], [22.5, 20.5, 19.25, 19.0, 18.5, 19.0, 19.25, 19.5], [21.5, 20.75, 19.75, 19.0, 19.5, 18.75, 19.25, 19.75], [22.25, 21.0, 20.0, 19.5, 19.75, 19.5, 19.25, 19.0], [20.0, 19.5, 19.75, 20.25, 19.5, 20.5, 20.0, 19.75]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:28:26] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.5, 26.0, 22.25, 20.25, 19.5, 19.25, 19.75, 19.5], [31.0, 26.0, 20.5, 20.0, 20.0, 19.75, 19.75, 19.0], [33.0, 24.5, 20.0, 20.25, 20.25, 19.5, 19.25, 19.75], [27.75, 21.75, 20.0, 19.5, 20.0, 19.75, 19.75, 19.5], [22.5, 21.0, 20.0, 19.5, 19.75, 19.75, 20.0, 20.0], [21.75, 21.25, 19.5, 19.5, 19.75, 19.5, 20.0, 20.0], [22.5, 20.75, 20.5, 19.5, 19.75, 20.0, 19.75, 19.5], [21.0, 20.0, 20.5, 19.25, 20.5, 20.5, 19.75, 20.25]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:28:36] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.0, 26.5, 22.75, 20.0, 19.5, 19.25, 19.75, 20.0], [31.75, 25.75, 20.75, 20.25, 19.75, 19.5, 19.75, 19.5], [33.75, 24.5, 20.75, 20.25, 20.25, 19.75, 19.75, 18.75], [28.0, 22.0, 20.5, 20.0, 20.0, 19.75, 20.0, 19.25], [22.75, 21.0, 20.0, 19.75, 20.0, 19.0, 20.25, 20.25], [22.0, 21.25, 20.0, 19.75, 19.5, 20.0, 20.25, 20.0], [23.25, 21.75, 20.5, 20.0, 20.0, 20.25, 20.25, 19.75], [21.0, 20.25, 20.25, 20.0, 20.0, 20.75, 20.0, 20.5]] C | normalized=0.422 | threshold_hit=False
+[2026-06-02 17:28:46] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 26.25, 22.25, 20.5, 20.0, 19.5, 19.75, 19.75], [31.75, 26.0, 20.25, 20.0, 19.75, 19.5, 19.75, 19.5], [33.25, 24.5, 20.0, 20.0, 19.75, 19.5, 19.5, 19.75], [28.0, 21.5, 20.25, 19.5, 19.5, 19.5, 19.75, 19.0], [22.5, 21.25, 19.75, 19.5, 19.75, 19.5, 20.0, 19.75], [21.25, 21.0, 19.75, 19.5, 19.25, 19.5, 19.5, 19.5], [22.25, 21.25, 20.25, 19.5, 20.0, 20.5, 20.0, 19.75], [20.75, 20.0, 20.0, 19.5, 19.25, 20.25, 19.75, 20.75]] C | normalized=0.416 | threshold_hit=False
+[2026-06-02 17:28:56] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.25, 26.0, 22.5, 20.5, 19.5, 19.25, 20.25, 19.75], [31.75, 25.75, 20.25, 20.25, 20.0, 20.0, 19.75, 19.25], [33.25, 24.5, 20.25, 20.25, 20.0, 19.25, 20.0, 19.0], [28.0, 21.75, 20.25, 20.0, 19.75, 19.5, 20.0, 19.0], [22.75, 21.25, 20.0, 20.0, 19.75, 19.5, 20.25, 19.75], [21.5, 21.0, 20.5, 20.0, 20.25, 19.25, 20.0, 20.5], [23.5, 21.25, 20.75, 19.75, 20.25, 20.25, 20.0, 20.0], [21.0, 20.0, 20.5, 20.5, 20.25, 20.5, 19.75, 20.25]] C | normalized=0.416 | threshold_hit=False
+[2026-06-02 17:29:06] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.0, 25.5, 21.5, 19.5, 19.25, 18.75, 19.25, 19.25], [31.25, 25.5, 19.75, 19.5, 19.0, 19.0, 19.25, 19.0], [32.75, 24.0, 20.0, 19.5, 19.75, 18.75, 18.75, 18.75], [28.0, 21.25, 20.25, 19.0, 19.25, 19.5, 19.5, 18.75], [21.5, 21.0, 19.5, 19.0, 19.0, 19.0, 19.5, 19.5], [21.25, 20.75, 20.0, 19.5, 19.25, 19.0, 20.0, 19.75], [22.25, 21.25, 20.0, 19.5, 19.25, 19.5, 19.25, 18.75], [20.25, 19.75, 19.5, 19.75, 19.5, 19.75, 19.5, 19.75]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:29:16] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.25, 25.5, 22.5, 20.25, 19.75, 19.75, 20.25, 19.5], [31.5, 25.75, 20.25, 20.0, 20.25, 19.5, 20.0, 19.75], [33.25, 25.0, 20.5, 20.0, 20.0, 19.75, 19.75, 19.5], [28.0, 22.0, 20.5, 20.0, 20.0, 19.75, 20.25, 19.5], [23.0, 21.0, 20.0, 20.0, 19.75, 19.75, 20.5, 20.0], [21.75, 21.25, 20.0, 20.0, 19.5, 19.75, 20.5, 19.75], [22.75, 21.25, 20.25, 20.5, 20.0, 20.25, 20.5, 19.5], [20.5, 20.25, 21.0, 19.75, 20.25, 20.5, 20.25, 20.75]] C | normalized=0.416 | threshold_hit=False
+[2026-06-02 17:29:26] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[30.0, 26.5, 22.5, 21.0, 20.5, 20.0, 20.0, 20.5], [32.25, 27.0, 21.25, 21.0, 20.0, 20.5, 20.75, 20.0], [34.0, 25.5, 20.75, 20.75, 20.5, 20.5, 20.5, 20.5], [28.75, 22.25, 21.25, 20.5, 20.5, 20.5, 21.0, 20.5], [23.5, 21.75, 20.75, 20.0, 20.5, 20.75, 20.75, 20.75], [22.25, 21.5, 21.0, 20.5, 20.75, 20.25, 20.75, 21.0], [23.5, 22.0, 21.25, 20.5, 21.0, 20.75, 20.75, 20.5], [21.25, 20.75, 21.25, 20.75, 20.5, 21.0, 20.75, 20.75]] C | normalized=0.425 | threshold_hit=False
+[2026-06-02 17:29:36] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.0, 26.25, 21.75, 19.75, 19.5, 19.25, 19.5, 19.0], [31.5, 26.0, 20.25, 20.25, 19.5, 19.0, 19.5, 18.5], [32.75, 24.0, 19.75, 19.5, 19.5, 19.25, 19.5, 19.0], [27.75, 21.5, 20.0, 19.0, 19.5, 19.25, 19.5, 19.5], [22.0, 21.0, 19.5, 19.5, 19.0, 19.0, 19.75, 19.25], [20.75, 20.75, 19.5, 19.5, 19.25, 19.25, 19.75, 19.5], [22.5, 21.25, 20.5, 19.5, 19.75, 20.0, 19.75, 19.75], [20.5, 20.0, 20.0, 19.75, 19.75, 20.5, 20.0, 19.75]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:29:46] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 25.75, 21.25, 19.0, 18.5, 18.75, 19.5, 19.0], [31.0, 25.75, 19.75, 19.75, 19.25, 18.75, 19.25, 19.0], [32.25, 24.5, 19.5, 19.5, 19.25, 19.0, 18.5, 19.0], [27.5, 21.25, 19.5, 19.0, 19.0, 19.0, 19.5, 18.25], [21.5, 20.25, 19.0, 18.75, 19.0, 18.75, 19.0, 19.25], [21.0, 21.0, 19.25, 18.75, 19.0, 18.5, 19.25, 18.75], [22.0, 20.75, 19.5, 19.5, 19.25, 19.25, 19.25, 19.0], [20.5, 20.25, 19.75, 19.75, 19.75, 20.0, 19.25, 19.5]] C | normalized=0.403 | threshold_hit=False
+[2026-06-02 17:29:56] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.5, 25.5, 21.5, 19.75, 19.5, 18.75, 19.5, 18.75], [31.5, 25.75, 20.0, 19.5, 19.0, 19.25, 19.25, 18.75], [33.25, 24.5, 20.0, 20.25, 19.75, 19.25, 19.0, 18.5], [27.75, 21.0, 19.75, 19.25, 19.25, 19.5, 19.25, 19.0], [22.25, 21.0, 19.25, 19.0, 18.75, 18.75, 19.75, 19.5], [21.5, 20.75, 19.5, 19.5, 19.0, 18.75, 19.25, 19.0], [22.25, 20.25, 20.0, 19.5, 19.5, 19.5, 19.25, 19.25], [20.5, 20.0, 19.5, 19.25, 20.0, 19.75, 19.75, 19.75]] C | normalized=0.416 | threshold_hit=False
+[2026-06-02 17:30:06] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 25.5, 21.75, 19.0, 19.0, 18.75, 19.5, 18.75], [31.5, 25.25, 20.0, 19.25, 19.0, 18.75, 19.75, 19.25], [32.75, 24.0, 19.5, 19.25, 19.25, 19.0, 18.75, 18.5], [27.5, 20.75, 19.75, 19.25, 19.0, 19.0, 19.0, 18.75], [22.0, 20.25, 19.25, 18.75, 19.0, 18.5, 19.5, 19.5], [21.0, 20.5, 19.5, 19.25, 19.0, 19.0, 19.25, 19.0], [22.0, 20.5, 20.0, 19.25, 19.5, 19.75, 19.25, 18.75], [20.75, 19.75, 19.75, 19.25, 19.75, 19.75, 19.25, 19.75]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:30:16] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 25.25, 21.5, 19.25, 19.25, 18.5, 19.0, 18.75], [31.25, 25.25, 19.75, 19.5, 19.0, 19.25, 19.0, 19.0], [32.5, 24.25, 19.25, 19.75, 19.0, 19.5, 18.75, 19.25], [27.5, 21.0, 19.75, 19.5, 19.25, 19.25, 19.75, 18.75], [22.0, 20.75, 19.5, 19.0, 18.75, 19.25, 19.5, 19.5], [21.25, 20.5, 20.0, 19.25, 19.25, 19.0, 19.25, 19.75], [22.75, 21.0, 19.75, 19.75, 19.25, 19.5, 19.75, 18.75], [20.75, 20.0, 19.75, 19.25, 19.5, 20.0, 19.75, 20.0]] C | normalized=0.406 | threshold_hit=False
+[2026-06-02 17:30:26] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 25.75, 21.75, 19.25, 18.75, 18.25, 19.0, 19.25], [31.25, 25.75, 20.0, 19.5, 19.0, 19.0, 19.0, 18.75], [32.5, 24.25, 19.5, 19.5, 19.0, 19.0, 19.0, 18.5], [27.5, 21.0, 19.75, 19.5, 19.0, 18.75, 19.25, 18.75], [22.0, 20.0, 19.0, 18.75, 19.25, 19.25, 19.5, 19.5], [21.25, 20.5, 19.5, 19.25, 18.75, 18.75, 19.5, 19.5], [21.75, 20.25, 19.75, 19.0, 19.0, 19.25, 19.5, 18.75], [20.5, 20.0, 19.25, 19.25, 19.5, 19.5, 19.0, 19.5]] C | normalized=0.406 | threshold_hit=False
+[2026-06-02 17:30:36] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.5, 25.5, 21.75, 19.75, 19.25, 19.0, 19.25, 19.25], [31.0, 25.75, 19.75, 19.75, 18.75, 19.25, 19.0, 19.25], [32.75, 24.5, 20.25, 19.75, 19.75, 19.25, 19.5, 18.5], [27.5, 21.0, 19.75, 19.25, 19.5, 19.25, 19.25, 18.75], [22.0, 20.75, 19.25, 19.25, 19.25, 19.0, 19.75, 19.5], [21.5, 20.5, 19.25, 19.5, 18.5, 19.0, 19.75, 19.5], [22.0, 20.75, 19.75, 19.0, 19.25, 20.0, 19.25, 19.25], [20.0, 19.75, 20.0, 20.0, 19.25, 20.0, 19.5, 20.0]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:30:46] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.5, 26.0, 22.5, 20.25, 19.75, 19.25, 19.5, 20.0], [31.5, 26.5, 20.5, 20.25, 19.5, 19.25, 19.75, 19.25], [33.25, 24.25, 20.5, 20.0, 20.0, 19.25, 19.25, 19.25], [27.75, 21.5, 20.0, 19.75, 19.5, 19.25, 19.75, 19.25], [22.25, 21.0, 19.75, 19.5, 19.75, 19.25, 19.5, 19.75], [21.75, 21.25, 19.75, 19.5, 19.5, 19.25, 19.75, 20.0], [22.25, 21.25, 19.75, 19.75, 19.75, 20.0, 20.0, 19.75], [20.75, 20.25, 20.25, 20.0, 19.75, 20.25, 20.25, 20.0]] C | normalized=0.416 | threshold_hit=False
+[2026-06-02 17:30:56] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.5, 26.0, 21.5, 19.25, 19.25, 18.75, 18.75, 19.25], [31.25, 25.25, 20.0, 19.75, 18.75, 18.75, 19.0, 18.75], [32.75, 24.25, 20.0, 19.5, 19.75, 19.0, 19.0, 18.75], [27.25, 21.0, 19.25, 19.5, 18.75, 19.0, 19.25, 18.5], [22.0, 20.25, 19.25, 18.75, 19.0, 18.5, 19.0, 19.25], [21.0, 20.5, 19.5, 19.25, 18.75, 18.5, 19.25, 19.0], [22.0, 20.25, 19.75, 19.25, 19.25, 19.5, 19.5, 18.75], [20.0, 19.5, 19.75, 19.25, 19.75, 20.0, 19.25, 19.75]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:31:02] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:02] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:02] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:02] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:06] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 25.75, 21.5, 19.5, 19.0, 18.25, 19.25, 19.0], [31.5, 25.75, 20.0, 19.5, 19.0, 19.25, 19.25, 18.75], [32.5, 24.0, 19.75, 19.25, 19.5, 19.0, 19.0, 18.25], [27.75, 21.0, 19.75, 18.75, 19.25, 19.25, 19.5, 19.0], [22.25, 20.25, 19.0, 19.0, 19.25, 18.5, 19.5, 19.5], [21.25, 20.5, 19.5, 19.25, 19.25, 19.0, 19.5, 19.75], [22.25, 20.5, 19.25, 19.5, 19.0, 19.25, 19.25, 19.0], [20.0, 19.75, 20.0, 19.25, 19.25, 19.5, 19.25, 18.75]] C | normalized=0.406 | threshold_hit=False
+[2026-06-02 17:31:08] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:08] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:09] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:09] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:09] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:09] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:11] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:11] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:13] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:13] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:15] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:15] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:15] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:15] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:16] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.5, 25.5, 21.5, 19.75, 18.75, 19.0, 19.75, 19.25], [31.0, 25.5, 20.25, 20.0, 19.25, 19.25, 19.5, 19.25], [32.75, 24.5, 20.0, 19.5, 19.5, 19.25, 19.25, 19.0], [27.5, 21.75, 19.5, 19.5, 19.75, 19.25, 19.5, 18.5], [22.0, 20.0, 19.25, 19.0, 19.25, 19.25, 19.5, 19.5], [21.25, 20.75, 19.25, 19.25, 19.0, 19.0, 19.0, 19.5], [22.0, 21.0, 19.75, 19.25, 19.5, 19.5, 19.25, 19.5], [20.25, 19.5, 19.5, 19.5, 19.25, 20.0, 19.25, 19.75]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:31:17] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:17] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:19] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:19] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:21] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:21] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:21] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:21] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:23] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:23] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:25] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:25] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:26] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 26.25, 21.5, 19.5, 19.0, 18.75, 19.75, 19.5], [30.75, 27.75, 20.0, 19.25, 19.0, 19.0, 19.25, 18.75], [32.75, 26.0, 19.5, 19.75, 19.75, 19.0, 19.0, 18.75], [27.5, 22.25, 19.25, 19.25, 19.25, 19.25, 19.0, 19.25], [22.75, 20.0, 19.0, 18.75, 18.75, 19.0, 20.0, 18.75], [21.75, 20.5, 19.25, 19.0, 19.0, 18.75, 19.5, 19.5], [21.75, 20.5, 19.75, 19.0, 19.0, 19.25, 19.0, 19.0], [20.5, 19.5, 19.5, 19.25, 19.75, 20.0, 19.25, 19.75]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:31:27] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:27] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:27] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:27] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:29] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:29] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:31] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:31] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:33] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:33] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:33] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:33] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:35] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:35] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:36] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.0, 26.0, 23.0, 19.5, 19.25, 18.25, 19.5, 19.25], [30.75, 27.75, 20.5, 19.75, 19.0, 19.0, 19.5, 19.5], [32.5, 24.5, 19.5, 19.75, 19.0, 19.5, 19.0, 18.25], [27.75, 20.75, 19.25, 19.5, 19.25, 19.25, 19.5, 18.75], [22.0, 20.25, 19.5, 19.0, 19.25, 19.0, 19.5, 19.5], [20.75, 20.5, 20.0, 18.75, 18.75, 18.75, 19.5, 19.5], [21.75, 20.5, 19.75, 19.5, 19.25, 19.5, 19.75, 19.0], [20.5, 20.0, 19.5, 20.0, 19.5, 19.75, 19.5, 19.75]] C | normalized=0.406 | threshold_hit=False
+[2026-06-02 17:31:37] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:37] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:39] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:39] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:39] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:39] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:41] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:41] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:43] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:43] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:45] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:45] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:45] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:45] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:46] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.5, 27.0, 23.0, 20.25, 20.0, 19.25, 19.75, 20.0], [31.75, 28.25, 21.5, 20.25, 19.5, 19.75, 20.0, 19.75], [33.5, 27.0, 20.75, 20.25, 20.25, 19.5, 20.0, 19.0], [28.0, 22.5, 20.25, 20.0, 20.0, 19.75, 19.75, 19.75], [23.25, 21.25, 20.0, 19.75, 19.75, 19.75, 20.5, 20.5], [22.25, 21.5, 20.75, 20.0, 20.0, 19.5, 20.0, 20.5], [22.5, 21.5, 20.75, 20.0, 20.25, 20.5, 20.25, 20.25], [20.75, 20.5, 20.75, 20.25, 20.25, 21.25, 19.75, 20.5]] C | normalized=0.419 | threshold_hit=False
+[2026-06-02 17:31:47] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:47] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:49] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:49] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:49] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:31:49] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:31:56] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.5, 26.0, 22.0, 19.5, 19.75, 19.75, 19.5, 19.75], [31.5, 26.0, 20.25, 20.0, 20.0, 19.25, 19.75, 18.75], [32.5, 24.0, 20.0, 20.0, 20.25, 19.25, 18.75, 19.25], [27.75, 21.5, 20.25, 19.5, 19.75, 20.0, 19.25, 19.25], [22.25, 20.75, 19.5, 19.5, 19.25, 19.5, 20.25, 20.0], [21.5, 21.0, 19.75, 19.5, 19.5, 19.5, 20.0, 19.75], [22.5, 20.75, 20.0, 20.25, 20.0, 20.25, 20.25, 19.75], [20.75, 20.25, 20.0, 20.5, 20.0, 20.25, 19.75, 20.0]] C | normalized=0.406 | threshold_hit=False
+[2026-06-02 17:32:06] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 26.5, 21.5, 19.5, 19.5, 19.25, 19.25, 19.0], [31.25, 27.5, 20.0, 20.0, 19.25, 19.0, 19.25, 19.0], [33.0, 26.0, 19.75, 20.0, 19.75, 18.75, 18.75, 19.0], [27.0, 21.5, 19.75, 19.25, 19.25, 19.0, 19.25, 18.75], [22.5, 20.5, 19.75, 18.75, 19.0, 18.5, 19.75, 19.0], [21.0, 20.5, 19.5, 19.0, 18.75, 19.25, 19.5, 19.75], [22.0, 20.75, 19.75, 19.5, 19.5, 19.5, 19.75, 19.25], [20.5, 19.75, 19.75, 19.0, 19.5, 19.75, 19.25, 20.25]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:32:16] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 26.0, 23.0, 19.75, 19.25, 19.0, 19.0, 19.25], [31.25, 27.75, 21.25, 19.75, 19.25, 18.75, 19.25, 19.0], [33.0, 26.0, 20.0, 19.25, 19.25, 19.5, 19.0, 18.75], [27.5, 21.5, 19.75, 19.5, 19.0, 19.0, 19.25, 18.75], [22.75, 20.5, 19.0, 19.0, 19.0, 18.75, 19.25, 19.25], [21.0, 20.75, 19.25, 19.5, 19.25, 19.0, 20.25, 19.75], [22.0, 20.5, 20.0, 19.25, 19.25, 19.75, 19.25, 19.25], [20.25, 19.75, 19.75, 19.5, 19.75, 19.75, 19.75, 19.5]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:32:26] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.5, 25.5, 22.75, 19.5, 19.0, 18.75, 19.0, 18.75], [31.25, 27.75, 21.25, 19.75, 19.75, 19.0, 19.25, 19.0], [32.5, 25.75, 20.0, 19.75, 19.75, 19.0, 19.75, 18.75], [27.5, 21.25, 20.25, 19.25, 19.5, 19.25, 19.25, 18.75], [22.25, 20.75, 19.5, 19.25, 19.25, 19.0, 19.5, 19.75], [21.25, 20.75, 19.5, 19.25, 18.75, 19.0, 19.25, 19.25], [22.25, 20.75, 19.75, 19.0, 19.5, 19.5, 19.5, 19.25], [20.75, 20.25, 20.0, 20.0, 19.75, 20.25, 20.0, 20.0]] C | normalized=0.406 | threshold_hit=False
+[2026-06-02 17:32:36] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.5, 25.75, 21.75, 19.5, 19.25, 19.0, 19.0, 19.25], [30.75, 26.75, 20.25, 19.75, 19.0, 18.75, 19.5, 19.25], [32.75, 24.25, 19.5, 19.25, 19.5, 19.25, 19.25, 18.75], [27.5, 21.0, 19.5, 19.25, 19.5, 19.0, 19.0, 19.5], [22.0, 20.5, 19.0, 19.0, 19.0, 18.5, 19.5, 19.25], [21.25, 20.5, 19.5, 19.0, 19.5, 19.25, 19.5, 19.0], [21.75, 20.5, 20.0, 19.25, 19.25, 19.5, 19.25, 19.25], [20.75, 20.0, 20.0, 19.5, 19.5, 20.25, 19.5, 19.75]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:32:37] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:32:37] "OPTIONS /api/camera/toggle HTTP/1.1" 200 -
+[2026-06-02 17:32:37] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:32:37] "POST /api/camera/toggle HTTP/1.1" 200 -
+[2026-06-02 17:32:46] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.25, 26.25, 25.0, 25.25, 22.0, 19.5, 20.0, 20.25], [31.75, 28.75, 26.0, 25.5, 20.5, 19.5, 20.0, 19.5], [34.0, 28.5, 25.25, 24.0, 20.75, 19.75, 19.25, 19.25], [30.25, 28.0, 24.75, 21.75, 20.25, 19.75, 20.0, 19.5], [27.75, 26.0, 20.5, 20.0, 19.5, 20.0, 20.25, 20.25], [26.75, 25.0, 20.75, 20.25, 19.5, 19.5, 20.0, 20.0], [23.75, 22.0, 20.5, 20.0, 20.0, 20.0, 19.75, 19.5], [21.0, 20.0, 20.5, 20.0, 20.25, 20.25, 19.75, 20.25]] C | normalized=0.425 | threshold_hit=False
+[2026-06-02 17:32:56] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.25, 25.75, 24.25, 22.75, 21.25, 19.0, 19.5, 19.75], [31.5, 27.5, 23.75, 22.75, 21.25, 19.25, 19.25, 18.5], [33.25, 27.5, 25.0, 23.5, 19.5, 19.25, 18.75, 18.5], [28.75, 25.75, 23.0, 19.75, 19.0, 19.5, 19.25, 19.25], [26.25, 23.5, 19.75, 19.0, 19.25, 19.25, 19.5, 19.25], [27.75, 23.25, 19.75, 19.25, 19.0, 18.75, 19.0, 18.75], [22.5, 21.5, 20.0, 19.0, 19.5, 19.5, 19.25, 18.75], [19.5, 20.0, 20.0, 19.25, 19.5, 19.75, 19.5, 19.0]] C | normalized=0.416 | threshold_hit=False
+[2026-06-02 17:33:07] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 25.5, 24.25, 23.0, 19.25, 18.75, 19.25, 18.5], [31.0, 27.5, 24.75, 22.75, 19.5, 19.0, 19.75, 18.25], [33.25, 27.5, 24.75, 20.5, 19.25, 19.25, 18.5, 18.25], [28.25, 25.0, 22.5, 19.25, 19.25, 18.75, 19.25, 18.0], [25.75, 22.0, 19.5, 18.75, 19.25, 19.0, 19.5, 19.75], [26.5, 21.0, 19.75, 19.0, 18.75, 19.0, 19.75, 18.75], [22.75, 20.5, 19.75, 19.0, 19.25, 19.0, 19.25, 19.25], [20.5, 19.75, 20.0, 19.5, 19.75, 19.75, 19.75, 19.25]] C | normalized=0.416 | threshold_hit=False
+[2026-06-02 17:33:10] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:33:10] "[33mGET /api/camera/snapshot HTTP/1.1[0m" 404 -
+[2026-06-02 17:33:10] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:33:10] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+[2026-06-02 17:33:17] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.5, 25.25, 24.0, 24.75, 19.75, 18.75, 19.0, 19.0], [31.25, 27.5, 24.5, 24.25, 19.75, 19.0, 19.0, 18.75], [32.75, 27.25, 24.5, 22.5, 19.75, 19.5, 19.0, 18.5], [29.0, 26.25, 24.75, 20.5, 19.5, 19.0, 19.25, 19.25], [27.25, 23.75, 20.0, 19.5, 19.25, 18.75, 19.75, 19.25], [26.25, 22.5, 19.5, 19.75, 18.75, 19.0, 19.5, 19.0], [23.5, 21.25, 19.75, 19.5, 19.25, 19.75, 19.75, 18.75], [20.75, 20.25, 20.0, 19.25, 20.0, 20.0, 19.75, 19.5]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:33:24] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:33:24] "OPTIONS /api/camera/toggle HTTP/1.1" 200 -
+[2026-06-02 17:33:24] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:33:24] "POST /api/camera/toggle HTTP/1.1" 200 -
+[2026-06-02 17:33:27] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 25.25, 24.5, 24.5, 20.25, 19.0, 19.5, 19.25], [31.25, 27.5, 25.0, 23.25, 19.75, 19.0, 19.5, 19.0], [33.25, 27.25, 25.0, 21.25, 19.25, 19.0, 19.25, 18.5], [28.5, 25.0, 23.75, 20.0, 19.25, 19.25, 19.25, 19.0], [26.75, 21.75, 19.75, 19.25, 18.75, 18.75, 19.0, 19.5], [25.75, 21.5, 19.0, 18.75, 19.0, 18.75, 19.5, 19.25], [22.75, 20.5, 19.75, 19.5, 19.25, 19.25, 19.25, 18.75], [20.75, 19.25, 19.25, 19.5, 19.25, 19.75, 19.25, 19.5]] C | normalized=0.416 | threshold_hit=False
+[2026-06-02 17:33:37] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 25.5, 25.0, 22.5, 19.5, 18.75, 19.25, 18.5], [31.25, 27.75, 25.0, 21.0, 19.25, 18.75, 19.5, 18.5], [32.75, 27.25, 23.25, 19.5, 19.75, 19.0, 19.0, 18.5], [27.75, 23.75, 20.75, 19.5, 19.25, 19.0, 19.25, 18.75], [23.5, 20.75, 19.25, 19.0, 18.75, 18.5, 19.25, 19.0], [22.5, 20.75, 19.75, 18.75, 19.0, 19.0, 19.25, 19.25], [21.5, 20.75, 19.5, 19.5, 19.5, 19.5, 19.25, 18.75], [20.5, 19.75, 20.0, 19.25, 19.5, 19.75, 19.25, 19.5]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:33:38] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:33:38] "OPTIONS /api/camera/toggle HTTP/1.1" 200 -
+[2026-06-02 17:33:38] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:33:38] "POST /api/camera/toggle HTTP/1.1" 200 -
+[2026-06-02 17:33:47] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 25.75, 24.75, 22.0, 19.0, 18.75, 19.25, 19.5], [31.0, 27.5, 24.5, 20.25, 18.75, 18.75, 19.25, 18.75], [32.75, 27.5, 22.75, 19.5, 19.5, 19.5, 19.0, 18.75], [27.75, 24.0, 20.5, 19.75, 19.25, 19.0, 19.5, 19.0], [23.0, 20.25, 19.0, 19.0, 18.75, 19.0, 19.5, 18.75], [23.25, 21.0, 19.25, 19.0, 18.5, 18.75, 19.25, 19.5], [22.25, 20.5, 19.5, 19.25, 19.0, 19.75, 19.5, 19.25], [20.25, 19.75, 19.75, 19.5, 19.75, 20.0, 19.5, 19.5]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:33:55] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:33:55] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:33:55] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:33:55] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:33:57] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 25.5, 25.0, 22.25, 19.75, 19.0, 19.25, 19.75], [31.25, 27.75, 24.75, 20.25, 19.25, 19.0, 18.75, 18.75], [32.75, 27.5, 23.0, 20.25, 19.5, 19.25, 19.5, 19.0], [27.75, 23.75, 20.5, 19.5, 19.0, 19.5, 19.25, 19.0], [23.25, 20.75, 20.0, 19.25, 19.25, 19.25, 19.75, 19.5], [22.5, 20.75, 19.75, 19.5, 18.75, 19.25, 19.75, 20.0], [22.0, 20.5, 20.0, 19.5, 19.5, 19.5, 19.75, 19.75], [20.75, 19.75, 20.0, 19.75, 19.5, 20.25, 19.5, 20.25]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:33:58] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:33:58] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:01] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:01] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:01] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:01] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:04] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:04] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:07] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.0, 25.5, 25.25, 21.0, 19.5, 18.75, 19.5, 19.5], [31.25, 27.5, 22.5, 19.75, 19.0, 19.5, 19.5, 19.0], [32.5, 26.5, 20.25, 19.75, 19.5, 18.75, 19.25, 18.75], [27.5, 21.25, 19.5, 19.25, 19.0, 18.75, 19.5, 19.0], [22.25, 20.5, 19.5, 19.0, 19.0, 19.0, 19.5, 19.5], [21.5, 20.75, 19.25, 19.0, 19.25, 19.0, 19.25, 19.75], [21.5, 20.5, 20.25, 20.0, 19.5, 19.0, 19.75, 19.5], [20.5, 19.75, 19.75, 19.25, 19.25, 20.25, 19.5, 20.0]] C | normalized=0.406 | threshold_hit=False
+[2026-06-02 17:34:07] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:07] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:07] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:07] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:10] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:10] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:11] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:11] "OPTIONS /api/arm/nudge HTTP/1.1" 200 -
+[2026-06-02 17:34:11] core.orchestrator [INFO] [manual_arm_nudge:284] Orchestrator: arm_nudge queued | direction=pan_right
+[2026-06-02 17:34:11] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:11] "POST /api/arm/nudge HTTP/1.1" 200 -
+[2026-06-02 17:34:11] act.act_engine [INFO] [_dispatch_manual_commands:309] ActEngine: manual cmd | action=arm_nudge | params={'direction': 'pan_right'}
+[2026-06-02 17:34:13] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:13] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:13] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:13] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:16] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:16] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:17] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 25.75, 23.75, 20.0, 19.5, 19.25, 19.75, 19.5], [31.0, 27.5, 20.75, 20.25, 19.75, 19.5, 19.75, 19.5], [32.75, 24.5, 20.25, 19.75, 20.0, 19.75, 19.5, 18.75], [27.75, 21.5, 20.0, 19.5, 19.0, 19.5, 19.75, 19.75], [22.25, 20.75, 20.0, 19.75, 19.75, 19.25, 20.0, 19.75], [21.75, 21.5, 19.75, 19.25, 19.25, 19.75, 19.75, 19.75], [21.75, 20.75, 20.5, 20.0, 19.5, 19.25, 19.75, 19.25], [20.0, 20.25, 20.0, 20.25, 20.25, 20.75, 19.5, 19.75]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:34:19] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:19] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:19] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:19] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:22] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:22] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:25] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:25] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:25] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:25] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:27] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.0, 25.0, 23.5, 19.25, 18.75, 18.75, 19.25, 19.0], [30.75, 27.0, 20.5, 19.5, 18.75, 18.75, 19.25, 18.5], [32.25, 24.25, 19.75, 19.25, 19.25, 18.75, 18.75, 18.5], [27.25, 20.75, 19.25, 19.25, 19.0, 19.25, 19.5, 18.75], [22.25, 20.5, 19.0, 19.25, 19.25, 18.75, 19.5, 18.75], [21.25, 20.25, 19.75, 19.0, 19.0, 19.25, 19.75, 19.25], [21.75, 20.5, 20.25, 19.25, 19.0, 19.0, 19.5, 19.25], [20.5, 19.25, 19.5, 19.25, 19.75, 19.75, 19.5, 19.5]] C | normalized=0.403 | threshold_hit=False
+[2026-06-02 17:34:28] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:28] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:31] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:31] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:31] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:31] "OPTIONS /api/arm/nudge HTTP/1.1" 200 -
+[2026-06-02 17:34:31] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:31] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:31] core.orchestrator [INFO] [manual_arm_nudge:284] Orchestrator: arm_nudge queued | direction=pan_right
+[2026-06-02 17:34:31] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:31] "POST /api/arm/nudge HTTP/1.1" 200 -
+[2026-06-02 17:34:31] act.act_engine [INFO] [_dispatch_manual_commands:309] ActEngine: manual cmd | action=arm_nudge | params={'direction': 'pan_right'}
+[2026-06-02 17:34:34] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:34] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:37] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.0, 25.5, 23.5, 20.0, 19.5, 19.25, 19.5, 19.0], [31.0, 27.5, 20.75, 20.0, 19.75, 19.0, 19.75, 19.25], [32.25, 24.5, 20.0, 20.0, 19.75, 19.5, 19.0, 19.0], [27.5, 21.0, 20.25, 19.75, 19.25, 19.5, 19.5, 19.75], [22.0, 20.5, 19.75, 19.75, 19.25, 19.0, 19.75, 19.75], [21.25, 20.75, 20.0, 19.25, 19.5, 19.25, 20.0, 19.75], [22.5, 20.75, 20.0, 19.5, 19.25, 20.0, 19.75, 19.5], [21.0, 20.5, 20.5, 19.75, 20.0, 20.25, 20.25, 19.75]] C | normalized=0.403 | threshold_hit=False
+[2026-06-02 17:34:37] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:37] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:37] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:37] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:40] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:40] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:43] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:43] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:43] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:43] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:46] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:46] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:47] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 26.0, 25.25, 21.5, 20.0, 19.5, 19.75, 20.0], [31.25, 28.0, 23.0, 20.0, 19.75, 19.75, 19.75, 19.5], [33.5, 26.75, 20.5, 20.5, 20.25, 19.5, 19.25, 19.25], [28.0, 21.75, 20.5, 20.0, 19.5, 19.75, 19.75, 19.25], [22.5, 21.25, 19.5, 19.75, 19.5, 19.75, 20.5, 20.0], [22.0, 21.25, 20.0, 19.75, 19.75, 20.0, 20.25, 20.0], [22.0, 21.25, 20.25, 19.5, 19.75, 19.75, 20.0, 20.0], [21.0, 20.25, 20.75, 19.75, 20.25, 20.25, 19.75, 20.0]] C | normalized=0.419 | threshold_hit=False
+[2026-06-02 17:34:49] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:49] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:49] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:49] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:52] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:52] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:55] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:55] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:55] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:55] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:57] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 26.25, 24.75, 21.0, 19.5, 19.25, 19.25, 20.0], [31.5, 27.5, 21.5, 20.25, 19.75, 19.25, 19.75, 19.75], [33.0, 25.25, 20.25, 19.75, 20.0, 19.5, 19.25, 19.5], [28.0, 21.75, 20.0, 19.75, 19.5, 19.75, 20.0, 19.75], [22.5, 21.0, 19.75, 19.5, 19.25, 19.25, 19.75, 19.5], [21.0, 21.0, 19.75, 19.25, 20.0, 19.75, 20.0, 19.75], [22.25, 20.75, 20.5, 19.75, 19.75, 19.75, 19.75, 19.25], [20.5, 20.0, 20.25, 19.5, 20.0, 20.0, 19.75, 19.5]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:34:57] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:57] "OPTIONS /api/sensors/smoke/toggle HTTP/1.1" 200 -
+[2026-06-02 17:34:58] core.orchestrator [INFO] [toggle_sensor:290] Orchestrator: sensor override | smoke=True
+[2026-06-02 17:34:58] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:58] "POST /api/sensors/smoke/toggle HTTP/1.1" 200 -
+[2026-06-02 17:34:58] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:58] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:34:58] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:34:58] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:01] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:01] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:01] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:01] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:04] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:04] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:06] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:06] "OPTIONS /api/sensors/smoke/toggle HTTP/1.1" 200 -
+[2026-06-02 17:35:06] core.orchestrator [INFO] [toggle_sensor:290] Orchestrator: sensor override | smoke=True
+[2026-06-02 17:35:06] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:06] "POST /api/sensors/smoke/toggle HTTP/1.1" 200 -
+[2026-06-02 17:35:06] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:06] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:07] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.5, 25.75, 24.0, 21.0, 19.25, 18.75, 20.0, 19.75], [31.0, 26.5, 21.0, 20.25, 19.5, 19.0, 19.0, 18.75], [32.5, 24.0, 20.0, 20.0, 19.75, 19.0, 19.25, 19.0], [27.75, 21.25, 19.75, 19.5, 19.25, 19.0, 20.0, 18.75], [22.0, 20.5, 19.25, 19.25, 19.0, 19.25, 19.5, 19.75], [21.0, 21.0, 19.5, 19.25, 19.5, 19.25, 19.75, 19.75], [21.5, 21.0, 20.0, 19.25, 19.0, 19.25, 19.75, 19.5], [20.5, 20.0, 20.25, 19.25, 20.0, 19.75, 19.25, 20.0]] C | normalized=0.406 | threshold_hit=False
+[2026-06-02 17:35:07] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:07] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:07] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:07] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:10] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:10] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:13] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:13] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:13] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:13] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:16] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:16] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:17] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 25.5, 23.5, 21.25, 19.5, 19.25, 19.5, 19.75], [31.25, 27.0, 21.0, 20.0, 19.5, 19.25, 19.75, 19.25], [32.75, 24.75, 20.0, 20.0, 20.0, 19.5, 19.75, 19.5], [28.0, 21.5, 20.0, 19.75, 20.0, 19.75, 19.5, 19.5], [22.5, 21.5, 19.0, 19.5, 19.25, 19.75, 19.5, 19.75], [21.0, 20.75, 19.75, 19.25, 19.5, 19.25, 19.75, 19.75], [21.75, 21.5, 20.0, 20.25, 19.75, 20.0, 19.75, 19.25], [20.5, 20.25, 20.25, 19.75, 20.25, 20.25, 20.25, 20.0]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:35:19] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:19] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:19] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:19] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:22] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:22] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:25] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:25] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:25] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:25] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:27] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 26.25, 24.0, 23.25, 20.5, 19.25, 19.75, 19.75], [31.25, 27.75, 25.25, 20.75, 19.5, 19.25, 19.75, 18.75], [33.5, 28.0, 23.75, 20.25, 19.75, 19.5, 19.0, 18.75], [28.75, 23.75, 20.75, 19.75, 19.5, 19.5, 19.75, 19.25], [25.75, 21.5, 19.75, 19.75, 19.25, 19.0, 19.75, 19.5], [23.5, 21.0, 19.75, 19.25, 19.5, 19.25, 19.5, 19.75], [21.75, 21.0, 20.5, 19.5, 19.5, 19.25, 19.5, 19.25], [20.75, 20.0, 20.0, 20.25, 19.75, 20.5, 19.75, 19.75]] C | normalized=0.419 | threshold_hit=False
+[2026-06-02 17:35:28] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:28] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:31] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:31] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:31] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:31] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:34] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:34] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:37] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 23.25, 21.25, 23.5, 25.5, 26.5, 27.25, 25.75], [31.75, 25.75, 20.75, 24.75, 27.0, 27.75, 28.0, 27.75], [34.25, 25.5, 21.25, 24.75, 26.5, 27.75, 27.0, 27.75], [29.0, 22.25, 21.75, 24.5, 25.25, 26.0, 25.75, 27.0], [23.25, 21.75, 22.25, 24.5, 24.5, 25.25, 26.5, 23.5], [22.5, 22.25, 24.25, 25.75, 24.5, 24.5, 24.25, 22.0], [22.5, 23.75, 26.5, 26.25, 25.0, 25.0, 22.5, 21.0], [22.25, 22.5, 24.5, 25.0, 25.0, 23.5, 21.0, 21.25]] C | normalized=0.428 | threshold_hit=False
+[2026-06-02 17:35:37] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:37] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:37] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:37] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:40] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:40] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:43] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:43] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:43] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:43] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:46] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:46] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:47] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 25.75, 24.0, 23.75, 23.25, 20.75, 20.0, 19.75], [31.5, 27.5, 22.5, 20.5, 19.75, 19.5, 20.0, 20.0], [33.5, 27.5, 24.75, 20.25, 20.0, 19.25, 19.25, 19.0], [29.0, 24.75, 21.75, 20.0, 19.75, 19.5, 20.0, 19.25], [26.5, 23.75, 19.5, 19.5, 19.0, 19.0, 20.0, 19.25], [23.25, 21.5, 19.75, 19.75, 19.5, 19.25, 20.0, 20.25], [22.0, 21.25, 20.25, 19.75, 19.25, 19.75, 20.0, 19.5], [21.25, 20.25, 20.25, 20.0, 19.5, 20.0, 19.75, 20.0]] C | normalized=0.419 | threshold_hit=False
+[2026-06-02 17:35:49] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:49] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:49] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:49] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:52] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:52] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:55] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:55] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:55] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:55] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:35:56] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:56] "OPTIONS /api/predictions?limit=50 HTTP/1.1" 200 -
+[2026-06-02 17:35:56] routes.predictions [ERROR] [list_predictions:42] GET /api/predictions: connection to server at "db.kszkxbhfuaoblayzhumf.supabase.co" (2a05:d018:65a:e200:a496:af17:d567:572c), port 5432 failed: Network is unreachable
+	Is the server running on that host and accepting TCP/IP connections?
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/api/routes/predictions.py", line 35, in list_predictions
+    db = get_db()
+  File "/home/mj/Desktop/fire_robot/api/db.py", line 15, in get_db
+    g.db = psycopg2.connect(
+           ~~~~~~~~~~~~~~~~^
+        host=os.getenv("DB_HOST"),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        cursor_factory=RealDictCursor,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+psycopg2.OperationalError: connection to server at "db.kszkxbhfuaoblayzhumf.supabase.co" (2a05:d018:65a:e200:a496:af17:d567:572c), port 5432 failed: Network is unreachable
+	Is the server running on that host and accepting TCP/IP connections?
+
+[2026-06-02 17:35:56] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:35:56] "[35m[1mGET /api/predictions?limit=50 HTTP/1.1[0m" 500 -
+[2026-06-02 17:35:57] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 25.25, 24.0, 20.0, 19.25, 18.25, 19.25, 19.25], [31.0, 27.5, 24.25, 20.5, 19.25, 19.0, 19.5, 19.0], [33.0, 27.25, 23.5, 19.75, 19.25, 19.0, 19.0, 19.0], [28.5, 24.5, 20.5, 19.25, 19.25, 18.75, 19.0, 19.0], [24.75, 21.0, 19.25, 19.25, 19.25, 18.5, 19.25, 19.0], [22.5, 20.25, 19.25, 18.75, 19.0, 19.5, 19.25, 19.0], [21.5, 21.0, 20.25, 19.0, 19.25, 19.0, 19.5, 18.75], [20.5, 19.5, 19.5, 19.25, 20.25, 19.25, 19.5, 19.5]] C | normalized=0.412 | threshold_hit=False
+[2026-06-02 17:36:07] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.0, 26.75, 25.5, 24.75, 20.0, 19.75, 19.5, 19.75], [31.75, 28.25, 26.0, 23.75, 20.0, 19.75, 19.75, 19.5], [34.0, 27.5, 25.0, 23.75, 20.0, 20.0, 19.25, 19.0], [29.25, 25.5, 25.0, 21.75, 19.75, 19.75, 20.0, 19.5], [26.0, 26.25, 24.25, 20.0, 19.75, 20.0, 20.0, 20.25], [26.0, 26.25, 22.0, 20.0, 19.5, 19.5, 19.75, 20.25], [23.25, 22.5, 20.25, 19.5, 19.75, 19.5, 20.0, 19.5], [21.0, 20.0, 20.5, 19.25, 20.0, 20.25, 20.0, 19.75]] C | normalized=0.425 | threshold_hit=False
+[2026-06-02 17:36:17] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 25.5, 25.25, 21.0, 20.0, 19.0, 19.75, 19.5], [31.5, 27.5, 23.75, 20.5, 19.5, 19.5, 19.75, 19.25], [33.5, 27.75, 21.5, 20.0, 19.75, 19.75, 19.5, 19.25], [28.25, 24.0, 20.5, 19.5, 20.0, 19.75, 19.75, 19.0], [24.5, 21.0, 19.25, 19.5, 19.25, 19.25, 19.75, 19.75], [23.25, 21.25, 19.5, 19.5, 19.0, 19.5, 19.5, 19.75], [21.75, 21.25, 20.5, 19.75, 19.75, 19.75, 20.25, 19.75], [20.5, 19.75, 20.25, 19.5, 19.5, 19.75, 20.25, 19.75]] C | normalized=0.419 | threshold_hit=False
+[2026-06-02 17:36:27] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 22.0, 20.5, 19.5, 19.75, 18.5, 19.75, 19.25], [31.25, 25.5, 20.5, 20.25, 19.25, 19.5, 20.0, 19.5], [33.25, 24.5, 20.25, 20.25, 19.75, 19.5, 19.5, 19.25], [28.5, 21.75, 20.25, 20.0, 19.75, 19.75, 19.75, 20.0], [23.0, 21.0, 19.75, 20.0, 19.5, 19.5, 20.0, 19.75], [21.75, 21.25, 20.0, 19.75, 19.5, 20.0, 19.75, 20.0], [22.0, 21.25, 20.5, 20.0, 20.25, 20.25, 20.25, 19.75], [20.25, 20.25, 20.5, 20.0, 20.0, 19.75, 19.5, 20.25]] C | normalized=0.416 | threshold_hit=False
+[2026-06-02 17:36:36] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:36:36] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:36:36] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:36:36] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:36:37] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.5, 23.25, 21.75, 20.75, 20.5, 20.25, 20.75, 21.25], [32.5, 26.75, 21.25, 21.0, 21.0, 19.75, 20.5, 20.75], [34.5, 25.75, 21.5, 21.0, 21.0, 20.75, 20.5, 20.0], [29.5, 22.5, 21.5, 20.25, 20.75, 20.25, 21.0, 21.0], [23.5, 21.75, 20.75, 21.0, 21.0, 20.25, 20.75, 21.0], [22.5, 22.25, 21.5, 21.0, 20.75, 20.75, 21.0, 21.25], [22.5, 22.25, 21.75, 20.5, 21.0, 21.0, 21.25, 20.75], [21.5, 21.0, 21.0, 21.0, 21.0, 21.75, 20.75, 21.75]] C | normalized=0.431 | threshold_hit=False
+[2026-06-02 17:36:47] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.25, 23.75, 22.5, 19.75, 19.25, 18.25, 19.0, 19.0], [30.75, 27.0, 22.0, 19.5, 19.0, 18.25, 19.0, 18.5], [32.75, 26.25, 19.75, 18.75, 19.0, 18.75, 19.0, 18.25], [27.75, 21.0, 19.25, 19.25, 19.0, 18.5, 18.75, 19.0], [22.25, 20.0, 18.5, 18.5, 18.75, 18.25, 19.25, 18.75], [20.25, 20.25, 19.25, 19.0, 18.75, 18.75, 19.0, 19.25], [21.5, 20.5, 19.75, 19.0, 18.5, 19.25, 18.75, 18.5], [20.25, 18.75, 20.25, 19.0, 19.25, 19.25, 19.25, 18.75]] C | normalized=0.409 | threshold_hit=False
+[2026-06-02 17:36:53] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:36:53] "OPTIONS /api/notifications?limit=100 HTTP/1.1" 200 -
+[2026-06-02 17:36:53] routes.notifications [ERROR] [list_notifications:45] GET /api/notifications: connection to server at "db.kszkxbhfuaoblayzhumf.supabase.co" (2a05:d018:65a:e200:a496:af17:d567:572c), port 5432 failed: Network is unreachable
+	Is the server running on that host and accepting TCP/IP connections?
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/api/routes/notifications.py", line 37, in list_notifications
+    db = get_db()
+  File "/home/mj/Desktop/fire_robot/api/db.py", line 15, in get_db
+    g.db = psycopg2.connect(
+           ~~~~~~~~~~~~~~~~^
+        host=os.getenv("DB_HOST"),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        cursor_factory=RealDictCursor,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+psycopg2.OperationalError: connection to server at "db.kszkxbhfuaoblayzhumf.supabase.co" (2a05:d018:65a:e200:a496:af17:d567:572c), port 5432 failed: Network is unreachable
+	Is the server running on that host and accepting TCP/IP connections?
+
+[2026-06-02 17:36:53] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:36:53] "[35m[1mGET /api/notifications?limit=100 HTTP/1.1[0m" 500 -
+[2026-06-02 17:36:57] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[28.75, 25.5, 24.25, 21.0, 19.75, 19.25, 20.0, 20.75], [31.75, 28.0, 23.0, 20.5, 20.5, 20.0, 20.25, 19.75], [33.75, 27.5, 21.0, 20.25, 20.5, 20.25, 20.0, 19.0], [29.25, 22.5, 20.75, 20.25, 20.0, 20.25, 20.0, 19.5], [23.75, 21.75, 20.5, 20.0, 20.25, 20.0, 20.25, 20.25], [21.5, 21.5, 20.25, 20.0, 20.0, 20.0, 20.5, 20.25], [22.5, 21.5, 20.5, 20.0, 20.25, 20.0, 20.25, 19.75], [21.0, 20.5, 20.25, 20.25, 20.5, 20.75, 20.5, 20.0]] C | normalized=0.422 | threshold_hit=False
+[2026-06-02 17:37:07] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.25, 25.5, 24.25, 20.75, 20.25, 19.5, 20.25, 20.25], [32.0, 28.0, 23.75, 21.0, 19.75, 19.75, 20.25, 19.75], [34.0, 27.0, 21.25, 20.25, 20.25, 19.75, 20.0, 19.25], [29.0, 22.25, 21.0, 20.25, 20.0, 20.0, 20.25, 19.75], [23.5, 21.25, 20.0, 20.0, 20.25, 20.0, 20.5, 19.75], [21.75, 21.5, 20.5, 19.5, 19.75, 19.75, 20.0, 20.0], [22.5, 21.5, 20.75, 20.25, 20.0, 20.0, 20.25, 20.0], [21.0, 20.25, 20.5, 20.0, 20.5, 20.75, 20.0, 20.5]] C | normalized=0.425 | threshold_hit=False
+[2026-06-02 17:37:17] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:17] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:17] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:17] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:18] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[29.5, 25.75, 24.5, 21.25, 20.0, 19.5, 20.0, 20.5], [32.25, 29.0, 23.25, 20.75, 19.75, 20.0, 20.25, 20.0], [34.25, 27.25, 21.5, 20.25, 20.25, 20.0, 19.75, 19.5], [29.0, 22.25, 20.75, 20.75, 20.25, 20.0, 20.0, 19.75], [24.25, 21.25, 20.25, 20.0, 20.0, 20.25, 20.75, 20.5], [21.75, 21.5, 20.5, 19.75, 20.0, 20.0, 20.25, 20.0], [23.0, 21.5, 21.0, 20.0, 19.75, 20.25, 20.0, 19.75], [20.75, 21.0, 20.75, 20.5, 20.25, 20.25, 20.5, 21.0]] C | normalized=0.428 | threshold_hit=False
+[2026-06-02 17:37:18] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:18] "OPTIONS /api/sensors/heat_grid/toggle HTTP/1.1" 200 -
+[2026-06-02 17:37:18] core.orchestrator [INFO] [toggle_sensor:290] Orchestrator: sensor override | heat_grid=False
+[2026-06-02 17:37:18] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:18] "POST /api/sensors/heat_grid/toggle HTTP/1.1" 200 -
+[2026-06-02 17:37:19] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:19] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:20] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:20] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:23] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:23] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:23] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:23] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:26] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:26] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:29] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:29] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:29] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:29] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:32] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:32] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:35] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:35] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:35] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:35] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:38] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:38] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:41] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:41] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:41] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:41] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:44] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:44] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:47] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:47] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:47] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:47] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:50] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:50] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:53] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:53] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:53] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:53] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:56] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:56] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:58] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:58] "OPTIONS /api/arm/nudge HTTP/1.1" 200 -
+[2026-06-02 17:37:58] core.orchestrator [INFO] [manual_arm_nudge:284] Orchestrator: arm_nudge queued | direction=tilt_up
+[2026-06-02 17:37:58] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:58] "POST /api/arm/nudge HTTP/1.1" 200 -
+[2026-06-02 17:37:58] act.act_engine [INFO] [_dispatch_manual_commands:309] ActEngine: manual cmd | action=arm_nudge | params={'direction': 'tilt_up'}
+[2026-06-02 17:37:59] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:59] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:37:59] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:37:59] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:38:02] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:38:02] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:38:03] core.orchestrator [INFO] [manual_arm_nudge:284] Orchestrator: arm_nudge queued | direction=tilt_up
+[2026-06-02 17:38:03] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:38:03] "POST /api/arm/nudge HTTP/1.1" 200 -
+[2026-06-02 17:38:03] act.act_engine [INFO] [_dispatch_manual_commands:309] ActEngine: manual cmd | action=arm_nudge | params={'direction': 'tilt_up'}
+[2026-06-02 17:38:05] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:38:05] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:38:05] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:38:05] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:38:08] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:38:08] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:38:11] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:38:11] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:38:11] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:38:11] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:38:14] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:38:14] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:38:17] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:38:17] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:38:17] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:38:17] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:38:20] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:38:20] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:38:23] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:38:23] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:38:23] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:38:23] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:38:26] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:38:26] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:38:29] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:38:29] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-02 17:38:29] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:38:29] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:38:32] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:38:32] "GET /api/state HTTP/1.1" 200 -
+[2026-06-02 17:38:32] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:38:32] "OPTIONS /api/analytics/training HTTP/1.1" 200 -
+[2026-06-02 17:38:32] routes.analytics [ERROR] [training_stats:99] analytics/training: connection to server at "db.kszkxbhfuaoblayzhumf.supabase.co" (2a05:d018:65a:e200:a496:af17:d567:572c), port 5432 failed: Network is unreachable
+	Is the server running on that host and accepting TCP/IP connections?
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/api/routes/analytics.py", line 76, in training_stats
+    db = get_db()
+  File "/home/mj/Desktop/fire_robot/api/db.py", line 15, in get_db
+    g.db = psycopg2.connect(
+           ~~~~~~~~~~~~~~~~^
+        host=os.getenv("DB_HOST"),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        cursor_factory=RealDictCursor,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+psycopg2.OperationalError: connection to server at "db.kszkxbhfuaoblayzhumf.supabase.co" (2a05:d018:65a:e200:a496:af17:d567:572c), port 5432 failed: Network is unreachable
+	Is the server running on that host and accepting TCP/IP connections?
+
+[2026-06-02 17:38:32] werkzeug [INFO] [_log:97] 127.0.0.1 - - [02/Jun/2026 17:38:32] "[35m[1mGET /api/analytics/training HTTP/1.1[0m" 500 -
+[2026-06-02 17:40:28] __main__ [INFO] [handle_signal:72] Signal SIGINT — shutting down
+[2026-06-02 17:40:28] __main__ [INFO] [handle_signal:72] Signal SIGINT — shutting down
+[2026-06-02 17:40:28] __main__ [INFO] [handle_signal:72] Signal SIGINT — shutting down
+[2026-06-02 17:40:28] __main__ [INFO] [main:99] Shutting down...
+[2026-06-02 17:40:28] core.orchestrator [INFO] [shutdown:180] Orchestrator: full shutdown initiated
+[2026-06-02 17:40:28] core.orchestrator [INFO] [stop:155] Orchestrator: stopping system | signaling all processes
+[2026-06-02 17:40:28] core.orchestrator [DEBUG] [stop:168] Orchestrator: terminating SenseProcess
+[2026-06-02 17:40:28] __main__ [INFO] [handle_signal:72] Signal SIGTERM — shutting down
+[2026-06-02 17:40:29] sense.sensor_fuser [INFO] [start:80] SensorFuser: stopped
+[2026-06-02 17:40:29] notify.notification_service [INFO] [_log_notification:173] [orchestrator] NOTIFY | event=system_stopped | severity=info | payload={}
+[2026-06-02 17:40:29] core.orchestrator [INFO] [stop:176] Orchestrator: all processes stopped
+[2026-06-02 17:40:29] core.orchestrator [INFO] [shutdown:186] Orchestrator: multiprocessing manager shutdown
+[2026-06-02 17:40:29] __main__ [INFO] [main:101] Stopped cleanly.

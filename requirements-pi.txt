@@ -5,7 +5,7 @@ flask
 xgboost
 pyserial
 psycopg2-binary
-RPi.GPIO
+lgpio
 picamera2
 
 scikit-learn

@@ -2,8 +2,6 @@
 
 import logging
 
-import RPi.GPIO as GPIO
-
 from core.system_state import SystemState
 from act.actuators.actuator_base import Actuator
 from act.actuators.pump_actuator import PumpActuator
@@ -21,6 +19,9 @@ class ActuatorParser:
 
     ArmController is special — it takes (config, state) instead of (config)
     only, because its tracking thread reads from SystemState continuously.
+
+    Note: no global GPIO setup here. PumpActuator uses lgpio (opens its own
+    chip handle), ArmController uses gpiozero (auto-detects lgpio on Pi 5).
     """
 
     _TYPE_MAP = {
@@ -31,10 +32,6 @@ class ActuatorParser:
 
     @classmethod
     def build_actuators(cls, config: dict, state: SystemState) -> list[Actuator]:
-        # Centralised GPIO mode setup — done once here, not in each actuator.
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setwarnings(False)
-
         actuators = []
         act_cfg = config.get("act", {}).get("actuators", {})
 

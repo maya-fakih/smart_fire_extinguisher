@@ -16,7 +16,7 @@ from flask import Blueprint, Response, send_file, current_app
 logger = logging.getLogger(__name__)
 camera_bp = Blueprint("camera", __name__)
 
-LATEST_FRAME_PATH = "data/frames/latest.jpg"
+LATEST_FRAME_PATH = "data/frames/stream.jpg"  # was latest.jpg
 FPS = 10  # stream rate, frontend-friendly
 
 

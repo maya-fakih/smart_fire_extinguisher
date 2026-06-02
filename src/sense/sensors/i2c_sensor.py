@@ -59,10 +59,10 @@ class I2CSensor(Sensor):
         self._ads = ADS.ADS1115(self.bus, address=self.address)
         self._ads.gain = self.gain
 
-        channel_map = {0: ADS.P0, 1: ADS.P1, 2: ADS.P2, 3: ADS.P3}
-        if self.channel not in channel_map:
+        
+        if self.channel not in range(4):
             raise ValueError(f"{self.name}: Invalid ADS1115 channel '{self.channel}'")
-        self._channel = AnalogIn(self._ads, channel_map[self.channel])
+        self._channel = AnalogIn(self._ads, self.channel)
 
     def _setup_amg8833(self, config: dict):
         self._amg = adafruit_amg88xx.AMG88XX(self.bus, addr=self.address)
@@ -97,6 +97,8 @@ class I2CSensor(Sensor):
 
     def _read_ads1115(self) -> float:
         raw = float(self._channel.value)
+        if raw <= 0:
+            raw = 1.0          # bad/disconnected reading — clamp to avoid complex number
         if self._equation is None:
             raise ValueError(
                 f"{self.name}: 'equation' missing from config. "
