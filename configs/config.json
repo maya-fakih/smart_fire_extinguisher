@@ -89,7 +89,7 @@
     },
     "models": {
       "fire": {
-        "rpk": "model_weights/rpk/fire_smoke.rpk",
+        "rpk": "model_weights/rpk/fire_smoke_detection.rpk",
         "conf_threshold": 0.5
       }
     },
@@ -97,7 +97,7 @@
     "storage": {
       "frame_image_path": "data/frames/",
       "frame_url_prefix": "/frames/",
-      "frame_permanent_path": ""
+      "frame_permanent_path": "/media/mj/JANA'S USB/training_frames/"
     },
     "activation": {
       "idle_sleep_ms": 50
@@ -170,8 +170,8 @@
         "enabled": true,
         "type": "arm",
         "joints": {
-          "pan":  { "pin": 32, "step_deg": 0.5, "limit_min_deg": -90, "limit_max_deg": 90, "servo_min_deg": -90, "servo_max_deg": 90, "invert": false },
-          "tilt": { "pin": 33, "step_deg": 0.5, "limit_min_deg": -45, "limit_max_deg": 45, "servo_min_deg": -90, "servo_max_deg": 90, "invert": false }
+          "pan":  { "pin": 12, "step_deg": 0.5, "limit_min_deg": -90, "limit_max_deg": 90, "servo_min_deg": -90, "servo_max_deg": 90, "invert": false },
+          "tilt": { "pin": 13, "step_deg": 0.5, "limit_min_deg": -45, "limit_max_deg": 45, "servo_min_deg": -90, "servo_max_deg": 90, "invert": false }
         },
         "feedback": {
           "heat_use_threshold_c": 35,
