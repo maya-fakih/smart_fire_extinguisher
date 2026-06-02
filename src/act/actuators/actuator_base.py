@@ -27,7 +27,9 @@ class Actuator(ABC):
         """
         self.name      = config['name']
         self.enabled   = config.get('enabled', True)
-        self.interface = config['interface']
+        # 'interface' is present for GPIO actuators (pump, alarm) but
+        # not for the arm (which uses gpiozero servos). Optional.
+        self.interface = config.get('interface', '')
 
         self._is_active = False
         self._faulted   = False

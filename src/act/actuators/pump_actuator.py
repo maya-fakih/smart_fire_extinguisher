@@ -4,7 +4,7 @@ import threading
 import logging
 from typing import Optional
 
-import RPi.GPIO as GPIO
+import lgpio
 
 from act.actuators.actuator_base import Actuator
 from exceptions import ActuatorFaultError
@@ -29,6 +29,8 @@ class PumpActuator(Actuator):
         interface         "gpio"
         pin               int — BCM pin number, e.g. 17
         max_duration_s    float — safety cutoff in seconds, e.g. 30
+
+    Uses lgpio instead of RPi.GPIO — required for Pi 5 (RP1 chip).
     """
 
     def __init__(self, config: dict):
@@ -36,12 +38,12 @@ class PumpActuator(Actuator):
         self._pin = int(config['pin'])
         self._max_duration_s = float(config['max_duration_s'])
 
-        # Set BCM mode (idempotent if already set to BCM; raises if BOARD).
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setwarnings(False)
-
+        # Open the GPIO chip and claim the pin as output (LOW initially).
+        # lgpio uses the Linux character device (/dev/gpiochip0), which
+        # works on all Pi models including Pi 5.
         try:
-            GPIO.setup(self._pin, GPIO.OUT, initial=GPIO.LOW)
+            self._chip = lgpio.gpiochip_open(0)
+            lgpio.gpio_claim_output(self._chip, self._pin, 0)
         except Exception as e:
             raise ActuatorFaultError(
                 f"{self.name}: failed to init GPIO pin {self._pin}: {e}"
@@ -66,7 +68,7 @@ class PumpActuator(Actuator):
                 return
 
             try:
-                GPIO.output(self._pin, GPIO.HIGH)
+                lgpio.gpio_write(self._chip, self._pin, 1)
             except Exception as e:
                 logger.error(
                     f"PumpActuator {self.name}: activation failed - "
@@ -95,7 +97,7 @@ class PumpActuator(Actuator):
                 self._safety_timer = None
 
             try:
-                GPIO.output(self._pin, GPIO.LOW)
+                lgpio.gpio_write(self._chip, self._pin, 0)
             except Exception as e:
                 logger.warning(
                     f"PumpActuator {self.name}: deactivate write failed - "
@@ -123,19 +125,20 @@ class PumpActuator(Actuator):
     # ------------------------------------------------------------------
 
     def _ping(self) -> None:
-        """Verify the GPIO pin is still configured as an output."""
-        function = GPIO.gpio_function(self._pin)
-        if function != GPIO.OUT:
+        """Verify the GPIO pin is still claimed and readable."""
+        # lgpio.gpio_get_mode returns: 0 = input, 1 = output
+        mode = lgpio.gpio_get_mode(self._chip, self._pin)
+        if mode != 1:
             raise IOError(
                 f"{self.name}: GPIO pin {self._pin} is no longer configured as OUT "
-                f"(current function code: {function})"
+                f"(current mode: {mode})"
             )
 
     def cleanup(self) -> None:
-        """Deactivate and release the GPIO pin."""
+        """Deactivate and release the GPIO chip handle."""
         super().cleanup()  # calls deactivate()
         try:
-            GPIO.cleanup(self._pin)
+            lgpio.gpiochip_close(self._chip)
         except Exception as e:
             logger.warning(
                 f"PumpActuator {self.name}: GPIO cleanup error - "
