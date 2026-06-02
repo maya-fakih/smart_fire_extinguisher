@@ -16,10 +16,6 @@ model_weights/*.onnx
 *.sqlite
 *.sqlite3
 
-# Logs
-*.log
-logs/
-
 # OS nonsense
 .DS_Store
 Thumbs.db
