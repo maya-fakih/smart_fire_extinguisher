@@ -89,7 +89,7 @@
     },
     "models": {
       "fire": {
-        "rpk": "model_weights/rpk/fire_smoke.rpk",
+        "rpk": "model_weights/rpk/fire_smoke_detection.rpk",
         "conf_threshold": 0.5
       }
     },
