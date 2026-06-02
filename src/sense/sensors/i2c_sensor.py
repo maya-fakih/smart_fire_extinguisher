@@ -97,6 +97,8 @@ class I2CSensor(Sensor):
 
     def _read_ads1115(self) -> float:
         raw = float(self._channel.value)
+        if raw <= 0:
+            raw = 1.0          # bad/disconnected reading — clamp to avoid complex number
         if self._equation is None:
             raise ValueError(
                 f"{self.name}: 'equation' missing from config. "
