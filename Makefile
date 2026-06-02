@@ -211,19 +211,28 @@ tunnel-install:
 tunnel:
 	@echo ""
 	@echo "🔥 Starting tunnel to Flask API on port 5000..."
-	@echo "   Copy the URL below and paste it into your FIRECTRL dashboard."
+	@echo "   Logs → /tmp/cloudflare_tunnel.log"
 	@echo ""
-	@cloudflared tunnel --url http://localhost:5000 2>&1 | grep -o 'https://[^ ]*\.trycloudflare\.com' | head -1 | while read url; do \
-		echo ""; \
-		echo "╔══════════════════════════════════════════════════════════════╗"; \
-		echo "║  Your Pi is live at:                                        ║"; \
-		echo "║  $$url"; \
-		echo "╚══════════════════════════════════════════════════════════════╝"; \
-		echo ""; \
-		echo "Paste this URL into your FIRECTRL project settings."; \
-		echo "Press Ctrl+C to stop the tunnel."; \
-	done &
-	@cloudflared tunnel --url http://localhost:5000
+	@rm -f /tmp/cloudflare_tunnel.log; \
+	cloudflared tunnel --url http://localhost:5000 > /tmp/cloudflare_tunnel.log 2>&1 & \
+	TUNNEL_PID=$$!; \
+	trap "kill $$TUNNEL_PID 2>/dev/null; echo ''; echo 'Tunnel stopped.'" EXIT INT TERM; \
+	echo "Waiting for URL..."; \
+	for i in $$(seq 1 30); do \
+		url=$$(grep -o 'https://[a-zA-Z0-9-]*\.trycloudflare\.com' /tmp/cloudflare_tunnel.log 2>/dev/null | head -1); \
+		if [ -n "$$url" ]; then \
+			echo ""; \
+			echo "╔══════════════════════════════════════════════════════════════╗"; \
+			echo "║  Your Pi is live at:                                        ║"; \
+			echo "║  $$url"; \
+			echo "╚══════════════════════════════════════════════════════════════╝"; \
+			echo ""; \
+			echo "Press Ctrl+C to stop the tunnel."; \
+			break; \
+		fi; \
+		sleep 1; \
+	done; \
+	wait $$TUNNEL_PID
 
 tunnel-stop:
 	@pkill -f "cloudflared tunnel" 2>/dev/null && echo "✅ Tunnel stopped" || echo "No tunnel running"
