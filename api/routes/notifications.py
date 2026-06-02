@@ -43,7 +43,8 @@ def list_notifications():
         return jsonify({"notifications": rows, "count": len(rows)}), 200
     except Exception as e:
         logger.error(f"GET /api/notifications: {e}", exc_info=True)
-        return jsonify({"error": str(e)}), 500
+        msg = "Database unavailable" if "psycopg2" in type(e).__module__ else str(e)
+        return jsonify({"error": msg}), 500
 
 
 @notifications_bp.route("/api/notifications/<int:notif_id>/acknowledge", methods=["POST"])
@@ -62,4 +63,5 @@ def acknowledge(notif_id: int):
         return jsonify({"ok": True, "id": notif_id}), 200
     except Exception as e:
         logger.error(f"acknowledge: {e}", exc_info=True)
-        return jsonify({"error": str(e)}), 500
+        msg = "Database unavailable" if "psycopg2" in type(e).__module__ else str(e)
+        return jsonify({"error": msg}), 500
