@@ -2446,3 +2446,2424 @@ LINE 2:                     INSERT INTO notifications
 [2026-06-03 10:35:12] core.orchestrator [INFO] [stop:176] Orchestrator: all processes stopped
 [2026-06-03 10:35:12] core.orchestrator [INFO] [shutdown:186] Orchestrator: multiprocessing manager shutdown
 [2026-06-03 10:35:12] __main__ [INFO] [main:101] Stopped cleanly.
+[2026-06-03 10:35:44] __main__ [INFO] [main:59] ============================================================
+[2026-06-03 10:35:44] __main__ [INFO] [main:60] Fire Robot starting up
+[2026-06-03 10:35:44] __main__ [INFO] [main:61] ============================================================
+[2026-06-03 10:35:44] core.orchestrator [DEBUG] [_load_config:60] Orchestrator: loading config | path=configs/config.json
+[2026-06-03 10:35:44] core.orchestrator [INFO] [_load_config:63] Orchestrator: config loaded successfully
+[2026-06-03 10:35:44] core.orchestrator [DEBUG] [_init_manager:78] Orchestrator: initializing multiprocessing manager
+[2026-06-03 10:35:44] core.orchestrator [DEBUG] [_init_state:90] Orchestrator: initializing SystemState | mode=surveillance
+[2026-06-03 10:35:44] core.orchestrator [INFO] [_init_notifier:105] Orchestrator: NotificationService constructed
+[2026-06-03 10:35:44] core.orchestrator [INFO] [start:120] Orchestrator: starting system | spawning all processes
+[2026-06-03 10:35:44] notify.notification_service [INFO] [_log_notification:173] [orchestrator] NOTIFY | event=system_started | severity=info | payload={'mode': 'surveillance'}
+[2026-06-03 10:35:45] notify.notification_service [INFO] [_ensure_connected:85] NotificationService: DB connection established
+[2026-06-03 10:35:45] core.orchestrator [INFO] [start:146] Orchestrator: SenseProcess started
+[2026-06-03 10:35:45] core.orchestrator [INFO] [start:148] Orchestrator: SeeProcess started
+[2026-06-03 10:35:45] sense.sensor_fuser [INFO] [start:73] SensorFuser: starting
+[2026-06-03 10:35:45] core.orchestrator [INFO] [start:150] Orchestrator: ThinkProcess started
+[2026-06-03 10:35:45] sense.sensor_fuser [INFO] [start:78] SensorFuser: spawned 2 sensor threads
+[2026-06-03 10:35:45] core.orchestrator [INFO] [start:152] Orchestrator: ActProcess started
+[2026-06-03 10:35:45] __main__ [INFO] [main:93] Flask API listening on port 5000
+[2026-06-03 10:35:45] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor smoke: poll_result | physical=7.376283842613144e-08 ppm | normalized=0.000 | threshold_hit=False
+[2026-06-03 10:35:45] think.think_engine [INFO] [start:33] ThinkEngine: starting
+[2026-06-03 10:35:45] think.database.think_database [DEBUG] [connect:46] Database: connect attempt 1/3
+[2026-06-03 10:35:45] act.act_engine [INFO] [start:63] ActEngine: starting
+[2026-06-03 10:35:45] act.actuator_parser [INFO] [build_actuators:57] ActuatorParser: built pump 'pump'
+[2026-06-03 10:35:45] act.actuator_parser [INFO] [build_actuators:57] ActuatorParser: built arm 'arm'
+[2026-06-03 10:35:45] act.act_engine [INFO] [start:67] ActEngine: built actuators ['pump', 'arm']
+[2026-06-03 10:35:45] act.actuators.arm_controller [DEBUG] [_tracking_loop:147] ArmController arm: tracking loop entered
+[2026-06-03 10:35:45] act.actuators.arm_controller [INFO] [activate:95] ArmController arm: tracking thread started
+[2026-06-03 10:35:45] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[25.25, 22.0, 21.0, 19.75, 20.5, 20.0, 21.0, 21.25], [31.5, 22.25, 21.0, 20.75, 20.25, 20.5, 20.75, 20.5], [31.25, 21.25, 20.5, 20.25, 20.5, 20.75, 20.75, 20.0], [25.0, 21.5, 20.75, 21.0, 20.5, 20.5, 19.75, 19.75], [21.5, 21.25, 20.5, 20.25, 20.5, 20.25, 20.5, 20.25], [21.25, 21.25, 20.5, 20.5, 20.5, 20.0, 20.0, 20.5], [21.75, 21.75, 21.0, 21.0, 20.5, 20.5, 19.75, 19.5], [21.25, 20.75, 20.5, 19.5, 20.25, 20.25, 20.25, 20.25]] C | normalized=0.394 | threshold_hit=False
+[2026-06-03 10:35:45] picamera2.picamera2 [INFO] [_initialize_camera:555] Initialization successful.
+[2026-06-03 10:35:45] picamera2.picamera2 [INFO] [_open_camera:577] Camera now open.
+[2026-06-03 10:35:45] picamera2.picamera2 [DEBUG] [__init__:357] <libcamera._libcamera.CameraManager object at 0x7fff354d6430>
+[2026-06-03 10:35:45] picamera2.picamera2 [DEBUG] [configure_:1212] Requesting configuration: {'use_case': 'preview', 'transform': <libcamera.Transform 'identity'>, 'colour_space': <libcamera.ColorSpace 'sYCC'>, 'buffer_count': 4, 'queue': True, 'main': {'format': 'XBGR8888', 'size': (640, 480), 'preserve_ar': True, 'stride': 2560, 'framesize': 1228800}, 'lores': None, 'raw': {'format': 'RGGB_PISP_COMP1', 'size': (2028, 1520), 'stride': 2048, 'framesize': 3112960}, 'controls': {'NoiseReductionMode': <NoiseReductionModeEnum.Minimal: 3>, 'FrameDurationLimits': (100, 83333), 'FrameRate': 30}, 'sensor': {'bit_depth': 10, 'output_size': (2028, 1520)}, 'display': 'main', 'encode': 'main'}
+[2026-06-03 10:35:45] picamera2.picamera2 [INFO] [configure_:1216] Camera configuration has been adjusted!
+[2026-06-03 10:35:45] picamera2.picamera2 [INFO] [configure_:1221] Configuration successful!
+[2026-06-03 10:35:45] picamera2.picamera2 [DEBUG] [configure_:1222] Final configuration: {'use_case': 'preview', 'transform': <libcamera.Transform 'identity'>, 'colour_space': <libcamera.ColorSpace 'sYCC'>, 'buffer_count': 4, 'queue': True, 'main': {'format': 'XBGR8888', 'size': (640, 480), 'preserve_ar': True, 'stride': 2560, 'framesize': 1228800}, 'lores': None, 'raw': {'format': 'RGGB_PISP_COMP1', 'size': (2028, 1520), 'stride': 2048, 'framesize': 3112960}, 'controls': {'NoiseReductionMode': <NoiseReductionModeEnum.Minimal: 3>, 'FrameDurationLimits': (100, 83333), 'FrameRate': 30}, 'sensor': {'bit_depth': 10, 'output_size': (2028, 1520)}, 'display': 'main', 'encode': 'main'}
+[2026-06-03 10:35:45] picamera2.picamera2 [DEBUG] [configure_:1236] Streams: {'main': <libcamera._libcamera.Stream object at 0x7fff442b7cb0>, 'lores': None, 'raw': <libcamera._libcamera.Stream object at 0x7fff354e8630>}
+[2026-06-03 10:35:45] picamera2 [DEBUG] [allocate:70] Allocated 4 buffers for stream 0 with fds [44, 47, 50, 53]
+[2026-06-03 10:35:45] picamera2 [DEBUG] [allocate:70] Allocated 4 buffers for stream 1 with fds [56, 59, 62, 65]
+[2026-06-03 10:35:45] picamera2.picamera2 [INFO] [start_:1323] Camera started
+[2026-06-03 10:35:45] werkzeug [INFO] [_log:97] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.166.110.122:5000
+[2026-06-03 10:35:45] werkzeug [INFO] [_log:97] [33mPress CTRL+C to quit[0m
+[2026-06-03 10:35:46] think.database.think_database [INFO] [connect:56] Database: connected successfully
+[2026-06-03 10:35:46] think.think_engine [INFO] [start:39] ThinkEngine: database connected
+[2026-06-03 10:35:46] think.think_engine [DEBUG] [_load_model:801] ThinkEngine: loading model | active_model=xgboost
+[2026-06-03 10:35:46] think.ml.xgboost_model [DEBUG] [load:95] XGBoostModel: loading model | path=model_weights/
+[2026-06-03 10:35:46] think.ml.xgboost_model [ERROR] [load:100] XGBoostModel: load failed - XGBoostError: [10:35:46] /__w/xgboost/xgboost/src/common/io.cc:144: Opening model_weights//xgboost_model.json failed: No such file or directory
+Stack trace:
+  [bt] (0) /home/mj/Desktop/fyp_env/lib/python3.13/site-packages/xgboost/lib/libxgboost.so(+0x22fff4) [0x7fff3593fff4]
+  [bt] (1) /home/mj/Desktop/fyp_env/lib/python3.13/site-packages/xgboost/lib/libxgboost.so(+0x30c9c0) [0x7fff35a1c9c0]
+  [bt] (2) /home/mj/Desktop/fyp_env/lib/python3.13/site-packages/xgboost/lib/libxgboost.so(+0x1909bc) [0x7fff358a09bc]
+  [bt] (3) /home/mj/Desktop/fyp_env/lib/python3.13/site-packages/xgboost/lib/libxgboost.so(XGBoosterLoadModel+0xa0) [0x7fff358a0e30]
+  [bt] (4) /lib/aarch64-linux-gnu/libffi.so.8(+0x6a94) [0x7fff7ba16a94]
+  [bt] (5) /lib/aarch64-linux-gnu/libffi.so.8(+0x6088) [0x7fff7ba16088]
+  [bt] (6) /usr/lib/python3.13/lib-dynload/_ctypes.cpython-313-aarch64-linux-gnu.so(+0x12df0) [0x7fff78032df0]
+  [bt] (7) /usr/lib/python3.13/lib-dynload/_ctypes.cpython-313-aarch64-linux-gnu.so(+0x113d8) [0x7fff780313d8]
+  [bt] (8) /home/mj/Desktop/fyp_env/bin/python(_PyObject_MakeTpCall+0x278) [0x4a5680]
+
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/think/ml/xgboost_model.py", line 97, in load
+    self._model.load_model(f"{path}/xgboost_model.json")
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/xgboost/sklearn.py", line 1125, in load_model
+    self.get_booster().load_model(fname)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/xgboost/core.py", line 3050, in load_model
+    _check_call(_LIB.XGBoosterLoadModel(self.handle, c_str(fname)))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/xgboost/core.py", line 324, in _check_call
+    raise XGBoostError(py_str(_LIB.XGBGetLastError()))
+xgboost.core.XGBoostError: [10:35:46] /__w/xgboost/xgboost/src/common/io.cc:144: Opening model_weights//xgboost_model.json failed: No such file or directory
+Stack trace:
+  [bt] (0) /home/mj/Desktop/fyp_env/lib/python3.13/site-packages/xgboost/lib/libxgboost.so(+0x22fff4) [0x7fff3593fff4]
+  [bt] (1) /home/mj/Desktop/fyp_env/lib/python3.13/site-packages/xgboost/lib/libxgboost.so(+0x30c9c0) [0x7fff35a1c9c0]
+  [bt] (2) /home/mj/Desktop/fyp_env/lib/python3.13/site-packages/xgboost/lib/libxgboost.so(+0x1909bc) [0x7fff358a09bc]
+  [bt] (3) /home/mj/Desktop/fyp_env/lib/python3.13/site-packages/xgboost/lib/libxgboost.so(XGBoosterLoadModel+0xa0) [0x7fff358a0e30]
+  [bt] (4) /lib/aarch64-linux-gnu/libffi.so.8(+0x6a94) [0x7fff7ba16a94]
+  [bt] (5) /lib/aarch64-linux-gnu/libffi.so.8(+0x6088) [0x7fff7ba16088]
+  [bt] (6) /usr/lib/python3.13/lib-dynload/_ctypes.cpython-313-aarch64-linux-gnu.so(+0x12df0) [0x7fff78032df0]
+  [bt] (7) /usr/lib/python3.13/lib-dynload/_ctypes.cpython-313-aarch64-linux-gnu.so(+0x113d8) [0x7fff780313d8]
+  [bt] (8) /home/mj/Desktop/fyp_env/bin/python(_PyObject_MakeTpCall+0x278) [0x4a5680]
+
+
+[2026-06-03 10:35:46] think.think_engine [WARNING] [_load_model:819] ThinkEngine: model weights not found or invalid — forcing training mode | reason=Failed to load model: [10:35:46] /__w/xgboost/xgboost/src/common/io.cc:144: Opening model_weights//xgboost_model.json failed: No such file or directory
+Stack trace:
+  [bt] (0) /home/mj/Desktop/fyp_env/lib/python3.13/site-packages/xgboost/lib/libxgboost.so(+0x22fff4) [0x7fff3593fff4]
+  [bt] (1) /home/mj/Desktop/fyp_env/lib/python3.13/site-packages/xgboost/lib/libxgboost.so(+0x30c9c0) [0x7fff35a1c9c0]
+  [bt] (2) /home/mj/Desktop/fyp_env/lib/python3.13/site-packages/xgboost/lib/libxgboost.so(+0x1909bc) [0x7fff358a09bc]
+  [bt] (3) /home/mj/Desktop/fyp_env/lib/python3.13/site-packages/xgboost/lib/libxgboost.so(XGBoosterLoadModel+0xa0) [0x7fff358a0e30]
+  [bt] (4) /lib/aarch64-linux-gnu/libffi.so.8(+0x6a94) [0x7fff7ba16a94]
+  [bt] (5) /lib/aarch64-linux-gnu/libffi.so.8(+0x6088) [0x7fff7ba16088]
+  [bt] (6) /usr/lib/python3.13/lib-dynload/_ctypes.cpython-313-aarch64-linux-gnu.so(+0x12df0) [0x7fff78032df0]
+  [bt] (7) /usr/lib/python3.13/lib-dynload/_ctypes.cpython-313-aarch64-linux-gnu.so(+0x113d8) [0x7fff780313d8]
+  [bt] (8) /home/mj/Desktop/fyp_env/bin/python(_PyObject_MakeTpCall+0x278) [0x4a5680]
+
+
+[2026-06-03 10:35:46] think.think_engine [WARNING] [_load_model:827] ThinkEngine: system was in 'surveillance' mode — switching to training mode because no model weights exist
+[2026-06-03 10:35:46] notify.notification_service [WARNING] [_log_notification:171] [think] NOTIFY | event=model_load_failed | severity=warn | payload={'model': 'xgboost', 'error': 'Failed to load model: [10:35:46] /__w/xgboost/xgboost/src/common/io.cc:144: Opening model_weights//xgboost_model.json failed: No such file or directory\nStack trace:\n  [bt] (0) /home/mj/Desktop/fyp_env/lib/python3.13/site-packages/xgboost/lib/libxgboost.so(+0x22fff4) [0x7fff3593fff4]\n  [bt] (1) /home/mj/Desktop/fyp_env/lib/python3.13/site-packages/xgboost/lib/libxgboost.so(+0x30c9c0) [0x7fff35a1c9c0]\n  [bt] (2) /home/mj/Desktop/fyp_env/lib/python3.13/site-packages/xgboost/lib/libxgboost.so(+0x1909bc) [0x7fff358a09bc]\n  [bt] (3) /home/mj/Desktop/fyp_env/lib/python3.13/site-packages/xgboost/lib/libxgboost.so(XGBoosterLoadModel+0xa0) [0x7fff358a0e30]\n  [bt] (4) /lib/aarch64-linux-gnu/libffi.so.8(+0x6a94) [0x7fff7ba16a94]\n  [bt] (5) /lib/aarch64-linux-gnu/libffi.so.8(+0x6088) [0x7fff7ba16088]\n  [bt] (6) /usr/lib/python3.13/lib-dynload/_ctypes.cpython-313-aarch64-linux-gnu.so(+0x12df0) [0x7fff78032df0]\n  [bt] (7) /usr/lib/python3.13/lib-dynload/_ctypes.cpython-313-aarch64-linux-gnu.so(+0x113d8) [0x7fff780313d8]\n  [bt] (8) /home/mj/Desktop/fyp_env/bin/python(_PyObject_MakeTpCall+0x278) [0x4a5680]\n\n', 'action': 'forced training mode — collect data and train'}
+[2026-06-03 10:35:46] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:35:46] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-03 10:35:46] think.think_engine [INFO] [start:67] ThinkEngine: started | mode=training | model=none (training mode)
+[2026-06-03 10:35:46] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:35:46] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:35:48] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:35:48] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:35:51] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:35:51] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:35:52] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:35:52] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-03 10:35:52] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:35:52] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:35:54] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:35:54] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:35:55] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor smoke: poll_result | physical=7.376283842613144e-08 ppm | normalized=0.000 | threshold_hit=False
+[2026-06-03 10:35:55] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[24.25, 21.0, 20.0, 19.75, 20.25, 19.5, 20.25, 20.0], [30.5, 21.75, 20.25, 20.0, 19.75, 19.75, 20.25, 20.0], [30.75, 20.75, 20.0, 20.0, 19.75, 19.75, 19.5, 19.25], [24.25, 20.75, 20.25, 20.0, 20.0, 19.75, 19.75, 19.25], [20.75, 20.75, 20.0, 19.75, 19.5, 19.75, 20.0, 19.25], [21.25, 21.0, 20.0, 19.5, 19.75, 19.5, 19.75, 19.75], [21.5, 21.25, 20.25, 19.75, 19.75, 20.0, 19.5, 19.0], [21.25, 20.75, 20.0, 19.5, 19.75, 20.25, 19.75, 19.25]] C | normalized=0.384 | threshold_hit=False
+[2026-06-03 10:35:56] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:35:56] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:35:58] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:35:58] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-03 10:35:58] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:35:58] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:00] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:00] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:02] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:02] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:04] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:04] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:04] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:04] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:05] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor smoke: poll_result | physical=7.376283842613144e-08 ppm | normalized=0.000 | threshold_hit=False
+[2026-06-03 10:36:05] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[24.0, 20.75, 20.0, 19.5, 19.5, 19.5, 20.0, 19.75], [30.25, 21.0, 20.0, 19.75, 19.5, 19.25, 19.75, 19.25], [30.0, 20.75, 19.75, 19.75, 20.0, 19.5, 19.5, 18.75], [24.25, 20.75, 20.5, 20.0, 19.75, 19.5, 19.25, 19.25], [20.5, 20.25, 20.0, 19.5, 19.75, 19.5, 19.5, 19.0], [20.75, 20.75, 19.5, 19.75, 19.75, 19.25, 19.25, 19.75], [21.0, 21.0, 20.0, 20.0, 19.25, 19.75, 19.5, 19.0], [21.0, 20.0, 20.0, 19.25, 19.25, 19.75, 19.5, 19.0]] C | normalized=0.378 | threshold_hit=False
+[2026-06-03 10:36:06] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:06] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:08] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:08] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:09] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:09] "[33mGET /api/camera/snapshot?t=1780472169096 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:10] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:10] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:10] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:10] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:12] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:12] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:14] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:14] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:15] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor smoke: poll_result | physical=7.376283842613144e-08 ppm | normalized=0.000 | threshold_hit=False
+[2026-06-03 10:36:15] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[25.75, 23.0, 22.0, 21.25, 22.0, 21.5, 22.0, 22.0], [31.75, 22.75, 22.25, 21.75, 21.75, 21.5, 22.25, 21.75], [32.5, 23.25, 22.0, 21.75, 22.25, 21.5, 21.25, 21.5], [26.0, 22.75, 22.5, 21.75, 21.75, 21.5, 21.5, 21.5], [22.75, 22.5, 21.75, 21.75, 21.75, 21.75, 21.5, 21.75], [22.75, 22.25, 22.0, 21.75, 21.25, 21.25, 21.0, 21.75], [22.75, 22.75, 21.75, 22.25, 21.5, 21.5, 21.5, 21.5], [22.25, 21.5, 21.5, 21.5, 22.0, 21.0, 21.5, 21.0]] C | normalized=0.406 | threshold_hit=False
+[2026-06-03 10:36:16] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:16] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:16] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:16] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:18] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:18] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:20] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:20] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:22] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:22] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:22] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:22] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:24] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:24] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:25] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor smoke: poll_result | physical=7.376283842613144e-08 ppm | normalized=0.000 | threshold_hit=False
+[2026-06-03 10:36:25] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[24.75, 21.75, 21.0, 20.5, 21.0, 21.0, 21.25, 21.0], [31.25, 22.25, 21.5, 21.0, 20.75, 20.5, 21.5, 21.0], [32.0, 22.0, 21.25, 21.0, 21.25, 21.0, 20.75, 20.5], [25.0, 22.0, 21.0, 21.0, 21.25, 20.75, 20.75, 20.25], [21.75, 21.5, 21.5, 20.75, 20.75, 20.75, 20.75, 20.75], [21.75, 22.0, 21.5, 20.75, 20.75, 20.75, 20.25, 20.5], [22.0, 21.75, 21.5, 21.0, 21.0, 20.75, 20.0, 20.25], [21.25, 21.0, 21.0, 20.25, 20.5, 20.75, 20.0, 20.25]] C | normalized=0.400 | threshold_hit=False
+[2026-06-03 10:36:26] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:26] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:28] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:28] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:28] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:28] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:30] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:30] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:32] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:32] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:34] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:34] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:34] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:34] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:35] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor smoke: poll_result | physical=7.376283842613144e-08 ppm | normalized=0.000 | threshold_hit=False
+[2026-06-03 10:36:35] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[25.0, 21.75, 21.25, 19.75, 20.75, 20.75, 21.5, 21.0], [31.5, 22.0, 21.0, 21.0, 20.5, 20.5, 20.75, 20.5], [31.25, 22.0, 21.0, 21.0, 20.75, 20.25, 20.5, 20.25], [25.0, 21.75, 21.0, 20.75, 20.75, 20.5, 20.5, 20.5], [21.5, 21.5, 20.75, 20.75, 20.25, 20.75, 20.75, 20.5], [21.75, 21.75, 21.0, 20.5, 20.75, 20.5, 20.75, 20.5], [22.0, 22.0, 21.5, 20.5, 20.75, 20.5, 20.0, 20.5], [21.0, 20.75, 20.75, 20.0, 20.0, 21.0, 20.25, 19.75]] C | normalized=0.394 | threshold_hit=False
+[2026-06-03 10:36:36] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:36] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:38] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:38] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:40] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:40] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:40] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:40] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:41] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:41] "[33mGET /api/camera/snapshot?t=1780472201425 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:41] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:41] "[33mGET /api/camera/snapshot?t=1780472201483 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:41] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:41] "[33mGET /api/camera/snapshot?t=1780472201633 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:41] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:41] "[33mGET /api/camera/snapshot?t=1780472201783 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:41] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:41] "[33mGET /api/camera/snapshot?t=1780472201933 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:42] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:42] "[33mGET /api/camera/snapshot?t=1780472202083 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:42] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:42] "[33mGET /api/camera/snapshot?t=1780472202233 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:42] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:42] "[33mGET /api/camera/snapshot?t=1780472202383 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:42] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:42] "[33mGET /api/camera/snapshot?t=1780472202533 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:42] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:42] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:42] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:42] "[33mGET /api/camera/snapshot?t=1780472202683 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:42] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:42] "[33mGET /api/camera/snapshot?t=1780472202833 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:43] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:43] "[33mGET /api/camera/snapshot?t=1780472202983 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:43] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:43] "[33mGET /api/camera/snapshot?t=1780472203133 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:43] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:43] "[33mGET /api/camera/snapshot?t=1780472203283 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:43] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:43] "[33mGET /api/camera/snapshot?t=1780472203435 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:43] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:43] "[33mGET /api/camera/snapshot?t=1780472203583 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:43] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:43] "[33mGET /api/camera/snapshot?t=1780472203733 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:43] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:43] "[33mGET /api/camera/snapshot?t=1780472203883 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:44] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:44] "[33mGET /api/camera/snapshot?t=1780472204033 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:44] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:44] "[33mGET /api/camera/snapshot?t=1780472204183 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:44] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:44] "[33mGET /api/camera/snapshot?t=1780472204333 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:44] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:44] "[33mGET /api/camera/snapshot?t=1780472204483 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:44] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:44] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:44] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:44] "[33mGET /api/camera/snapshot?t=1780472204634 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:44] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:44] "[33mGET /api/camera/snapshot?t=1780472204783 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:44] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:44] "[33mGET /api/camera/snapshot?t=1780472204933 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:45] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:45] "[33mGET /api/camera/snapshot?t=1780472205084 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:45] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:45] "[33mGET /api/camera/snapshot?t=1780472205233 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:45] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:45] "[33mGET /api/camera/snapshot?t=1780472205383 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:45] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor smoke: poll_result | physical=7.376283842613144e-08 ppm | normalized=0.000 | threshold_hit=False
+[2026-06-03 10:36:45] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[24.5, 20.75, 20.5, 19.0, 20.25, 19.5, 20.0, 20.25], [30.5, 21.5, 20.25, 20.25, 20.25, 20.0, 20.0, 19.75], [30.75, 21.0, 20.25, 19.75, 20.0, 19.75, 19.25, 19.25], [24.25, 20.75, 20.5, 20.0, 20.25, 19.25, 19.75, 19.5], [20.75, 20.75, 20.25, 20.0, 19.75, 20.25, 19.5, 19.75], [21.25, 21.0, 20.25, 19.75, 19.5, 19.75, 19.0, 19.75], [21.0, 21.25, 20.5, 20.0, 19.75, 19.75, 19.75, 19.25], [20.75, 19.75, 20.0, 19.75, 19.75, 19.75, 19.5, 19.5]] C | normalized=0.384 | threshold_hit=False
+[2026-06-03 10:36:46] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:46] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:46] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:46] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:46] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:46] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:48] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:48] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:50] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:50] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:52] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:52] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:52] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:52] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:52] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:52] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:52] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:52] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:54] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:54] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:54] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:54] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:54] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:54] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:55] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor smoke: poll_result | physical=7.376283842613144e-08 ppm | normalized=0.000 | threshold_hit=False
+[2026-06-03 10:36:56] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[24.75, 21.0, 20.0, 19.5, 19.5, 20.25, 20.5, 20.25], [31.0, 21.5, 20.75, 20.25, 20.0, 20.0, 20.25, 19.75], [31.0, 21.5, 20.0, 20.25, 20.25, 20.25, 20.0, 19.75], [24.5, 21.0, 20.5, 20.25, 20.5, 20.0, 19.75, 20.0], [20.5, 20.75, 20.25, 20.0, 20.0, 19.75, 19.5, 20.0], [21.5, 20.75, 20.5, 20.5, 19.75, 19.75, 19.75, 19.75], [21.25, 21.0, 20.75, 20.0, 19.5, 19.75, 19.75, 19.75], [21.25, 20.0, 20.0, 19.5, 20.0, 20.0, 20.0, 19.5]] C | normalized=0.388 | threshold_hit=False
+[2026-06-03 10:36:56] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:56] "OPTIONS /api/camera/toggle HTTP/1.1" 200 -
+[2026-06-03 10:36:56] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:56] "POST /api/camera/toggle HTTP/1.1" 200 -
+[2026-06-03 10:36:56] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:56] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:56] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff354ec050>
+[2026-06-03 10:36:56] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:56] "[33mGET /api/camera/snapshot?t=1780472216629 HTTP/1.1[0m" 404 -
+[2026-06-03 10:36:56] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff35492710>
+[2026-06-03 10:36:56] see.vision_fuser [ERROR] [_capture_loop:264] VisionFuser: capture loop iteration failed - TypeError: 'numpy.float32' object is not iterable
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/see/vision_fuser.py", line 234, in _capture_loop
+    clusters, raw_detections = self._fire_detector.detect(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        metadata     = metadata,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_width  = frame_width,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_height = frame_height
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fire_robot/src/see/models/fire_detector.py", line 123, in detect
+    for box, score, class_id in zip(boxes, scores, classes):
+                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'numpy.float32' object is not iterable
+[2026-06-03 10:36:56] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:56] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:56] "[35m[1mGET /api/camera/snapshot?t=1780472216780 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:56] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:56] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:56] "[35m[1mGET /api/camera/snapshot?t=1780472216930 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:57] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:57] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:57] "[35m[1mGET /api/camera/snapshot?t=1780472217080 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:57] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff35492710>
+[2026-06-03 10:36:57] see.vision_fuser [ERROR] [_capture_loop:264] VisionFuser: capture loop iteration failed - TypeError: 'numpy.float32' object is not iterable
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/see/vision_fuser.py", line 234, in _capture_loop
+    clusters, raw_detections = self._fire_detector.detect(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        metadata     = metadata,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_width  = frame_width,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_height = frame_height
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fire_robot/src/see/models/fire_detector.py", line 123, in detect
+    for box, score, class_id in zip(boxes, scores, classes):
+                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'numpy.float32' object is not iterable
+[2026-06-03 10:36:57] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:57] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:57] "[35m[1mGET /api/camera/snapshot?t=1780472217231 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:57] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:57] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:57] "[35m[1mGET /api/camera/snapshot?t=1780472217380 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:57] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:57] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:57] "[35m[1mGET /api/camera/snapshot?t=1780472217530 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:57] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff35471cd0>
+[2026-06-03 10:36:57] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff35471cd0>
+[2026-06-03 10:36:57] see.vision_fuser [ERROR] [_capture_loop:264] VisionFuser: capture loop iteration failed - TypeError: 'numpy.float32' object is not iterable
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/see/vision_fuser.py", line 234, in _capture_loop
+    clusters, raw_detections = self._fire_detector.detect(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        metadata     = metadata,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_width  = frame_width,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_height = frame_height
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fire_robot/src/see/models/fire_detector.py", line 123, in detect
+    for box, score, class_id in zip(boxes, scores, classes):
+                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'numpy.float32' object is not iterable
+[2026-06-03 10:36:57] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:57] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:57] "[35m[1mGET /api/camera/snapshot?t=1780472217680 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:57] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:57] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:57] "[35m[1mGET /api/camera/snapshot?t=1780472217830 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:58] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:58] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:58] "[35m[1mGET /api/camera/snapshot?t=1780472217981 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:58] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:58] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:58] "[35m[1mGET /api/camera/snapshot?t=1780472218130 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:58] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff3545ae70>
+[2026-06-03 10:36:58] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff3542bf00>
+[2026-06-03 10:36:58] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff3542bf00>
+[2026-06-03 10:36:58] see.vision_fuser [ERROR] [_capture_loop:264] VisionFuser: capture loop iteration failed - TypeError: 'numpy.float32' object is not iterable
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/see/vision_fuser.py", line 234, in _capture_loop
+    clusters, raw_detections = self._fire_detector.detect(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        metadata     = metadata,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_width  = frame_width,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_height = frame_height
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fire_robot/src/see/models/fire_detector.py", line 123, in detect
+    for box, score, class_id in zip(boxes, scores, classes):
+                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'numpy.float32' object is not iterable
+[2026-06-03 10:36:58] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:58] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:58] "[35m[1mGET /api/camera/snapshot?t=1780472218280 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:58] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:58] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:58] "[35m[1mGET /api/camera/snapshot?t=1780472218431 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:58] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:58] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:58] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:58] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:58] "[35m[1mGET /api/camera/snapshot?t=1780472218580 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:58] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:58] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:36:58] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff35637850>
+[2026-06-03 10:36:58] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff35637850>
+[2026-06-03 10:36:58] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff354ce6c0>
+[2026-06-03 10:36:58] see.vision_fuser [ERROR] [_capture_loop:264] VisionFuser: capture loop iteration failed - TypeError: 'numpy.float32' object is not iterable
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/see/vision_fuser.py", line 234, in _capture_loop
+    clusters, raw_detections = self._fire_detector.detect(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        metadata     = metadata,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_width  = frame_width,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_height = frame_height
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fire_robot/src/see/models/fire_detector.py", line 123, in detect
+    for box, score, class_id in zip(boxes, scores, classes):
+                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'numpy.float32' object is not iterable
+[2026-06-03 10:36:58] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:58] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:58] "[35m[1mGET /api/camera/snapshot?t=1780472218730 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:58] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:58] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:58] "[35m[1mGET /api/camera/snapshot?t=1780472218880 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:59] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:59] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:59] "[35m[1mGET /api/camera/snapshot?t=1780472219030 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:59] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:59] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:59] "[35m[1mGET /api/camera/snapshot?t=1780472219180 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:59] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff354ce6c0>
+[2026-06-03 10:36:59] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff35498e50>
+[2026-06-03 10:36:59] see.vision_fuser [ERROR] [_capture_loop:264] VisionFuser: capture loop iteration failed - TypeError: 'numpy.float32' object is not iterable
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/see/vision_fuser.py", line 234, in _capture_loop
+    clusters, raw_detections = self._fire_detector.detect(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        metadata     = metadata,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_width  = frame_width,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_height = frame_height
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fire_robot/src/see/models/fire_detector.py", line 123, in detect
+    for box, score, class_id in zip(boxes, scores, classes):
+                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'numpy.float32' object is not iterable
+[2026-06-03 10:36:59] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:59] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:59] "[35m[1mGET /api/camera/snapshot?t=1780472219330 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:59] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:59] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:59] "[35m[1mGET /api/camera/snapshot?t=1780472219480 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:59] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:59] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:59] "[35m[1mGET /api/camera/snapshot?t=1780472219630 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:59] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:59] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:59] "[35m[1mGET /api/camera/snapshot?t=1780472219780 HTTP/1.1[0m" 500 -
+[2026-06-03 10:36:59] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff35499010>
+[2026-06-03 10:36:59] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff3546bc70>
+[2026-06-03 10:36:59] see.vision_fuser [ERROR] [_capture_loop:264] VisionFuser: capture loop iteration failed - TypeError: 'numpy.float32' object is not iterable
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/see/vision_fuser.py", line 234, in _capture_loop
+    clusters, raw_detections = self._fire_detector.detect(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        metadata     = metadata,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_width  = frame_width,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_height = frame_height
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fire_robot/src/see/models/fire_detector.py", line 123, in detect
+    for box, score, class_id in zip(boxes, scores, classes):
+                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'numpy.float32' object is not iterable
+[2026-06-03 10:36:59] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:36:59] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:36:59] "[35m[1mGET /api/camera/snapshot?t=1780472219930 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:00] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:00] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:00] "[35m[1mGET /api/camera/snapshot?t=1780472220080 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:00] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:00] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:00] "[35m[1mGET /api/camera/snapshot?t=1780472220230 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:00] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff354947d0>
+[2026-06-03 10:37:00] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff354947d0>
+[2026-06-03 10:37:00] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff3556bcd0>
+[2026-06-03 10:37:00] see.vision_fuser [ERROR] [_capture_loop:264] VisionFuser: capture loop iteration failed - TypeError: 'numpy.float32' object is not iterable
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/see/vision_fuser.py", line 234, in _capture_loop
+    clusters, raw_detections = self._fire_detector.detect(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        metadata     = metadata,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_width  = frame_width,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_height = frame_height
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fire_robot/src/see/models/fire_detector.py", line 123, in detect
+    for box, score, class_id in zip(boxes, scores, classes):
+                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'numpy.float32' object is not iterable
+[2026-06-03 10:37:00] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:00] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:00] "[35m[1mGET /api/camera/snapshot?t=1780472220380 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:00] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:00] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:00] "[35m[1mGET /api/camera/snapshot?t=1780472220530 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:00] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:00] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:37:00] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:00] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:00] "[35m[1mGET /api/camera/snapshot?t=1780472220680 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:00] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:00] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:00] "[35m[1mGET /api/camera/snapshot?t=1780472220830 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:00] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff3556bcd0>
+[2026-06-03 10:37:00] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff354f8050>
+[2026-06-03 10:37:00] see.vision_fuser [ERROR] [_capture_loop:264] VisionFuser: capture loop iteration failed - TypeError: 'numpy.float32' object is not iterable
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/see/vision_fuser.py", line 234, in _capture_loop
+    clusters, raw_detections = self._fire_detector.detect(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        metadata     = metadata,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_width  = frame_width,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_height = frame_height
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fire_robot/src/see/models/fire_detector.py", line 123, in detect
+    for box, score, class_id in zip(boxes, scores, classes):
+                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'numpy.float32' object is not iterable
+[2026-06-03 10:37:01] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:01] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:01] "[35m[1mGET /api/camera/snapshot?t=1780472220981 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:01] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:01] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:01] "[35m[1mGET /api/camera/snapshot?t=1780472221130 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:01] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:01] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:01] "[35m[1mGET /api/camera/snapshot?t=1780472221280 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:01] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff3551c050>
+[2026-06-03 10:37:01] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff35607bf0>
+[2026-06-03 10:37:01] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:01] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:01] "[35m[1mGET /api/camera/snapshot?t=1780472221430 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:01] see.vision_fuser [ERROR] [_capture_loop:264] VisionFuser: capture loop iteration failed - TypeError: 'numpy.float32' object is not iterable
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/see/vision_fuser.py", line 234, in _capture_loop
+    clusters, raw_detections = self._fire_detector.detect(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        metadata     = metadata,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_width  = frame_width,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_height = frame_height
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fire_robot/src/see/models/fire_detector.py", line 123, in detect
+    for box, score, class_id in zip(boxes, scores, classes):
+                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'numpy.float32' object is not iterable
+[2026-06-03 10:37:01] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:01] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:01] "[35m[1mGET /api/camera/snapshot?t=1780472221580 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:01] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:01] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:01] "[35m[1mGET /api/camera/snapshot?t=1780472221730 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:01] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:01] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:01] "[35m[1mGET /api/camera/snapshot?t=1780472221880 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:01] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff355125d0>
+[2026-06-03 10:37:01] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff354e6650>
+[2026-06-03 10:37:02] see.vision_fuser [ERROR] [_capture_loop:264] VisionFuser: capture loop iteration failed - TypeError: 'numpy.float32' object is not iterable
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/see/vision_fuser.py", line 234, in _capture_loop
+    clusters, raw_detections = self._fire_detector.detect(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        metadata     = metadata,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_width  = frame_width,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_height = frame_height
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fire_robot/src/see/models/fire_detector.py", line 123, in detect
+    for box, score, class_id in zip(boxes, scores, classes):
+                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'numpy.float32' object is not iterable
+[2026-06-03 10:37:02] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:02] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:02] "[35m[1mGET /api/camera/snapshot?t=1780472222030 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:02] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:02] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:02] "[35m[1mGET /api/camera/snapshot?t=1780472222180 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:02] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:02] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:02] "[35m[1mGET /api/camera/snapshot?t=1780472222330 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:02] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff354e6850>
+[2026-06-03 10:37:02] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff35512450>
+[2026-06-03 10:37:02] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:02] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:02] "[35m[1mGET /api/camera/snapshot?t=1780472222480 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:02] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff354e6850>
+[2026-06-03 10:37:02] see.vision_fuser [ERROR] [_capture_loop:264] VisionFuser: capture loop iteration failed - TypeError: 'numpy.float32' object is not iterable
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/see/vision_fuser.py", line 234, in _capture_loop
+    clusters, raw_detections = self._fire_detector.detect(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        metadata     = metadata,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_width  = frame_width,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_height = frame_height
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fire_robot/src/see/models/fire_detector.py", line 123, in detect
+    for box, score, class_id in zip(boxes, scores, classes):
+                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'numpy.float32' object is not iterable
+[2026-06-03 10:37:02] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:02] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:37:02] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:02] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:02] "[35m[1mGET /api/camera/snapshot?t=1780472222630 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:02] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:02] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:02] "[35m[1mGET /api/camera/snapshot?t=1780472222780 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:02] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:02] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:02] "[35m[1mGET /api/camera/snapshot?t=1780472222930 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:03] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff355123d0>
+[2026-06-03 10:37:03] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff3548d550>
+[2026-06-03 10:37:03] see.vision_fuser [ERROR] [_capture_loop:264] VisionFuser: capture loop iteration failed - TypeError: 'numpy.float32' object is not iterable
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/see/vision_fuser.py", line 234, in _capture_loop
+    clusters, raw_detections = self._fire_detector.detect(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        metadata     = metadata,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_width  = frame_width,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_height = frame_height
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fire_robot/src/see/models/fire_detector.py", line 123, in detect
+    for box, score, class_id in zip(boxes, scores, classes):
+                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'numpy.float32' object is not iterable
+[2026-06-03 10:37:03] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:03] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:03] "[35m[1mGET /api/camera/snapshot?t=1780472223080 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:03] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:03] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:03] "[35m[1mGET /api/camera/snapshot?t=1780472223230 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:03] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:03] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:03] "[35m[1mGET /api/camera/snapshot?t=1780472223380 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:03] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff354e67d0>
+[2026-06-03 10:37:03] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff354e67d0>
+[2026-06-03 10:37:03] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:03] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:03] "[35m[1mGET /api/camera/snapshot?t=1780472223530 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:03] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff354e67d0>
+[2026-06-03 10:37:03] see.vision_fuser [ERROR] [_capture_loop:264] VisionFuser: capture loop iteration failed - TypeError: 'numpy.float32' object is not iterable
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/see/vision_fuser.py", line 234, in _capture_loop
+    clusters, raw_detections = self._fire_detector.detect(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        metadata     = metadata,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_width  = frame_width,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_height = frame_height
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fire_robot/src/see/models/fire_detector.py", line 123, in detect
+    for box, score, class_id in zip(boxes, scores, classes):
+                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'numpy.float32' object is not iterable
+[2026-06-03 10:37:03] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:03] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:03] "[35m[1mGET /api/camera/snapshot?t=1780472223680 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:03] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:03] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:03] "[35m[1mGET /api/camera/snapshot?t=1780472223830 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:04] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:04] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:04] "[35m[1mGET /api/camera/snapshot?t=1780472223980 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:04] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff354e6750>
+[2026-06-03 10:37:04] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff354e6750>
+[2026-06-03 10:37:04] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff354e6750>
+[2026-06-03 10:37:04] see.vision_fuser [ERROR] [_capture_loop:264] VisionFuser: capture loop iteration failed - TypeError: 'numpy.float32' object is not iterable
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/see/vision_fuser.py", line 234, in _capture_loop
+    clusters, raw_detections = self._fire_detector.detect(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        metadata     = metadata,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_width  = frame_width,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_height = frame_height
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fire_robot/src/see/models/fire_detector.py", line 123, in detect
+    for box, score, class_id in zip(boxes, scores, classes):
+                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'numpy.float32' object is not iterable
+[2026-06-03 10:37:04] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:04] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:04] "[35m[1mGET /api/camera/snapshot?t=1780472224130 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:04] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:04] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:04] "[35m[1mGET /api/camera/snapshot?t=1780472224280 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:04] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:04] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:04] "[35m[1mGET /api/camera/snapshot?t=1780472224430 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:04] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:04] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-03 10:37:04] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff35512450>
+[2026-06-03 10:37:04] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:04] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:04] "[35m[1mGET /api/camera/snapshot?t=1780472224580 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:04] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff354e66d0>
+[2026-06-03 10:37:04] see.vision_fuser [ERROR] [_capture_loop:264] VisionFuser: capture loop iteration failed - TypeError: 'numpy.float32' object is not iterable
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/see/vision_fuser.py", line 234, in _capture_loop
+    clusters, raw_detections = self._fire_detector.detect(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        metadata     = metadata,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_width  = frame_width,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_height = frame_height
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fire_robot/src/see/models/fire_detector.py", line 123, in detect
+    for box, score, class_id in zip(boxes, scores, classes):
+                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'numpy.float32' object is not iterable
+[2026-06-03 10:37:04] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:04] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:37:04] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:04] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:04] "[35m[1mGET /api/camera/snapshot?t=1780472224730 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:04] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:04] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:04] "[35m[1mGET /api/camera/snapshot?t=1780472224880 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:05] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:05] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:05] "[35m[1mGET /api/camera/snapshot?t=1780472225030 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:05] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff35512550>
+[2026-06-03 10:37:05] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff354e6650>
+[2026-06-03 10:37:05] see.vision_fuser [ERROR] [_capture_loop:264] VisionFuser: capture loop iteration failed - TypeError: 'numpy.float32' object is not iterable
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/see/vision_fuser.py", line 234, in _capture_loop
+    clusters, raw_detections = self._fire_detector.detect(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        metadata     = metadata,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_width  = frame_width,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_height = frame_height
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fire_robot/src/see/models/fire_detector.py", line 123, in detect
+    for box, score, class_id in zip(boxes, scores, classes):
+                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'numpy.float32' object is not iterable
+[2026-06-03 10:37:05] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:05] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:05] "[35m[1mGET /api/camera/snapshot?t=1780472225180 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:05] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:05] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:05] "[35m[1mGET /api/camera/snapshot?t=1780472225332 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:05] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:05] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:05] "[35m[1mGET /api/camera/snapshot?t=1780472225480 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:05] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff355125d0>
+[2026-06-03 10:37:05] picamera2.picamera2 [DEBUG] [process_requests:1459] Execute job: <picamera2.job.Job object at 0x7fff354e6850>
+[2026-06-03 10:37:05] see.vision_fuser [ERROR] [_capture_loop:264] VisionFuser: capture loop iteration failed - TypeError: 'numpy.float32' object is not iterable
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fire_robot/src/see/vision_fuser.py", line 234, in _capture_loop
+    clusters, raw_detections = self._fire_detector.detect(
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        metadata     = metadata,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_width  = frame_width,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        frame_height = frame_height
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/mj/Desktop/fire_robot/src/see/models/fire_detector.py", line 123, in detect
+    for box, score, class_id in zip(boxes, scores, classes):
+                                ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'numpy.float32' object is not iterable
+[2026-06-03 10:37:05] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor smoke: poll_result | physical=7.376283842613144e-08 ppm | normalized=0.000 | threshold_hit=False
+[2026-06-03 10:37:05] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:05] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:05] "[35m[1mGET /api/camera/snapshot?t=1780472225630 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:05] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:05] "OPTIONS /api/camera/toggle HTTP/1.1" 200 -
+[2026-06-03 10:37:05] app [ERROR] [log_exception:875] Exception on /api/camera/snapshot [GET]
+Traceback (most recent call last):
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/mj/Desktop/fire_robot/api/routes/camera.py", line 27, in snapshot
+    return send_file(LATEST_FRAME_PATH, mimetype="image/jpeg")
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/flask/helpers.py", line 518, in send_file
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **_prepare_send_file_kwargs(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        )
+        ^
+    )
+    ^
+  File "/home/mj/Desktop/fyp_env/lib/python3.13/site-packages/werkzeug/utils.py", line 421, in send_file
+    stat = os.stat(path)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mj/Desktop/fire_robot/api/data/frames/stream.jpg'
+[2026-06-03 10:37:05] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:05] "[35m[1mGET /api/camera/snapshot?t=1780472225782 HTTP/1.1[0m" 500 -
+[2026-06-03 10:37:05] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:05] "POST /api/camera/toggle HTTP/1.1" 200 -
+[2026-06-03 10:37:06] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[24.25, 20.5, 20.0, 19.0, 19.75, 19.25, 20.25, 19.0], [30.0, 20.75, 19.75, 19.5, 19.25, 19.5, 19.5, 19.0], [30.0, 20.75, 19.25, 19.5, 19.5, 19.25, 19.0, 18.75], [23.75, 20.5, 20.0, 19.25, 19.25, 19.25, 19.0, 18.75], [20.25, 20.0, 19.25, 19.25, 19.5, 19.25, 19.0, 19.0], [20.75, 20.5, 19.5, 19.25, 19.0, 19.0, 19.0, 19.25], [20.25, 21.25, 20.0, 19.5, 19.5, 19.75, 19.25, 18.5], [20.75, 20.25, 19.75, 19.25, 19.25, 19.25, 19.0, 19.0]] C | normalized=0.375 | threshold_hit=False
+[2026-06-03 10:37:06] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:06] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:37:08] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:08] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:37:10] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:10] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-03 10:37:10] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:10] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:37:12] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:12] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:37:14] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:14] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:37:15] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor smoke: poll_result | physical=7.376283842613144e-08 ppm | normalized=0.000 | threshold_hit=False
+[2026-06-03 10:37:16] sense.sensors.sensor_base [DEBUG] [poll:164] Sensor heat_grid: poll_result | physical=[[25.5, 21.75, 20.75, 20.0, 20.5, 20.75, 21.25, 20.75], [31.25, 22.25, 21.0, 20.5, 20.25, 20.0, 20.5, 20.5], [31.5, 22.0, 21.0, 21.0, 21.0, 20.5, 20.5, 20.75], [25.25, 21.25, 21.5, 21.0, 21.0, 21.0, 21.0, 19.75], [21.75, 21.75, 21.0, 20.75, 20.75, 20.5, 20.75, 20.25], [21.5, 21.75, 20.75, 20.5, 20.5, 20.25, 20.25, 20.0], [22.0, 21.75, 21.25, 20.75, 20.5, 20.5, 20.5, 19.75], [21.75, 20.25, 20.75, 20.25, 20.5, 20.25, 20.25, 20.0]] C | normalized=0.394 | threshold_hit=False
+[2026-06-03 10:37:16] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:16] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-03 10:37:16] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:16] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:37:18] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:18] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:37:20] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:20] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:37:22] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:22] "OPTIONS /api/state HTTP/1.1" 200 -
+[2026-06-03 10:37:22] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:22] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:37:24] __main__ [INFO] [handle_signal:72] Signal SIGINT — shutting down
+[2026-06-03 10:37:24] __main__ [INFO] [handle_signal:72] Signal SIGINT — shutting down
+[2026-06-03 10:37:24] __main__ [INFO] [handle_signal:72] Signal SIGINT — shutting down
+[2026-06-03 10:37:24] __main__ [INFO] [handle_signal:72] Signal SIGINT — shutting down
+[2026-06-03 10:37:24] __main__ [INFO] [handle_signal:72] Signal SIGINT — shutting down
+[2026-06-03 10:37:24] __main__ [INFO] [main:99] Shutting down...
+[2026-06-03 10:37:24] core.orchestrator [INFO] [shutdown:180] Orchestrator: full shutdown initiated
+[2026-06-03 10:37:24] core.orchestrator [INFO] [stop:155] Orchestrator: stopping system | signaling all processes
+[2026-06-03 10:37:24] picamera2.picamera2 [INFO] [stop_:1391] Camera stopped
+[2026-06-03 10:37:24] picamera2.picamera2 [INFO] [close:734] Camera closed successfully.
+[2026-06-03 10:37:24] werkzeug [INFO] [_log:97] 127.0.0.1 - - [03/Jun/2026 10:37:24] "GET /api/state HTTP/1.1" 200 -
+[2026-06-03 10:37:24] core.orchestrator [DEBUG] [stop:168] Orchestrator: terminating SenseProcess
+[2026-06-03 10:37:24] __main__ [INFO] [handle_signal:72] Signal SIGTERM — shutting down
+[2026-06-03 10:37:26] sense.sensor_fuser [INFO] [start:80] SensorFuser: stopped
+[2026-06-03 10:37:26] notify.notification_service [INFO] [_log_notification:173] [orchestrator] NOTIFY | event=system_stopped | severity=info | payload={}
+[2026-06-03 10:37:26] notify.notification_service [ERROR] [_insert_notification:202] NotificationService: DB insert failed - OperationalError: SSL error: decryption failed or bad record mac
+
+[2026-06-03 10:37:26] core.orchestrator [INFO] [stop:176] Orchestrator: all processes stopped
+[2026-06-03 10:37:26] core.orchestrator [INFO] [shutdown:186] Orchestrator: multiprocessing manager shutdown
+[2026-06-03 10:37:26] __main__ [INFO] [main:101] Stopped cleanly.
