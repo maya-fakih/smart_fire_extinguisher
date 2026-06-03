@@ -104,8 +104,13 @@ class VisionFuser:
         self._fire_detector  = None             # built in start() after camera starts
 
         # ── Storage settings ──────────────────────────────────────────────────
-        self._frame_path       = storage_cfg["frame_image_path"]
+        self._frame_path       = storage_cfg["frame_image_path"]       # local fallback
         self._frame_url_prefix = storage_cfg["frame_url_prefix"]
+        # Permanent frames (sensor-triggered) go to USB to avoid SD card wear.
+        # Falls back to frame_image_path if USB is not mounted.
+        self._frame_permanent_path = storage_cfg.get("frame_permanent_path", self._frame_path)
+        # stream.jpg lives in RAM (tmpfs) — written ~30x/sec, zero disk I/O.
+        self._stream_dir = "/dev/shm/fire_robot"
 
         # ── Activation gate settings ──────────────────────────────────────────
         # SEE only does work when sensor_triggered or camera_feed_active.
@@ -419,18 +424,22 @@ class VisionFuser:
             str: Web URL to access the saved frame
         """
 
-        os.makedirs(self._frame_path, exist_ok=True)
+        os.makedirs(self._stream_dir, exist_ok=True)
 
         # ── Timestamped frame (permanent, only on sensor-triggered events) ────
-        # FIX-1/2: Only write a new timestamped file when the sensor has actually
-        # triggered a fire-detection event. Writing every frame regardless was
-        # filling the disk during camera-feed-only sessions (e.g. dashboard live
-        # view with no fire present). Camera-feed-only frames are handled solely
-        # by the stream.jpg rolling buffer below.
+        # Goes to USB (frame_permanent_path) to avoid SD card wear.
+        # Falls back to frame_image_path if USB is not available.
         filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jpg"
-        filepath = os.path.join(self._frame_path, filename)
 
         if self._state.sensor_triggered:
+            # Try USB first, fall back to SD card if USB isn't mounted
+            save_dir = self._frame_permanent_path
+            try:
+                os.makedirs(save_dir, exist_ok=True)
+            except OSError:
+                save_dir = self._frame_path
+                os.makedirs(save_dir, exist_ok=True)
+            filepath = os.path.join(save_dir, filename)
             try:
                 ok = cv2.imwrite(filepath, frame)
                 if not ok:
@@ -444,18 +453,17 @@ class VisionFuser:
                         source_layer="see",
                     )
 
-        # ── Stream buffer (rolling, overwrites every frame) ───────────────────
-        # Only written when camera feed is active (toggled from website).
-        # Uses temp + os.replace for atomic write — no torn frames on read.
+        # ── Stream buffer (in RAM — /dev/shm/) ───────────────────────────────
+        # Written every frame when camera feed is active. Lives in tmpfs so
+        # there is zero SD card I/O — just memory writes.
         if self._state.camera_feed_active:
-            stream_path = os.path.join(self._frame_path, "stream.jpg")
-            tmp_path    = os.path.join(self._frame_path, "stream.tmp.jpg")
+            stream_path = os.path.join(self._stream_dir, "stream.jpg")
+            tmp_path    = os.path.join(self._stream_dir, "stream.tmp.jpg")
             try:
                 ok = cv2.imwrite(tmp_path, frame)
                 if ok:
                     os.replace(tmp_path, stream_path)
             except Exception as e:
-                import logging
-                logging.getLogger(__name__).warning(f"stream.jpg write failed: {e}")
+                logger.warning(f"stream.jpg write failed: {e}")
 
         return self._frame_url_prefix + filename

@@ -97,7 +97,7 @@
     "storage": {
       "frame_image_path": "data/frames/",
       "frame_url_prefix": "/frames/",
-      "frame_permanent_path": "/media/mj/JANA'S USB/training_frames/"
+      "frame_permanent_path": "/media/mj/JANA_S USB/training_frames/"
     },
     "activation": {
       "idle_sleep_ms": 50
