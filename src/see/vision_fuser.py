@@ -111,6 +111,8 @@ class VisionFuser:
         self._frame_permanent_path = storage_cfg.get("frame_permanent_path", self._frame_path)
         # stream.jpg lives in RAM (tmpfs) — written ~30x/sec, zero disk I/O.
         self._stream_dir = "/dev/shm/fire_robot"
+        # Lower quality = smaller JPEG = faster through tunnel. 55 is fine for a dashboard.
+        self._stream_jpeg_quality = camera_cfg.get("stream_jpeg_quality", 55)
 
         # ── Activation gate settings ──────────────────────────────────────────
         # SEE only does work when sensor_triggered or camera_feed_active.
@@ -460,7 +462,8 @@ class VisionFuser:
             stream_path = os.path.join(self._stream_dir, "stream.jpg")
             tmp_path    = os.path.join(self._stream_dir, "stream.tmp.jpg")
             try:
-                ok = cv2.imwrite(tmp_path, frame)
+                encode_params = [cv2.IMWRITE_JPEG_QUALITY, self._stream_jpeg_quality]
+                ok = cv2.imwrite(tmp_path, frame, encode_params)
                 if ok:
                     os.replace(tmp_path, stream_path)
             except Exception as e:

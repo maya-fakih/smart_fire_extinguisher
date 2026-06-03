@@ -10,7 +10,7 @@ camera_bp = Blueprint("camera", __name__)
 # ── stream.jpg lives in RAM (tmpfs) — no SD card wear ────────────────────
 STREAM_DIR  = "/dev/shm/fire_robot"
 STREAM_PATH = os.path.join(STREAM_DIR, "stream.jpg")
-FPS = 10
+FPS = 25
 
 os.makedirs(STREAM_DIR, exist_ok=True)
 

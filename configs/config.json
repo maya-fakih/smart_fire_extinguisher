@@ -84,8 +84,9 @@
   },
   "vision": {
     "camera": {
-      "resolution": [640, 480],
-      "fps": 30
+      "resolution": [320, 240],
+      "fps": 30,
+      "stream_jpeg_quality": 55
     },
     "models": {
       "fire": {
