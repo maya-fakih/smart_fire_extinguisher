@@ -47,7 +47,11 @@ def start_api_server(orchestrator, port: int) -> None:
         sys.path.insert(0, os.path.abspath(api_path))
         from app import create_app
         flask_app = create_app(orchestrator)
-        flask_app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)
+        # FIX-3c: threaded=True lets Flask handle each request in its own thread.
+        # Without it, the MJPEG /api/camera/feed route (a blocking generator)
+        # monopolises the single worker and makes every other API endpoint
+        # (state, controls, notifications, etc.) hang until the stream ends.
+        flask_app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False, threaded=True)
     except Exception as e:
         logging.getLogger(__name__).error(f"Flask failed: {e}", exc_info=True)
 

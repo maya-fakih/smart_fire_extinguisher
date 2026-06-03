@@ -38,3 +38,9 @@ __pycache__/
 .env
 *.egg-info/
 .DS_Store
+
+/logs
+*.log
+
+/data/frames
+*.jpg

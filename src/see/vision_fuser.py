@@ -167,21 +167,49 @@ class VisionFuser:
         # tell SystemState we are running
         self._state.see_running = True
 
+        # Keep the SeeProcess alive — same pattern as SensorFuser._main_loop().
+        # Without this, start() returns immediately, the multiprocessing.Process
+        # target function completes, the OS process exits, and the daemon thread
+        # (and camera hardware) die with it — which is exactly why stream.jpg
+        # was never written and every /api/camera/snapshot returned 404.
+        self._main_loop()
+
     # ── Stop ──────────────────────────────────────────────────────────────────
-    # stops the capture loop and powers off camera
+    # signals the capture loop and _main_loop to exit
     def stop(self) -> None:
         """
-        Stop capture loop and power off camera.
+        Signal the capture loop and _main_loop to exit.
 
-        Signals background thread to exit and stops camera hardware.
-        Safe to call multiple times.
+        Sets _running = False so _main_loop unblocks and handles cleanup
+        (thread join + camera stop). Safe to call multiple times.
 
         Returns:
             None
         """
         self._running = False
+
+    # ── Main Loop ─────────────────────────────────────────────────────────────
+    # Keeps the SeeProcess alive while the capture thread runs.
+    # Mirrors SensorFuser._main_loop() exactly — without this the process
+    # exits as soon as start() returns and the daemon thread dies with it.
+    def _main_loop(self) -> None:
+        """
+        Block the SeeProcess main function until system stops.
+
+        start() calls this after launching _capture_loop in a daemon thread.
+        Without this, the multiprocessing.Process target returns immediately,
+        the process exits, and the daemon capture thread (plus camera) die.
+        """
+        while self._running and self._state.system_running:
+            time.sleep(0.5)
+
+        # System is stopping — clean up
+        self._running = False
+        if self._thread and self._thread.is_alive():
+            self._thread.join(timeout=2)
         self._camera.stop()
         self._state.see_running = False
+        logger.info("VisionFuser: stopped")
 
     # ── Capture Loop ──────────────────────────────────────────────────────────
     # runs continuously in its own thread
@@ -256,8 +284,12 @@ class VisionFuser:
                 snap = self.snapshot(clusters, raw_detections, frame_url, frame_width, frame_height)
 
                 # ── Emit to see_queue ─────────────────────────────────────────────
-                # Gate above already ensured one of (sensor_triggered, camera_feed_active) is true.
-                self.emit_trigger(snap)
+                # FIX-3a: Only push to THINK when the sensor has fired. The
+                # camera_feed_active flag means the dashboard wants a live picture —
+                # it does NOT mean a fire event has been triggered. Emitting on
+                # every feed frame floods the THINK queue and causes spurious alerts.
+                if self._state.sensor_triggered:
+                    self.emit_trigger(snap)
 
             except Exception as e:
                 logger.error(
@@ -389,22 +421,28 @@ class VisionFuser:
 
         os.makedirs(self._frame_path, exist_ok=True)
 
-        # ── Timestamped frame (permanent, tied to sensor-triggered events) ────
-        filename  = f"{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jpg"
-        filepath  = os.path.join(self._frame_path, filename)
+        # ── Timestamped frame (permanent, only on sensor-triggered events) ────
+        # FIX-1/2: Only write a new timestamped file when the sensor has actually
+        # triggered a fire-detection event. Writing every frame regardless was
+        # filling the disk during camera-feed-only sessions (e.g. dashboard live
+        # view with no fire present). Camera-feed-only frames are handled solely
+        # by the stream.jpg rolling buffer below.
+        filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jpg"
+        filepath = os.path.join(self._frame_path, filename)
 
-        try:
-            ok = cv2.imwrite(filepath, frame)
-            if not ok:
-                raise IOError(f"cv2.imwrite returned False for {filepath}")
-        except Exception as e:
-            if self._notifier is not None:
-                from notify import EventType
-                self._notifier.notify(
-                    EventType.FRAME_STORAGE_FAILED,
-                    payload={"path": filepath, "error": f"{type(e).__name__}: {e}"},
-                    source_layer="see",
-                )
+        if self._state.sensor_triggered:
+            try:
+                ok = cv2.imwrite(filepath, frame)
+                if not ok:
+                    raise IOError(f"cv2.imwrite returned False for {filepath}")
+            except Exception as e:
+                if self._notifier is not None:
+                    from notify import EventType
+                    self._notifier.notify(
+                        EventType.FRAME_STORAGE_FAILED,
+                        payload={"path": filepath, "error": f"{type(e).__name__}: {e}"},
+                        source_layer="see",
+                    )
 
         # ── Stream buffer (rolling, overwrites every frame) ───────────────────
         # Only written when camera feed is active (toggled from website).

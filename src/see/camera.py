@@ -92,7 +92,7 @@ class IMX500Camera:
         # main stream → the image we capture
         # controls → fps setting
         config = self._picam2.create_preview_configuration(
-            main={"size": self._resolution},    # resolution from config
+            main={"size": self._resolution, "format": "RGB888"},    # resolution from config
             controls={"FrameRate": self._fps}   # fps from config
         )
         self._picam2.configure(config)
@@ -130,7 +130,7 @@ class IMX500Camera:
         
         Returns:
             tuple[np.ndarray, dict] | None: 
-                - frame: Numpy array (H, W, 3) in RGB format
+                - frame: Numpy array (H, W, 3) in BGR format
                 - metadata: Dict containing IMX500 YOLO inference results
                 - None if camera is not active
         """
