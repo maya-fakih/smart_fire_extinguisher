@@ -166,6 +166,7 @@ class VisionFuser:
 
         # tell SystemState we are running
         self._state.see_running = True
+        self._thread.join()
 
     # ── Stop ──────────────────────────────────────────────────────────────────
     # stops the capture loop and powers off camera

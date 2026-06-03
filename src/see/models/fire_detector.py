@@ -11,6 +11,7 @@ Classes:
 
 # this part is for fire detector, we analyze what we get from our YOLO trained Model
 # YOLO runs on-chip on the IMX500 camera — we just parse the results from metadata
+import numpy as np
 from picamera2.devices.imx500 import IMX500
 from shapely.geometry import box as shapely_box
 from shapely.ops import unary_union
@@ -116,9 +117,16 @@ class FireDetector(VisionModel):
         # ── Steps 2 & 3: Parse output → separate into fire and smoke ──────────
         # skip class_id == 1 ("other") — only useful for YOLO training, not for us
         # raw_detections keeps ALL boxes because VisionSnapshot needs them later
-        fire_boxes     = []     # only fire detections
-        smoke_boxes    = []     # only smoke detections
-        raw_detections = []     # everything unmodified for VisionSnapshot
+
+        # guard against single-detection squeeze — IMX500 returns scalar
+        # numpy.float32 instead of array when there is exactly one detection
+        boxes   = np.atleast_1d(boxes)
+        scores  = np.atleast_1d(scores)
+        classes = np.atleast_1d(classes)
+
+        raw_detections = []
+        fire_boxes     = []
+        smoke_boxes    = []
 
         for box, score, class_id in zip(boxes, scores, classes):
 
