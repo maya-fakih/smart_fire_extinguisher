@@ -173,6 +173,10 @@ class VisionFuser:
 
         # tell SystemState we are running
         self._state.see_running = True
+        logger.info(
+            f"VisionFuser: started | conf_threshold={self._conf_threshold} | "
+            f"camera_active={self._camera.is_active()}"
+        )
 
         # Keep the SeeProcess alive — same pattern as SensorFuser._main_loop().
         # Without this, start() returns immediately, the multiprocessing.Process
@@ -239,6 +243,9 @@ class VisionFuser:
             None
         """
 
+        _none_count = 0
+        _gate_logged = False
+
         while self._running and self._state.system_running:
 
             # ── Activation gate ──────────────────────────────────────────────
@@ -250,8 +257,17 @@ class VisionFuser:
                 if self._state.latest_fire_x is not None or self._state.latest_fire_y is not None:
                     self._state.latest_fire_x = None
                     self._state.latest_fire_y = None
+                _gate_logged = False
                 time.sleep(self._idle_sleep_s)
                 continue
+
+            if not _gate_logged:
+                logger.info(
+                    f"VisionFuser: capture loop activated | "
+                    f"sensor_triggered={self._state.sensor_triggered} | "
+                    f"camera_feed_active={self._state.camera_feed_active}"
+                )
+                _gate_logged = True
 
             # ── BUG-7: wrap the full work cycle so an exception in any step
             # doesn't silently kill the thread and leave see_running=True.
@@ -259,10 +275,23 @@ class VisionFuser:
                 # ── Capture frame + metadata from IMX500 camera ──────────────────
                 result = self._camera.capture()
                 if result is None:
-                    continue                        # camera not ready, try again
+                    _none_count += 1
+                    if _none_count == 1 or _none_count % 50 == 0:
+                        logger.warning(
+                            f"VisionFuser: camera.capture() returned None "
+                            f"(count={_none_count}) — camera_active={self._camera.is_active()}"
+                        )
+                    continue
+                _none_count = 0
 
                 frame, metadata = result
                 frame_height, frame_width = frame.shape[:2]  # numpy array → (h, w, channels)
+                if _none_count == 0 and not hasattr(self, '_first_frame_logged'):
+                    self._first_frame_logged = True
+                    logger.info(
+                        f"VisionFuser: first frame captured | "
+                        f"resolution={frame_width}x{frame_height}"
+                    )
 
                 # ── Analyze with FireDetector ─────────────────────────────────────
                 clusters, raw_detections = self._fire_detector.detect(
