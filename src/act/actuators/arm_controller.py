@@ -163,6 +163,11 @@ class ArmController(Actuator):
                 err_mag = (err_x ** 2 + err_y ** 2) ** 0.5
 
                 if err_mag > self._tolerance:
+                    logger.debug(
+                        f"ArmController {self.name}: stepping | "
+                        f"err_x={err_x:.3f} err_y={err_y:.3f} mag={err_mag:.3f} | "
+                        f"pan={self._pan_angle:.1f}° tilt={self._tilt_angle:.1f}°"
+                    )
                     self._step_joints(err_x, err_y)
 
                 self._sleep_cycle(triggered)
@@ -208,16 +213,22 @@ class ArmController(Actuator):
         if heat_raw is not None and camera_raw is not None:
             heat_corr   = (heat_raw[0]   + self._heat_bias_x,   heat_raw[1]   + self._heat_bias_y)
             camera_corr = (camera_raw[0] + self._camera_bias_x, camera_raw[1] + self._camera_bias_y)
-            return (
+            result = (
                 (heat_corr[0] + camera_corr[0]) / 2.0,
                 (heat_corr[1] + camera_corr[1]) / 2.0,
             )
+            logger.debug(f"ArmController {self.name}: source=heat+camera err=({result[0]:.3f}, {result[1]:.3f})")
+            return result
 
         if heat_raw is not None:
-            return (heat_raw[0] + self._heat_bias_x, heat_raw[1] + self._heat_bias_y)
+            result = (heat_raw[0] + self._heat_bias_x, heat_raw[1] + self._heat_bias_y)
+            logger.debug(f"ArmController {self.name}: source=heat err=({result[0]:.3f}, {result[1]:.3f})")
+            return result
 
         if camera_raw is not None:
-            return (camera_raw[0] + self._camera_bias_x, camera_raw[1] + self._camera_bias_y)
+            result = (camera_raw[0] + self._camera_bias_x, camera_raw[1] + self._camera_bias_y)
+            logger.debug(f"ArmController {self.name}: source=camera err=({result[0]:.3f}, {result[1]:.3f})")
+            return result
 
         return None
 
@@ -274,14 +285,14 @@ class ArmController(Actuator):
             self._command_tilt(self._tilt_angle)
 
     def _command_pan(self, deg: float) -> None:
-        self._pan_servo.value = self._deg_to_value(
-            deg, self._pan_cfg["servo_min_deg"], self._pan_cfg["servo_max_deg"]
-        )
+        val = self._deg_to_value(deg, self._pan_cfg["servo_min_deg"], self._pan_cfg["servo_max_deg"])
+        self._pan_servo.value = val
+        logger.debug(f"ArmController {self.name}: pan → {deg:.1f}° (servo_val={val:.3f})")
 
     def _command_tilt(self, deg: float) -> None:
-        self._tilt_servo.value = self._deg_to_value(
-            deg, self._tilt_cfg["servo_min_deg"], self._tilt_cfg["servo_max_deg"]
-        )
+        val = self._deg_to_value(deg, self._tilt_cfg["servo_min_deg"], self._tilt_cfg["servo_max_deg"])
+        self._tilt_servo.value = val
+        logger.debug(f"ArmController {self.name}: tilt → {deg:.1f}° (servo_val={val:.3f})")
 
     @staticmethod
     def _deg_to_value(deg: float, servo_min_deg: float, servo_max_deg: float) -> float:
