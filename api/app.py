@@ -11,6 +11,7 @@ from routes.predictions import predictions_bp
 from routes.analytics import analytics_bp
 from routes.camera import camera_bp
 from routes.training import training_bp
+from routes.config import config_bp
 from db import init_app as init_db
 from train_jobs import TrainJobRegistry
 
@@ -39,6 +40,7 @@ def create_app(orchestrator) -> Flask:
     app.register_blueprint(analytics_bp)
     app.register_blueprint(camera_bp)
     app.register_blueprint(training_bp)
+    app.register_blueprint(config_bp)
 
     @app.route("/api/health")
     def health():
