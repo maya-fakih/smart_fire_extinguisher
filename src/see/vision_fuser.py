@@ -104,7 +104,7 @@ class VisionFuser:
         self._fire_detector  = None             # built in start() after camera starts
 
         # ── Storage settings ──────────────────────────────────────────────────
-        self._frame_path       = storage_cfg["frame_image_path"]       # local fallback
+        self._frame_path       = storage_cfg["frame_image_path"]       # default if permanent_path not set
         self._frame_url_prefix = storage_cfg["frame_url_prefix"]
         # Permanent frames (sensor-triggered) go to USB to avoid SD card wear.
         # Falls back to frame_image_path if USB is not mounted.
@@ -145,6 +145,20 @@ class VisionFuser:
             None
         """
 
+        # Catch-all: if ANYTHING in start() crashes, log it loudly before the
+        # process dies — otherwise the camera just silently disappears.
+        try:
+            self._start_inner()
+        except Exception as e:
+            logger.critical(
+                f"VisionFuser: start() CRASHED — SeeProcess will exit | "
+                f"{type(e).__name__}: {e}",
+                exc_info=True,
+            )
+            raise
+
+    def _start_inner(self) -> None:
+
         # start camera first — loads .rpk onto IMX500 chip
         try:
             self._camera.start()
@@ -171,11 +185,21 @@ class VisionFuser:
         self._thread  = threading.Thread(target=self._capture_loop, daemon=True)
         self._thread.start()
 
-        # tell SystemState we are running
-        self._state.see_running = True
+        # tell SystemState we are running — retry if manager proxy isn't
+        # connected yet (same race as _main_loop, see comment there).
+        for _attempt in range(20):
+            try:
+                self._state.see_running = True
+                break
+            except Exception as e:
+                logger.warning(
+                    f"VisionFuser: start() state write failed ({e}) — "
+                    f"retry {_attempt + 1}/20"
+                )
+                time.sleep(0.25)
         logger.info(
             f"VisionFuser: started | conf_threshold={self._conf_threshold} | "
-            f"camera_active={self._camera.is_active()}"
+            f"camera_active={self._camera.is_active}"
         )
 
         # Keep the SeeProcess alive — same pattern as SensorFuser._main_loop().
@@ -213,7 +237,11 @@ class VisionFuser:
         """
         while self._running:
             try:
-                if not self._state.system_running:
+                sr = self._state.system_running
+                if not sr:
+                    logger.info(
+                        f"VisionFuser: _main_loop exiting — system_running={sr}"
+                    )
                     break
             except Exception as e:
                 logger.warning(
@@ -294,7 +322,7 @@ class VisionFuser:
                     if _none_count == 1 or _none_count % 50 == 0:
                         logger.warning(
                             f"VisionFuser: camera.capture() returned None "
-                            f"(count={_none_count}) — camera_active={self._camera.is_active()}"
+                            f"(count={_none_count}) — camera_active={self._camera.is_active}"
                         )
                     continue
                 _none_count = 0
@@ -478,25 +506,24 @@ class VisionFuser:
         filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jpg"
 
         if self._state.sensor_triggered:
-            # Try USB first, fall back to SD card if USB isn't mounted
+            # Save to USB only — never fall back to SD card.
             save_dir = self._frame_permanent_path
             try:
                 os.makedirs(save_dir, exist_ok=True)
-            except OSError:
-                save_dir = self._frame_path
-                os.makedirs(save_dir, exist_ok=True)
-            filepath = os.path.join(save_dir, filename)
-            try:
+                filepath = os.path.join(save_dir, filename)
                 ok = cv2.imwrite(filepath, frame)
                 if not ok:
                     raise IOError(f"cv2.imwrite returned False for {filepath}")
             except Exception as e:
-                if self._notifier is not None:
-                    from notify import EventType
-                    self._notifier.notify(
-                        EventType.FRAME_STORAGE_FAILED,
-                        payload={"path": filepath, "error": f"{type(e).__name__}: {e}"},
-                        source_layer="see",
+                # USB not mounted or write failed — skip this frame silently.
+                # Log once per 50 failures to avoid flooding.
+                if not hasattr(self, '_frame_fail_count'):
+                    self._frame_fail_count = 0
+                self._frame_fail_count += 1
+                if self._frame_fail_count == 1 or self._frame_fail_count % 50 == 0:
+                    logger.warning(
+                        f"VisionFuser: permanent frame save skipped "
+                        f"(count={self._frame_fail_count}) — {type(e).__name__}: {e}"
                     )
 
         # ── Stream buffer (in RAM — /dev/shm/) ───────────────────────────────
