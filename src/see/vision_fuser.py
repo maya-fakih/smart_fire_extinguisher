@@ -211,7 +211,16 @@ class VisionFuser:
         Without this, the multiprocessing.Process target returns immediately,
         the process exits, and the daemon capture thread (plus camera) die.
         """
-        while self._running and self._state.system_running:
+        while self._running:
+            try:
+                if not self._state.system_running:
+                    break
+            except Exception as e:
+                logger.warning(
+                    f"VisionFuser: _main_loop state read failed ({e}) — retrying"
+                )
+                time.sleep(0.1)
+                continue
             time.sleep(0.5)
 
         # System is stopping — clean up
@@ -246,7 +255,13 @@ class VisionFuser:
         _none_count = 0
         _gate_logged = False
 
-        while self._running and self._state.system_running:
+        while self._running:
+            try:
+                if not self._state.system_running:
+                    break
+            except Exception:
+                time.sleep(0.1)
+                continue
 
             # ── Activation gate ──────────────────────────────────────────────
             # SEE only does work when sensor_triggered or camera_feed_active.

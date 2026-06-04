@@ -62,6 +62,15 @@ class ActEngine:
     def start(self) -> None:
         logger.info("ActEngine: starting")
         try:
+            # Install SIGTERM handler so process.terminate() from the orchestrator
+            # still runs cleanup (neutralizes arm, stops pump) before exiting.
+            import signal as _signal
+            def _on_term(sig, frame):
+                logger.info("ActEngine: SIGTERM received — running cleanup")
+                self.stop()
+                raise SystemExit(0)
+            _signal.signal(_signal.SIGTERM, _on_term)
+
             built = ActuatorParser.build_actuators(self._config, self._state)
             self._actuators = {a.name: a for a in built}
             logger.info(f"ActEngine: built actuators {list(self._actuators)}")
@@ -76,6 +85,8 @@ class ActEngine:
             self._running = True
             self._state.act_running = True
             self._run_loop()
+            # system_running went False — clean up actuators (neutralize arm, stop pump)
+            self.stop()
         except Exception as e:
             logger.error(
                 f"ActEngine: start failed - {type(e).__name__}: {e}",
