@@ -70,6 +70,14 @@ class ArmController(Actuator):
         self._running = False
         self._thread: Optional[threading.Thread] = None
 
+        # Adaptive direction state — tracks last error and learned step sign
+        # per axis so the arm self-corrects if the servo is physically inverted.
+        # After one wrong step the sign flips and stays correct for the session.
+        self._pan_last_err  = 0.0
+        self._pan_step_sign = 1
+        self._tilt_last_err = 0.0
+        self._tilt_step_sign = 1
+
         # Center the servos at construction so they don't sit at a random angle
         self._command_pan(0.0)
         self._command_tilt(0.0)
@@ -260,29 +268,70 @@ class ArmController(Actuator):
     # ------------------------------------------------------------------
 
     def _step_joints(self, err_x: float, err_y: float) -> None:
-        # Pan responds to horizontal error.
+        """
+        Adaptive step: move one step_deg increment toward the target, but
+        learn the correct direction from feedback rather than assuming it.
+
+        On the first step (or after centering) we guess: positive error →
+        positive direction, adjusted by the invert flag. On every subsequent
+        step we compare the new error magnitude to the previous one:
+          - smaller  → we're converging, keep going
+          - larger   → we overshot or went the wrong way, flip direction
+
+        This makes the arm self-correcting regardless of how the servo is
+        physically mounted — one wrong step and it auto-corrects.
+        Step size of 0.2–0.5° (set via config) keeps corrections smooth.
+        """
+        # ── Pan axis ──────────────────────────────────────────────────
         if abs(err_x) > self._tolerance / 2:
-            direction = 1 if err_x > 0 else -1
-            if self._pan_cfg.get("invert", False):
-                direction = -direction
+            if self._pan_last_err == 0.0:
+                # First step: guess direction from error sign + invert flag
+                self._pan_step_sign = 1 if err_x > 0 else -1
+                if self._pan_cfg.get("invert", False):
+                    self._pan_step_sign *= -1
+            elif abs(err_x) > abs(self._pan_last_err):
+                # Error got worse → flip direction, self-correct
+                self._pan_step_sign *= -1
+                logger.info(
+                    f"ArmController {self.name}: pan direction flipped "
+                    f"(err {self._pan_last_err:+.3f} → {err_x:+.3f})"
+                )
+
             self._pan_angle = self._clip(
-                self._pan_angle + direction * self._pan_cfg["step_deg"],
+                self._pan_angle + self._pan_step_sign * self._pan_cfg["step_deg"],
                 self._pan_cfg["limit_min_deg"],
                 self._pan_cfg["limit_max_deg"],
             )
             self._command_pan(self._pan_angle)
+            self._pan_last_err = err_x
+        else:
+            # Within tolerance — reset so next activation starts fresh
+            self._pan_last_err  = 0.0
+            self._pan_step_sign = 1
 
-        # Tilt responds to vertical error.
+        # ── Tilt axis ─────────────────────────────────────────────────
         if abs(err_y) > self._tolerance / 2:
-            direction = 1 if err_y > 0 else -1
-            if self._tilt_cfg.get("invert", False):
-                direction = -direction
+            if self._tilt_last_err == 0.0:
+                self._tilt_step_sign = 1 if err_y > 0 else -1
+                if self._tilt_cfg.get("invert", False):
+                    self._tilt_step_sign *= -1
+            elif abs(err_y) > abs(self._tilt_last_err):
+                self._tilt_step_sign *= -1
+                logger.info(
+                    f"ArmController {self.name}: tilt direction flipped "
+                    f"(err {self._tilt_last_err:+.3f} → {err_y:+.3f})"
+                )
+
             self._tilt_angle = self._clip(
-                self._tilt_angle + direction * self._tilt_cfg["step_deg"],
+                self._tilt_angle + self._tilt_step_sign * self._tilt_cfg["step_deg"],
                 self._tilt_cfg["limit_min_deg"],
                 self._tilt_cfg["limit_max_deg"],
             )
             self._command_tilt(self._tilt_angle)
+            self._tilt_last_err = err_y
+        else:
+            self._tilt_last_err  = 0.0
+            self._tilt_step_sign = 1
 
     def _command_pan(self, deg: float) -> None:
         val = self._deg_to_value(deg, self._pan_cfg["servo_min_deg"], self._pan_cfg["servo_max_deg"])

@@ -233,7 +233,7 @@
           }
         },
         "feedback": {
-          "heat_use_threshold_c": 35,
+          "heat_use_threshold_c": 30,
           "tolerance_normalized": 0.1,
           "sensor_offsets": {
             "heat": {
