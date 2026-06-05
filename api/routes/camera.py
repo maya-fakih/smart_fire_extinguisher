@@ -42,13 +42,22 @@ def feed():
     disconnects (finally block), so VisionFuser knows when to write frames.
     """
     orch = current_app.config["ORCHESTRATOR"]
-    orch.set_camera_feed(True)
+    # NOTE: feed() no longer flips camera_feed_active. The flag is owned solely
+    # by the explicit /api/camera/toggle endpoint. Merely opening this stream
+    # (e.g. an <img> on any page) must not turn the camera on, otherwise pages
+    # fight over one global flag. If the camera is off, stream nothing.
 
     def generate():
-        try:
-            while True:
-                if os.path.exists(STREAM_PATH):
-                    try:
+        last_mtime = None
+        while True:
+            if orch.get_state_summary().get("camera_feed_active", False) \
+                    and os.path.exists(STREAM_PATH):
+                try:
+                    mtime = os.path.getmtime(STREAM_PATH)
+                    # Only push when a NEW frame was written — avoids re-sending
+                    # the same JPEG 25x/sec and the disk thrash that caused lag.
+                    if mtime != last_mtime:
+                        last_mtime = mtime
                         with open(STREAM_PATH, "rb") as f:
                             frame_bytes = f.read()
                         yield (
@@ -56,11 +65,9 @@ def feed():
                             b"Content-Type: image/jpeg\r\n\r\n"
                             + frame_bytes + b"\r\n"
                         )
-                    except Exception as e:
-                        logger.warning(f"camera feed read failed: {e}")
-                time.sleep(1.0 / FPS)
-        finally:
-            orch.set_camera_feed(False)
+                except Exception as e:
+                    logger.warning(f"camera feed read failed: {e}")
+            time.sleep(1.0 / FPS)
 
     return Response(
         generate(),
