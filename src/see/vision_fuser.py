@@ -363,11 +363,17 @@ class VisionFuser:
                 snap = self.snapshot(clusters, raw_detections, frame_url, frame_width, frame_height)
 
                 # ── Emit to see_queue ─────────────────────────────────────────────
-                # FIX-3a: Only push to THINK when the sensor has fired. The
-                # camera_feed_active flag means the dashboard wants a live picture —
-                # it does NOT mean a fire event has been triggered. Emitting on
-                # every feed frame floods the THINK queue and causes spurious alerts.
-                if self._state.sensor_triggered:
+                # Prediction modes: only push when the sensor has fired (FIX-3a)
+                # — the live camera feed alone must not flood THINK with frames.
+                #
+                # Training-recording is the deliberate exception: the recorder
+                # NEEDS a steady frame stream on see_queue to align + label, even
+                # with no fire present (e.g. recording an empty office as level 1).
+                # Gating that on sensor_triggered made no-fire recordings save
+                # nothing. So while recording, emit on camera_feed_active too.
+                if self._state.sensor_triggered or (
+                    self._state.training_recording and self._state.camera_feed_active
+                ):
                     self.emit_trigger(snap)
 
             except Exception as e:
