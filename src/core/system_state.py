@@ -89,12 +89,12 @@ class SystemState:
         # When a row's timestamp >= valid_until, the head label is popped and
         # the next one becomes current. A label with valid_until=None applies
         # to all subsequent rows until a new label is pushed.
-        self.training_recording    = False
+        self._data['training_recording'] = False
         self.training_label_stream = manager.Queue()
         # training_event_id: explicit event_id for the current recording.
         # Set when the human starts a recording (new event or continue last);
         # used directly so we don't ping the DB on every row.
-        self.training_event_id = 0
+        self._data['training_event_id'] = 0
 
         # Website → SENSE: per-sensor soft enable/disable
         self.sensor_overrides = manager.dict()
@@ -298,3 +298,18 @@ class SystemState:
     @arm_manual_mode_until.setter
     def arm_manual_mode_until(self, value: float):
         self._data['arm_manual_mode_until'] = float(value)
+    # --- training recording flag (bool, cross-process via _data) ---
+    @property
+    def training_recording(self) -> bool:
+        return self._data.get('training_recording', False)
+    @training_recording.setter
+    def training_recording(self, value: bool):
+        self._data['training_recording'] = bool(value)
+
+    # --- training event id (int, cross-process via _data) ---
+    @property
+    def training_event_id(self) -> int:
+        return self._data.get('training_event_id', 0)
+    @training_event_id.setter
+    def training_event_id(self, value: int):
+        self._data['training_event_id'] = int(value)
