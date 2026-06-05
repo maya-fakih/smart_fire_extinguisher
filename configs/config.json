@@ -66,7 +66,7 @@
   },
   "sensors": {
     "smoke": {
-      "enabled": false,
+      "enabled": true,
       "interface": "i2c",
       "bus": "primary",
       "device_type": "ads1115",
@@ -98,7 +98,7 @@
       "raw_max": 80,
       "physical_min": 0,
       "physical_max": 80,
-      "threshold_physical": 30,
+      "threshold_physical": 17,
       "unit": "C",
       "max_retries": 3
     }

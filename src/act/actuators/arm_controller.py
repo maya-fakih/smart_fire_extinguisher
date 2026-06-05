@@ -7,6 +7,8 @@ from typing import Optional
 
 import numpy as np
 from gpiozero import Servo
+from gpiozero.pins.lgpio import LGPIOFactory
+_PIN_FACTORY = LGPIOFactory()
 
 from core.system_state import SystemState
 from act.actuators.actuator_base import Actuator
@@ -42,9 +44,9 @@ class ArmController(Actuator):
         self._pan_cfg  = joints["pan"]
         self._tilt_cfg = joints["tilt"]
 
-        self._pan_servo  = Servo(pin=int(self._pan_cfg["pin"]))
-        self._tilt_servo = Servo(pin=int(self._tilt_cfg["pin"]))
-
+        self._pan_servo  = Servo(pin=int(self._pan_cfg["pin"]), pin_factory=_PIN_FACTORY)
+        self._tilt_servo = Servo(pin=int(self._tilt_cfg["pin"]), pin_factory=_PIN_FACTORY)
+        
         # Current commanded angles (start centered)
         self._pan_angle  = 0.0
         self._tilt_angle = 0.0
