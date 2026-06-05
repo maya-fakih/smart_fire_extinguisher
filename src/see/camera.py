@@ -1,75 +1,170 @@
-# api/routes/camera.py
-import os
-import time
-import logging
-from flask import Blueprint, Response, send_file, current_app
+"""
+Camera Module - IMX500 Hardware Management.
 
-logger = logging.getLogger(__name__)
-camera_bp = Blueprint("camera", __name__)
+This module owns and manages the Raspberry Pi IMX500 camera hardware.
+It loads the YOLO detection model onto the IMX500 chip (runs on-device inference)
+and handles frame capture with associated metadata from the hardware accelerator.
 
-# ── stream.jpg lives in RAM (tmpfs) — no SD card wear ────────────────────
-STREAM_DIR  = "/dev/shm/fire_robot"
-STREAM_PATH = os.path.join(STREAM_DIR, "stream.jpg")
-FPS = 25
+Classes:
+    IMX500Camera: Manages camera initialization, YOLO model loading, and frame capture.
+"""
 
-os.makedirs(STREAM_DIR, exist_ok=True)
-
-
-@camera_bp.route("/api/camera/snapshot", methods=["GET"])
-def snapshot():
-    """Single JPEG frame — fallback for proxies that break MJPEG."""
-    orch = current_app.config["ORCHESTRATOR"]
-    if not orch.get_state_summary().get("camera_feed_active", False):
-        return {"error": "camera is off"}, 403
-    if not os.path.exists(STREAM_PATH):
-        return {"error": "frame not ready — camera warming up"}, 503
-    response = send_file(STREAM_PATH, mimetype="image/jpeg")
-    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-    response.headers["Pragma"]        = "no-cache"
-    response.headers["Expires"]       = "0"
-    return response
+# camera.py — owns the IMX500 hardware and Picamera2
+# responsible for loading the YOLO .rpk model onto the IMX500 chip
+# and capturing frames + metadata for FireDetector to analyze
+from picamera2 import Picamera2
+from picamera2.devices.imx500 import IMX500
+import numpy as np
 
 
-@camera_bp.route("/api/camera/feed", methods=["GET"])
-def feed():
+# ── IMX500Camera ──────────────────────────────────────────────────────────────
+# owns the camera hardware — IMX500 chip + Picamera2
+# loads the YOLO .rpk file onto the chip at startup
+# captures frames + metadata and returns them to VisionFuser
+class IMX500Camera:
     """
-    MJPEG stream — the standard way to stream a Pi camera.
-
-    Browser opens a single long-lived connection. Each frame is pushed as a
-    multipart JPEG chunk. No polling, no caching issues, no intervals.
-
-    camera_feed_active is set True on connect and False when the browser
-    disconnects (finally block), so VisionFuser knows when to write frames.
+    Manages the IMX500 camera hardware and YOLO model.
+    
+    The IMX500 is a specialized camera with an embedded AI accelerator chip.
+    This class handles:
+    - Loading the YOLO model (.rpk file) onto the chip for on-device inference
+    - Configuring camera resolution and frame rate
+    - Capturing frames and YOLO inference metadata
+    
+    Attributes:
+        _model_path (str): Path to the YOLO .rpk model file
+        _resolution (tuple): Target camera resolution (width, height)
+        _fps (int): Target frames per second
+        _imx500 (IMX500): IMX500 device object for model loading
+        _picam2 (Picamera2): Camera interface for frame capture
+        _active (bool): Whether camera is currently running
     """
-    orch = current_app.config["ORCHESTRATOR"]
-    # NOTE: feed() no longer flips camera_feed_active. The flag is owned solely
-    # by the explicit /api/camera/toggle endpoint. Merely opening this stream
-    # (e.g. an <img> on any page) must not turn the camera on, otherwise pages
-    # fight over one global flag. If the camera is off, stream nothing.
 
-    def generate():
-        last_mtime = None
-        while True:
-            if orch.get_state_summary().get("camera_feed_active", False) \
-                    and os.path.exists(STREAM_PATH):
-                try:
-                    mtime = os.path.getmtime(STREAM_PATH)
-                    # Only push when a NEW frame was written — avoids re-sending
-                    # the same JPEG 25x/sec and the disk thrash that caused lag.
-                    if mtime != last_mtime:
-                        last_mtime = mtime
-                        with open(STREAM_PATH, "rb") as f:
-                            frame_bytes = f.read()
-                        yield (
-                            b"--frame\r\n"
-                            b"Content-Type: image/jpeg\r\n\r\n"
-                            + frame_bytes + b"\r\n"
-                        )
-                except Exception as e:
-                    logger.warning(f"camera feed read failed: {e}")
-            time.sleep(1.0 / FPS)
+    # ── Init ─────────────────────────────────────────────────────────────────
+    # receives camera settings and model path from VisionFuser (who reads config)
+    # does NOT open config.json itself
+    def __init__(self, model_path: str, resolution: tuple[int, int], fps: int):
+        """
+        Initialize IMX500 camera configuration (does not start hardware yet).
+        
+        Args:
+            model_path (str): Absolute path to YOLO .rpk model file
+            resolution (tuple): Target resolution as (width, height), e.g. (640, 480)
+            fps (int): Target frames per second, e.g. 30
+        """
+        self._model_path = model_path           # path to .rpk YOLO model file
+        self._resolution = resolution           # (width, height) e.g. (640, 480)
+        self._fps        = fps                  # frames per second e.g. 30
+        self._imx500     = None                 # IMX500 object, created in start()
+        self._picam2     = None                 # Picamera2 object, created in start()
+        self._active     = False                # is the camera currently running?
 
-    return Response(
-        generate(),
-        mimetype="multipart/x-mixed-replace; boundary=frame",
-    )
+    # ── Start ─────────────────────────────────────────────────────────────────
+    # powers on the camera and loads the YOLO .rpk model onto the IMX500 chip
+    # MUST be called before capture()
+    # IMX500 must be created BEFORE Picamera2 — order matters!
+    def start(self) -> None:
+
+        """
+        Power on camera and load YOLO model onto IMX500 chip.
+        
+        This method:
+        1. Initializes IMX500 device and loads YOLO model (may take minutes on first run)
+        2. Creates Picamera2 interface (must happen AFTER IMX500 init)
+        3. Configures resolution and frame rate from config
+        4. Starts the capture stream
+        
+        Must be called before capture(). Call only once per session.
+        
+        Returns:
+            None
+        """
+
+        # step 1: load .rpk model onto IMX500 chip
+        # this uploads the YOLO firmware to the camera hardware
+        # may take a few minutes on first run (progress bar shown in console)
+        self._imx500 = IMX500(self._model_path)
+
+        # step 2: create Picamera2 AFTER IMX500 is ready
+        self._picam2 = Picamera2()
+
+        # step 3: configure camera settings from config
+        # main stream → the image we capture
+        # controls → fps setting
+        config = self._picam2.create_preview_configuration(
+            main={"size": self._resolution, "format": "RGB888"},    # resolution from config
+            controls={"FrameRate": self._fps}   # fps from config
+        )
+        self._picam2.configure(config)
+
+        # step 4: start capturing
+        self._picam2.start()
+        self._active = True
+
+    # ── Stop ──────────────────────────────────────────────────────────────────
+    # powers off the camera cleanly
+    # called by VisionFuser when sensor_triggered goes False
+    def stop(self) -> None:
+        """
+        Power off camera cleanly and release hardware resources.
+        
+        Stops the capture stream and marks camera as inactive.
+        Safe to call multiple times.
+        
+        Returns:
+            None
+        """
+        if self._picam2 and self._active:
+            self._picam2.stop()
+            self._active = False
+
+    # ── Capture ───────────────────────────────────────────────────────────────
+    # grabs one frame + IMX500 metadata from the camera
+    # returns (frame, metadata) → VisionFuser passes both to FireDetector
+    # frame    → numpy array image, saved to disk and streamed to website
+    # metadata → contains YOLO inference results from IMX500 chip
+    def capture(self) -> tuple[np.ndarray, dict] | None:
+
+        """
+        Capture one frame and YOLO inference metadata from camera.
+        
+        Returns:
+            tuple[np.ndarray, dict] | None: 
+                - frame: Numpy array (H, W, 3) in BGR format
+                - metadata: Dict containing IMX500 YOLO inference results
+                - None if camera is not active
+        """
+
+        if not self._active:
+            return None                         # camera not running, return nothing
+
+        # capture one request from Picamera2
+        # request contains BOTH the image AND the IMX500 inference metadata
+        request = self._picam2.capture_request()
+
+        # extract the image as a numpy array (rows x cols x RGB channels)
+        frame = request.make_array("main")
+
+        # extract metadata — this contains the YOLO results from IMX500 chip
+        metadata = request.get_metadata()
+
+        # release the request so Picamera2 can reuse the buffer
+        request.release()
+
+        return frame, metadata
+
+    # ── Properties ───────────────────────────────────────────────────────────
+    @property
+    def imx500(self) -> IMX500:
+        """Get IMX500 device object for inference."""
+        return self._imx500                     # VisionFuser passes this to FireDetector
+
+    @property
+    def is_active(self) -> bool:
+        """Check if camera is currently running."""
+        return self._active                     # is camera currently running?
+
+    @property
+    def resolution(self) -> tuple[int, int]:
+        """Get configured camera resolution as (width, height)."""
+        return self._resolution                 # (width, height)
