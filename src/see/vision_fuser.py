@@ -360,7 +360,7 @@ class VisionFuser:
                     self._state.latest_fire_y = None
 
                 # ── Save frame to disk ────────────────────────────────────────────
-                frame_url = self._save_frame(frame)
+                frame_url = self._save_frame(frame, raw_detections, clusters)
 
                 # ── Assemble VisionSnapshot ───────────────────────────────────────
                 snap = self.snapshot(clusters, raw_detections, frame_url, frame_width, frame_height)
@@ -489,7 +489,7 @@ class VisionFuser:
     # ── Save Frame ────────────────────────────────────────────────────────────
     # saves captured frame to disk and returns its URL
     # URL is stored in VisionSnapshot so THINK can reference the image
-    def _save_frame(self, frame) -> str:
+    def _save_frame(self, frame, raw_detections=None, clusters=None) -> str:
         """
         Save captured frame to disk and return its URL.
 
@@ -538,15 +538,73 @@ class VisionFuser:
         # ── Stream buffer (in RAM — /dev/shm/) ───────────────────────────────
         # Written every frame when camera feed is active. Lives in tmpfs so
         # there is zero SD card I/O — just memory writes.
+        #
+        # Annotation: YOLO boxes are drawn on a COPY of the frame before write,
+        # so the on-disk permanent save (USB) stays clean for training data.
+        # The annotated copy goes only to stream.jpg (the live MJPEG feed).
         if self._state.camera_feed_active:
             stream_path = os.path.join(self._stream_dir, "stream.jpg")
             tmp_path    = os.path.join(self._stream_dir, "stream.tmp.jpg")
             try:
+                annotated = self._annotate_frame(frame, raw_detections, clusters)
                 encode_params = [cv2.IMWRITE_JPEG_QUALITY, self._stream_jpeg_quality]
-                ok = cv2.imwrite(tmp_path, frame, encode_params)
+                ok = cv2.imwrite(tmp_path, annotated, encode_params)
                 if ok:
                     os.replace(tmp_path, stream_path)
             except Exception as e:
                 logger.warning(f"stream.jpg write failed: {e}")
 
         return self._frame_url_prefix + filename
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # Annotation helper — draws YOLO boxes onto a COPY of the frame.
+    # Used only for the live MJPEG stream. The on-disk permanent save uses the
+    # raw unannotated frame so training data stays clean.
+    # ─────────────────────────────────────────────────────────────────────────
+    def _annotate_frame(self, frame, raw_detections, clusters):
+        """
+        Draw bounding boxes and labels on a copy of the frame.
+
+        Colors:
+          fire  → red    (BGR: 0, 0, 255)
+          smoke → blue   (BGR: 255, 128, 0)
+          cluster center → small green crosshair on the dominant cluster
+
+        Returns the annotated copy. Falls back to the original frame on any
+        error — we never want annotation issues to break the live stream.
+        """
+        try:
+            if not raw_detections and not clusters:
+                return frame
+            annotated = frame.copy()
+
+            # ── Per-detection boxes ──────────────────────────────────────────
+            for det in (raw_detections or []):
+                xc, yc, w, h = det.bbox
+                x1 = int(xc - w / 2); y1 = int(yc - h / 2)
+                x2 = int(xc + w / 2); y2 = int(yc + h / 2)
+                if det.label == "fire":
+                    color = (0, 0, 255)        # red in BGR
+                elif det.label == "smoke":
+                    color = (255, 128, 0)      # blue-ish in BGR
+                else:
+                    color = (200, 200, 200)
+                cv2.rectangle(annotated, (x1, y1), (x2, y2), color, 2)
+                label = f"{det.label} {det.confidence:.2f}"
+                cv2.putText(annotated, label, (x1, max(y1 - 6, 12)),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1, cv2.LINE_AA)
+
+            # ── Dominant cluster crosshair (where ACT would aim) ─────────────
+            if clusters:
+                c = clusters[0]
+                fh, fw = annotated.shape[:2]
+                cx = int(c.origin_x * fw)
+                cy = int(c.origin_y * fh)
+                cv2.drawMarker(annotated, (cx, cy), (0, 255, 0),
+                               markerType=cv2.MARKER_CROSS,
+                               markerSize=20, thickness=2)
+
+            return annotated
+        except Exception as e:
+            logger.debug(f"_annotate_frame: fell back to raw frame — {e}")
+            return frame

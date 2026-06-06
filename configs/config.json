@@ -1,263 +1,263 @@
 {
-    "logging": {
-        "version": 1,
-        "disable_existing_loggers": false,
-        "formatters": {
-            "standard": {
-                "format": "[%(asctime)s] %(name)s [%(levelname)s] %(message)s",
-                "datefmt": "%Y-%m-%d %H:%M:%S"
-            },
-            "detailed": {
-                "format": "[%(asctime)s] %(name)s [%(levelname)s] [%(funcName)s:%(lineno)d] %(message)s",
-                "datefmt": "%Y-%m-%d %H:%M:%S"
-            }
-        },
-        "handlers": {
-            "console": {
-                "class": "logging.StreamHandler",
-                "level": "INFO",
-                "formatter": "standard",
-                "stream": "ext://sys.stdout"
-            },
-            "file": {
-                "class": "logging.handlers.RotatingFileHandler",
-                "level": "DEBUG",
-                "formatter": "detailed",
-                "filename": "logs/fire_robot.log",
-                "maxBytes": 10485760,
-                "backupCount": 5
-            }
-        },
-        "root": {
-            "level": "INFO",
-            "handlers": [
-                "console",
-                "file"
-            ]
-        },
-        "loggers": {
-            "sense": {
-                "level": "INFO"
-            },
-            "think": {
-                "level": "INFO"
-            },
-            "act": {
-                "level": "INFO"
-            },
-            "see": {
-                "level": "INFO"
-            },
-            "core": {
-                "level": "INFO"
-            }
-        }
+  "logging": {
+    "version": 1,
+    "disable_existing_loggers": false,
+    "formatters": {
+      "standard": {
+        "format": "[%(asctime)s] %(name)s [%(levelname)s] %(message)s",
+        "datefmt": "%Y-%m-%d %H:%M:%S"
+      },
+      "detailed": {
+        "format": "[%(asctime)s] %(name)s [%(levelname)s] [%(funcName)s:%(lineno)d] %(message)s",
+        "datefmt": "%Y-%m-%d %H:%M:%S"
+      }
     },
-    "system": {
-        "system_mode": "surveillance",
-        "polling_interval_idle_ms": 200,
-        "polling_interval_active_ms": 200,
-        "i2c_buses": {
-            "primary": {
-                "scl": "SCL",
-                "sda": "SDA"
-            }
-        }
+    "handlers": {
+      "console": {
+        "class": "logging.StreamHandler",
+        "level": "INFO",
+        "formatter": "standard",
+        "stream": "ext://sys.stdout"
+      },
+      "file": {
+        "class": "logging.handlers.RotatingFileHandler",
+        "level": "DEBUG",
+        "formatter": "detailed",
+        "filename": "logs/fire_robot.log",
+        "maxBytes": 10485760,
+        "backupCount": 5
+      }
     },
-    "sensors": {
-        "smoke": {
-            "enabled": true,
-            "interface": "i2c",
-            "bus": "primary",
-            "device_type": "ads1115",
-            "address": "0x48",
-            "channel": 0,
-            "gain": 1,
-            "equation": "A * (((3.3 - (raw / 32767.0) * 3.3) / ((raw / 32767.0) * 3.3)) * RL / Ro) ** B",
-            "eq_params": {
-                "RL": 8200,
-                "Ro": 9500,
-                "A": 574.25,
-                "B": -2.222
-            },
-            "raw_min": 0,
-            "raw_max": 32767,
-            "physical_min": 0,
-            "physical_max": 10000,
-            "threshold_physical": 300,
-            "unit": "ppm",
-            "max_retries": 3
-        },
-        "heat_grid": {
-            "enabled": true,
-            "interface": "i2c",
-            "bus": "primary",
-            "device_type": "amg8833",
-            "address": "0x69",
-            "raw_min": 0,
-            "raw_max": 80,
-            "physical_min": 0,
-            "physical_max": 80,
-            "threshold_physical": 17,
-            "unit": "C",
-            "max_retries": 3
-        }
+    "root": {
+      "level": "INFO",
+      "handlers": [
+        "console",
+        "file"
+      ]
     },
-    "vision": {
-        "camera": {
-            "resolution": [
-                320,
-                240
-            ],
-            "fps": 30,
-            "stream_jpeg_quality": 55
-        },
-        "models": {
-            "fire": {
-                "rpk": "model_weights/rpk/fire_smoke_detection.rpk",
-                "conf_threshold": 0.5
-            }
-        },
-        "labels": "configs/labels.json",
-        "storage": {
-            "frame_image_path": "data/frames/",
-            "frame_url_prefix": "/frames/",
-            "frame_permanent_path": "/media/mj/JANA_S USB/training_frames/"
-        },
-        "activation": {
-            "idle_sleep_ms": 50
-        }
-    },
-    "think": {
-        "active_model": "xgboost",
-        "model_weights_path": "model_weights/",
-        "max_gap_ms": 500,
-        "max_event_gap_ms": 10000,
-        "training": {
-            "test_split": 0.2,
-            "min_rows_to_train": 200,
-            "random_state": 42
-        },
-        "chain_length": 5,
-        "poa_map": {
-            "1": [
-                "monitor"
-            ],
-            "2": [
-                "monitor"
-            ],
-            "3": [
-                "alert"
-            ],
-            "4": [
-                "alert",
-                "suppress"
-            ],
-            "5": [
-                "alert",
-                "suppress",
-                "evacuate"
-            ]
-        },
-        "label_encoding": {
-            "composite_label": {
-                "none": 0,
-                "smoke": 1,
-                "fire": 2,
-                "fire_smoke": 3
-            },
-            "scene_label": {
-                "clear": 0,
-                "hazy": 1,
-                "smoky": 2,
-                "fire": 3
-            }
-        },
-        "xgboost": {
-            "n_estimators": 100,
-            "max_depth": 4,
-            "learning_rate": 0.1,
-            "subsample": 0.8,
-            "colsample_bytree": 0.8
-        }
-    },
-    "act": {
-        "system": {
-            "cycle_ms": 100,
-            "danger_threshold_to_act": 5,
-            "copilot_timeout_s": 60
-        },
-        "actions": {
-            "available": [
-                "monitor",
-                "alert",
-                "suppress",
-                "evacuate"
-            ],
-            "requires_actuator": {
-                "monitor": null,
-                "alert": null,
-                "suppress": "pump",
-                "evacuate": null
-            }
-        },
-        "actuators": {
-            "pump": {
-                "enabled": true,
-                "type": "pump",
-                "interface": "gpio",
-                "pin": 17,
-                "max_duration_s": 30
-            },
-            "arm": {
-                "enabled": true,
-                "type": "arm",
-                "joints": {
-                    "pan": {
-                        "pin": 12,
-                        "step_deg": 1.0,
-                        "limit_min_deg": -90,
-                        "limit_max_deg": 90,
-                        "servo_min_deg": -90,
-                        "servo_max_deg": 90,
-                        "invert": false
-                    },
-                    "tilt": {
-                        "pin": 13,
-                        "step_deg": 1.0,
-                        "limit_min_deg": -45,
-                        "limit_max_deg": 45,
-                        "servo_min_deg": -90,
-                        "servo_max_deg": 90,
-                        "invert": false
-                    }
-                },
-                "feedback": {
-                    "heat_use_threshold_c": 19.0,
-                    "tolerance_normalized": 0.05,
-                    "sensor_offsets": {
-                        "heat": {
-                            "x_bias": -0.12,
-                            "y_bias": -0.28
-                        },
-                        "camera": {
-                            "x_bias": 0.0,
-                            "y_bias": 0.0
-                        }
-                    },
-                    "tracking_source": "heat",
-                    "heat_flip_x": false,
-                    "heat_flip_y": true,
-                    "camera_flip_x": false,
-                    "camera_flip_y": false
-                },
-                "cycle_active_ms": 20,
-                "cycle_idle_ms": 20
-            }
-        }
-    },
-    "api": {
-        "train_job_history_size": 50,
-        "train_job_timeout_s": 120.0
+    "loggers": {
+      "sense": {
+        "level": "INFO"
+      },
+      "think": {
+        "level": "INFO"
+      },
+      "act": {
+        "level": "DEBUG"
+      },
+      "see": {
+        "level": "INFO"
+      },
+      "core": {
+        "level": "INFO"
+      }
     }
+  },
+  "system": {
+    "system_mode": "surveillance",
+    "polling_interval_idle_ms": 200,
+    "polling_interval_active_ms": 200,
+    "i2c_buses": {
+      "primary": {
+        "scl": "SCL",
+        "sda": "SDA"
+      }
+    }
+  },
+  "sensors": {
+    "smoke": {
+      "enabled": true,
+      "interface": "i2c",
+      "bus": "primary",
+      "device_type": "ads1115",
+      "address": "0x48",
+      "channel": 0,
+      "gain": 1,
+      "equation": "A * (((3.3 - (raw / 32767.0) * 3.3) / ((raw / 32767.0) * 3.3)) * RL / Ro) ** B",
+      "eq_params": {
+        "RL": 8200,
+        "Ro": 9500,
+        "A": 574.25,
+        "B": -2.222
+      },
+      "raw_min": 0,
+      "raw_max": 32767,
+      "physical_min": 0,
+      "physical_max": 10000,
+      "threshold_physical": 300,
+      "unit": "ppm",
+      "max_retries": 3
+    },
+    "heat_grid": {
+      "enabled": true,
+      "interface": "i2c",
+      "bus": "primary",
+      "device_type": "amg8833",
+      "address": "0x69",
+      "raw_min": 0,
+      "raw_max": 80,
+      "physical_min": 0,
+      "physical_max": 80,
+      "threshold_physical": 27,
+      "unit": "C",
+      "max_retries": 3
+    }
+  },
+  "vision": {
+    "camera": {
+      "resolution": [
+        320,
+        240
+      ],
+      "fps": 30,
+      "stream_jpeg_quality": 55
+    },
+    "models": {
+      "fire": {
+        "rpk": "model_weights/rpk/fire_smoke_detection.rpk",
+        "conf_threshold": 0.5
+      }
+    },
+    "labels": "configs/labels.json",
+    "storage": {
+      "frame_image_path": "data/frames/",
+      "frame_url_prefix": "/frames/",
+      "frame_permanent_path": "/media/mj/JANA_S USB/training_frames/"
+    },
+    "activation": {
+      "idle_sleep_ms": 50
+    }
+  },
+  "think": {
+    "active_model": "xgboost",
+    "model_weights_path": "model_weights/",
+    "max_gap_ms": 500,
+    "max_event_gap_ms": 10000,
+    "training": {
+      "test_split": 0.2,
+      "min_rows_to_train": 200,
+      "random_state": 42
+    },
+    "chain_length": 5,
+    "poa_map": {
+      "1": [
+        "monitor"
+      ],
+      "2": [
+        "monitor"
+      ],
+      "3": [
+        "alert"
+      ],
+      "4": [
+        "alert",
+        "suppress"
+      ],
+      "5": [
+        "alert",
+        "suppress",
+        "evacuate"
+      ]
+    },
+    "label_encoding": {
+      "composite_label": {
+        "none": 0,
+        "smoke": 1,
+        "fire": 2,
+        "fire_smoke": 3
+      },
+      "scene_label": {
+        "clear": 0,
+        "hazy": 1,
+        "smoky": 2,
+        "fire": 3
+      }
+    },
+    "xgboost": {
+      "n_estimators": 100,
+      "max_depth": 4,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8
+    }
+  },
+  "act": {
+    "system": {
+      "cycle_ms": 100,
+      "danger_threshold_to_act": 5,
+      "copilot_timeout_s": 60
+    },
+    "actions": {
+      "available": [
+        "monitor",
+        "alert",
+        "suppress",
+        "evacuate"
+      ],
+      "requires_actuator": {
+        "monitor": null,
+        "alert": null,
+        "suppress": "pump",
+        "evacuate": null
+      }
+    },
+    "actuators": {
+      "pump": {
+        "enabled": true,
+        "type": "pump",
+        "interface": "gpio",
+        "pin": 17,
+        "max_duration_s": 30
+      },
+      "arm": {
+        "enabled": true,
+        "type": "arm",
+        "joints": {
+          "pan": {
+            "pin": 12,
+            "step_deg": 1.0,
+            "limit_min_deg": -90,
+            "limit_max_deg": 90,
+            "servo_min_deg": -90,
+            "servo_max_deg": 90,
+            "invert": false
+          },
+          "tilt": {
+            "pin": 13,
+            "step_deg": 1.0,
+            "limit_min_deg": -45,
+            "limit_max_deg": 45,
+            "servo_min_deg": -90,
+            "servo_max_deg": 90,
+            "invert": false
+          }
+        },
+        "feedback": {
+          "heat_use_threshold_c": 25,
+          "tolerance_normalized": 0.05,
+          "sensor_offsets": {
+            "heat": {
+              "x_bias": -0.12,
+              "y_bias": -0.28
+            },
+            "camera": {
+              "x_bias": 0.0,
+              "y_bias": 0.0
+            }
+          },
+          "tracking_source": "heat",
+          "heat_flip_x": false,
+          "heat_flip_y": true,
+          "camera_flip_x": false,
+          "camera_flip_y": false
+        },
+        "cycle_active_ms": 20,
+        "cycle_idle_ms": 20
+      }
+    }
+  },
+  "api": {
+    "train_job_history_size": 50,
+    "train_job_timeout_s": 120.0
+  }
 }
