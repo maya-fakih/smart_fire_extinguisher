@@ -58,6 +58,19 @@ class ArmController(Actuator):
         self._heat_use_threshold = float(feedback.get("heat_use_threshold_c", 35.0))
         self._tolerance          = float(feedback.get("tolerance_normalized", 0.1))
 
+        # Tracking source: "heat" | "camera" | "both"
+        # Controls which sensors feed _compute_error(). Default: heat only.
+        self._tracking_source = feedback.get("tracking_source", "heat")
+
+        # Per-sensor flip flags — correct for physical mounting orientation.
+        # heat_flip_y=True when the AMG8833 is ceiling-mounted (rows inverted).
+        # camera_flip_y=True when camera image is vertically mirrored.
+        # Set independently in config so each sensor's orientation is explicit.
+        self._heat_flip_x   = bool(feedback.get("heat_flip_x",   False))
+        self._heat_flip_y   = bool(feedback.get("heat_flip_y",   False))
+        self._camera_flip_x = bool(feedback.get("camera_flip_x", False))
+        self._camera_flip_y = bool(feedback.get("camera_flip_y", False))
+
         # Per-sensor bias in normalized space (added to that sensor's error
         # vector before fusion). Calibrate by trial and error — these are
         # corrections, not physical offsets.
@@ -75,13 +88,11 @@ class ArmController(Actuator):
         self._running = False
         self._thread: Optional[threading.Thread] = None
 
-        # Adaptive direction state — tracks last error and learned step sign
-        # per axis so the arm self-corrects if the servo is physically inverted.
-        # After one wrong step the sign flips and stays correct for the session.
+        # Last error per axis — used only to detect within-tolerance reset.
+        # Direction is derived purely from error sign + per-joint invert flag.
+        # No adaptive flipping — it fights moving targets and causes oscillation.
         self._pan_last_err  = 0.0
-        self._pan_step_sign = 1
         self._tilt_last_err = 0.0
-        self._tilt_step_sign = 1
 
         # Center the servos at construction so they don't sit at a random angle
         self._command_pan(0.0)
@@ -169,7 +180,7 @@ class ArmController(Actuator):
 
                 err = self._compute_error()
                 if err is None:
-                    time.sleep(0)  # yield to scheduler, no artificial delay
+                    self._sleep_cycle(triggered)
                     continue
 
                 err_x, err_y = err
@@ -183,7 +194,7 @@ class ArmController(Actuator):
                     )
                     self._step_joints(err_x, err_y)
 
-                time.sleep(0)  # yield to scheduler, no artificial delay
+                self._sleep_cycle(triggered)
 
             except Exception as e:
                 logger.error(
@@ -205,23 +216,21 @@ class ArmController(Actuator):
 
     def _compute_error(self) -> Optional[tuple]:
         """
-        Three-mode fusion of heat and camera signals:
-          - both available    → average of (heat + heat_bias) and (camera + camera_bias)
-          - heat only         → heat + heat_bias
-          - camera only       → camera + camera_bias
-          - neither           → None
+        Compute tracking error based on tracking_source config:
+          "heat"   -> heat grid only (AMG8833)
+          "camera" -> camera YOLO detections only
+          "both"   -> average of both when both available, fallback to either
 
-        "Available" = the sensor's error function returned non-None.
-        For heat that means a peak above heat_use_threshold_c.
-        For camera that means latest_fire_x/y are both not None (SEE is
-        running AND a fire cluster was detected).
-
+        Flip flags and bias offsets are applied inside each sensor method.
         Returns (err_x, err_y) normalized to [-1, +1] or None.
         """
-        heat_raw   = self._heat_error(self._state.latest_heat_matrix)
+        use_heat   = self._tracking_source in ("heat",   "both")
+        use_camera = self._tracking_source in ("camera", "both")
+
+        heat_raw   = self._heat_error(self._state.latest_heat_matrix) if use_heat   else None
         camera_raw = self._camera_error(
             self._state.latest_fire_x, self._state.latest_fire_y
-        )
+        ) if use_camera else None
 
         if heat_raw is not None and camera_raw is not None:
             heat_corr   = (heat_raw[0]   + self._heat_bias_x,   heat_raw[1]   + self._heat_bias_y)
@@ -246,6 +255,12 @@ class ArmController(Actuator):
         return None
 
     def _heat_error(self, heat) -> Optional[tuple]:
+        """
+        Find hottest pixel in the 8x8 grid, return its normalized offset from
+        center as (err_x, err_y) in [-1, +1].
+        heat_flip_y=True when sensor is ceiling-mounted (rows physically inverted).
+        heat_flip_x=True when sensor is mirrored left-right.
+        """
         if heat is None or len(heat) == 0:
             return None
         arr = np.array(heat, dtype=float)
@@ -258,14 +273,27 @@ class ArmController(Actuator):
         cy = (rows - 1) / 2.0
         err_x = (c - cx) / cx if cx > 0 else 0.0
         err_y = (r - cy) / cy if cy > 0 else 0.0
+        if self._heat_flip_x:
+            err_x = -err_x
+        if self._heat_flip_y:
+            err_y = -err_y
         return err_x, err_y
 
     def _camera_error(self, fx, fy) -> Optional[tuple]:
+        """
+        Convert YOLO fire centroid [0,1] coords to normalized error [-1,+1].
+        camera_flip_y=True when image is vertically mirrored.
+        camera_flip_x=True when image is horizontally mirrored.
+        """
         if fx is None or fy is None:
             return None
         # Camera coords are [0, 1] with (0.5, 0.5) as center.
         err_x = (fx - 0.5) * 2.0
         err_y = (fy - 0.5) * 2.0
+        if self._camera_flip_x:
+            err_x = -err_x
+        if self._camera_flip_y:
+            err_y = -err_y
         return err_x, err_y
 
     # ------------------------------------------------------------------
@@ -274,69 +302,45 @@ class ArmController(Actuator):
 
     def _step_joints(self, err_x: float, err_y: float) -> None:
         """
-        Adaptive step: move one step_deg increment toward the target, but
-        learn the correct direction from feedback rather than assuming it.
+        Step pan and tilt one step_deg toward the target.
 
-        On the first step (or after centering) we guess: positive error →
-        positive direction, adjusted by the invert flag. On every subsequent
-        step we compare the new error magnitude to the previous one:
-          - smaller  → we're converging, keep going
-          - larger   → we overshot or went the wrong way, flip direction
+        Direction = sign(err) * invert_factor.
+        The invert flag in config is the ONLY direction correction mechanism —
+        set pan.invert or tilt.invert to true if the servo moves the wrong way.
 
-        This makes the arm self-correcting regardless of how the servo is
-        physically mounted — one wrong step and it auto-corrects.
-        Step size of 0.2–0.5° (set via config) keeps corrections smooth.
+        No adaptive flipping: that scheme fights moving targets (lighter flame)
+        and causes oscillation when error grows because the target moved, not
+        because the arm stepped wrong.
         """
         # ── Pan axis ──────────────────────────────────────────────────
         if abs(err_x) > self._tolerance / 2:
-            if self._pan_last_err == 0.0:
-                # First step: guess direction from error sign + invert flag
-                self._pan_step_sign = 1 if err_x > 0 else -1
-                if self._pan_cfg.get("invert", False):
-                    self._pan_step_sign *= -1
-            elif abs(err_x) > abs(self._pan_last_err):
-                # Error got worse → flip direction, self-correct
-                self._pan_step_sign *= -1
-                logger.info(
-                    f"ArmController {self.name}: pan direction flipped "
-                    f"(err {self._pan_last_err:+.3f} → {err_x:+.3f})"
-                )
-
+            pan_sign = 1 if err_x > 0 else -1
+            if self._pan_cfg.get("invert", False):
+                pan_sign *= -1
             self._pan_angle = self._clip(
-                self._pan_angle + self._pan_step_sign * self._pan_cfg["step_deg"],
+                self._pan_angle + pan_sign * self._pan_cfg["step_deg"],
                 self._pan_cfg["limit_min_deg"],
                 self._pan_cfg["limit_max_deg"],
             )
             self._command_pan(self._pan_angle)
             self._pan_last_err = err_x
         else:
-            # Within tolerance — reset so next activation starts fresh
-            self._pan_last_err  = 0.0
-            self._pan_step_sign = 1
+            self._pan_last_err = 0.0
 
         # ── Tilt axis ─────────────────────────────────────────────────
         if abs(err_y) > self._tolerance / 2:
-            if self._tilt_last_err == 0.0:
-                self._tilt_step_sign = 1 if err_y > 0 else -1
-                if self._tilt_cfg.get("invert", False):
-                    self._tilt_step_sign *= -1
-            elif abs(err_y) > abs(self._tilt_last_err):
-                self._tilt_step_sign *= -1
-                logger.info(
-                    f"ArmController {self.name}: tilt direction flipped "
-                    f"(err {self._tilt_last_err:+.3f} → {err_y:+.3f})"
-                )
-
+            tilt_sign = 1 if err_y > 0 else -1
+            if self._tilt_cfg.get("invert", False):
+                tilt_sign *= -1
             self._tilt_angle = self._clip(
-                self._tilt_angle + self._tilt_step_sign * self._tilt_cfg["step_deg"],
+                self._tilt_angle + tilt_sign * self._tilt_cfg["step_deg"],
                 self._tilt_cfg["limit_min_deg"],
                 self._tilt_cfg["limit_max_deg"],
             )
             self._command_tilt(self._tilt_angle)
             self._tilt_last_err = err_y
         else:
-            self._tilt_last_err  = 0.0
-            self._tilt_step_sign = 1
+            self._tilt_last_err = 0.0
 
     def _command_pan(self, deg: float) -> None:
         val = self._deg_to_value(deg, self._pan_cfg["servo_min_deg"], self._pan_cfg["servo_max_deg"])
