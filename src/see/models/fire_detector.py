@@ -11,6 +11,7 @@ Classes:
 
 # this part is for fire detector, we analyze what we get from our YOLO trained Model
 # YOLO runs on-chip on the IMX500 camera — we just parse the results from metadata
+import logging
 import numpy as np
 from picamera2.devices.imx500 import IMX500
 from shapely.geometry import box as shapely_box
@@ -18,6 +19,13 @@ from shapely.ops import unary_union
 from see.models.vision_model_base import VisionModel
 from see.models.detection import Detection
 from see.models.fire_cluster import FireCluster
+
+logger = logging.getLogger(__name__)
+
+# Diagnostic throttle: detect() runs ~30x/sec. Log the shape/count picture at
+# INFO every Nth call so the feed isn't silent but the log isn't flooded.
+# Set to 1 temporarily for every-frame detail; 30 is roughly once per second.
+_DIAG_EVERY = 30
 
 
 # ── FireDetector ──────────────────────────────────────────────────────────────
@@ -58,6 +66,7 @@ class FireDetector(VisionModel):
         self._conf_threshold = conf_threshold   # minimum confidence to accept a box
         self._labels        = labels            # class id → label name from config
                                                 # example: {0: "fire", 1: "other", 2: "smoke"}
+        self._diag_calls    = 0                 # detect() call counter for throttled logging
 
     # ── Load ──────────────────────────────────────────────────────────────────
     # nothing to load here — model is loaded by camera.py onto the IMX500 chip
@@ -104,9 +113,31 @@ class FireDetector(VisionModel):
         # get_outputs() returns the raw inference results from the camera
         outputs = self._imx500.get_outputs(metadata)
 
+        # Throttled diagnostics — tells us what the chip is actually returning.
+        self._diag_calls += 1
+        diag = (self._diag_calls % _DIAG_EVERY == 1)
+
         # if camera returned nothing (no detections or not ready) → return empty
         if outputs is None:
+            if diag:
+                logger.info(
+                    "FireDetector: get_outputs() returned None "
+                    "(no inference result this frame — model not producing output, "
+                    "or no detections). conf_threshold=%s", self._conf_threshold
+                )
             return [], []
+
+        if diag:
+            try:
+                shape_info = [
+                    (np.asarray(o).shape if o is not None else None) for o in outputs
+                ]
+            except Exception:
+                shape_info = "uninspectable"
+            logger.info(
+                "FireDetector: get_outputs() OK | n_tensors=%s | shapes=%s",
+                len(outputs), shape_info
+            )
 
         # IMX500 YOLO output format: boxes, scores, classes
         # boxes  → array of [x, y, w, h] for each detection
@@ -128,15 +159,22 @@ class FireDetector(VisionModel):
         fire_boxes     = []
         smoke_boxes    = []
 
+        # Diagnostic survival counters.
+        _n_in = len(boxes)
+        _dropped_conf = 0
+        _dropped_label = 0
+
         for box, score, class_id in zip(boxes, scores, classes):
 
             # skip low confidence detections
             if score < self._conf_threshold:
+                _dropped_conf += 1
                 continue
 
             # skip "other" class — not relevant for fire analysis
             class_id = int(class_id)
             if class_id not in self._labels or self._labels[class_id] == "other":
+                _dropped_label += 1
                 continue
 
             # box comes as [x_center, y_center, width, height] in pixels
@@ -160,6 +198,32 @@ class FireDetector(VisionModel):
                 fire_boxes.append(detection)
             else:
                 smoke_boxes.append(detection)
+
+        if diag:
+            # If raw_in > 0 but survivors == 0, the filters are eating everything:
+            #   dropped_conf high  → conf_threshold too high OR scores are 0-1 vs 0-100 scale mismatch
+            #   dropped_label high → class ids from chip don't match labels.json keys
+            # If raw_in == 0 → the chip produced an empty box array (model/threshold on-chip).
+            sample = None
+            if _n_in > 0:
+                # raw first row, BEFORE any filtering — reveals coord scale (0-1 vs pixels)
+                # and score scale (0-1 vs 0-100). If box values are < 1.0 the coords are
+                # normalized and need imx500.convert_inference_coords() — boxes would
+                # otherwise draw as 1px dots at the origin and look invisible.
+                try:
+                    sample = {
+                        "box0": [float(v) for v in np.atleast_1d(boxes[0]).ravel()[:4]],
+                        "score0": float(np.atleast_1d(scores[0]).ravel()[0]),
+                        "class0": int(np.atleast_1d(classes[0]).ravel()[0]),
+                    }
+                except Exception as e:
+                    sample = f"sample-failed: {e}"
+            logger.info(
+                "FireDetector: filter | raw_in=%s survived=%s "
+                "(dropped_conf=%s dropped_label=%s) | fire=%s smoke=%s | conf_thr=%s | sample=%s",
+                _n_in, len(raw_detections), _dropped_conf, _dropped_label,
+                len(fire_boxes), len(smoke_boxes), self._conf_threshold, sample
+            )
 
         # ── Step 4: Merge same-class boxes that intersect ─────────────────────
         # two fire boxes touching → become one bigger fire box
