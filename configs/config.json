@@ -37,19 +37,19 @@
     },
     "loggers": {
       "sense": {
-        "level": "INFO"
+        "level": "DEBUG"
       },
       "think": {
-        "level": "INFO"
+        "level": "DEBUG"
       },
       "act": {
         "level": "DEBUG"
       },
       "see": {
-        "level": "INFO"
+        "level": "DEBUG"
       },
       "core": {
-        "level": "INFO"
+        "level": "DEBUG"
       }
     }
   },

@@ -139,21 +139,16 @@ class FireDetector(VisionModel):
                 len(outputs), shape_info
             )
 
-        # IMX500 YOLO output format: boxes, scores, classes
-        # boxes  → array of [x, y, w, h] for each detection
-        # scores → confidence value for each detection
-        # classes → class id for each detection
-        boxes, scores, classes = outputs[0][0], outputs[1][0], outputs[2][0]
-
-        # ── Steps 2 & 3: Parse output → separate into fire and smoke ──────────
-        # skip class_id == 1 ("other") — only useful for YOLO training, not for us
-        # raw_detections keeps ALL boxes because VisionSnapshot needs them later
-
-        # guard against single-detection squeeze — IMX500 returns scalar
-        # numpy.float32 instead of array when there is exactly one detection
-        boxes   = np.atleast_1d(boxes)
-        scores  = np.atleast_1d(scores)
-        classes = np.atleast_1d(classes)
+        # IMX500 YOLO output format (verified from raw tensor dump):
+        #   outputs[0] shape=(300, 4)  — boxes as [x1, y1, x2, y2] in pixels (corner format)
+        #   outputs[1] shape=(300,)    — confidence scores [0, 1]
+        #   outputs[2] shape=(300,)    — class ids
+        #   outputs[3] shape=(1,)      — number of VALID detections (rest is zero-padding)
+        # Always slice to n_valid so we never process padding rows.
+        n_valid = int(np.asarray(outputs[3]).ravel()[0])
+        boxes   = np.asarray(outputs[0])[:n_valid]   # shape (n_valid, 4)
+        scores  = np.asarray(outputs[1])[:n_valid]   # shape (n_valid,)
+        classes = np.asarray(outputs[2])[:n_valid]   # shape (n_valid,)
 
         raw_detections = []
         fire_boxes     = []
@@ -177,12 +172,16 @@ class FireDetector(VisionModel):
                 _dropped_label += 1
                 continue
 
-            # box comes as [x_center, y_center, width, height] in pixels
-            x, y, w, h = box[0], box[1], box[2], box[3]
+            # box is [x1, y1, x2, y2] in pixels (corner format from IMX500)
+            # convert to [cx, cy, w, h] which the rest of the pipeline expects
+            x1, y1, x2, y2 = float(box[0]), float(box[1]), float(box[2]), float(box[3])
+            w = x2 - x1
+            h = y2 - y1
+            x = x1 + w / 2   # center x
+            y = y1 + h / 2   # center y
 
             # area_ratio = how much of the frame this box covers
-            # example: box 100x50 on 640x480 frame → 5000/307200 = 0.016 = 1.6%
-            area_ratio = (float(w) * float(h)) / frame_area
+            area_ratio = (w * h) / frame_area
 
             # wrap into clean Detection object
             detection = Detection(

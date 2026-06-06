@@ -46,9 +46,8 @@ class ArmController(Actuator):
         # LGPIOFactory MUST be created here (inside __init__), not at module
         # level. This class is instantiated inside the ACT child process after
         # fork — a module-level handle opened in the parent is invalid here.
-        _factory = LGPIOFactory()
-        self._pan_servo  = Servo(pin=int(self._pan_cfg["pin"]), pin_factory=_factory)
-        self._tilt_servo = Servo(pin=int(self._tilt_cfg["pin"]), pin_factory=_factory)
+        self._pan_servo  = Servo(pin=int(self._pan_cfg["pin"]),  pin_factory=LGPIOFactory())
+        self._tilt_servo = Servo(pin=int(self._tilt_cfg["pin"]), pin_factory=LGPIOFactory())
         
         # Current commanded angles (start centered)
         self._pan_angle  = 0.0
