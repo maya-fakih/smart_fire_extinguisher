@@ -184,7 +184,8 @@ class VisionFuser:
         self._fire_detector = FireDetector(
             imx500          = self._camera.imx500,
             conf_threshold  = self._conf_threshold,
-            labels          = self._labels
+            labels          = self._labels,
+            picam2          = self._camera.picam2
         )
         self._fire_detector.load()              # does nothing but keeps contract ✅
 

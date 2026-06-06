@@ -53,7 +53,7 @@ class FireDetector(VisionModel):
     # ── Init ──────────────────────────────────────────────────────────────────
     # receives conf_threshold and labels from VisionFuser (who reads config)
     # imx500 object is passed in from camera.py — FireDetector does not own hardware
-    def __init__(self, imx500: IMX500, conf_threshold: float, labels: dict):
+    def __init__(self, imx500: IMX500, conf_threshold: float, labels: dict, picam2=None):
         """
         Initialize FireDetector with configuration.
 
@@ -63,6 +63,7 @@ class FireDetector(VisionModel):
             labels: Dict mapping class ID to class name
         """
         self._imx500        = imx500            # IMX500 object owned by camera.py
+        self._picam2        = picam2            # Picamera2 — needed for convert_inference_coords
         self._conf_threshold = conf_threshold   # minimum confidence to accept a box
         self._labels        = labels            # class id → label name from config
                                                 # example: {0: "fire", 1: "other", 2: "smoke"}
@@ -175,6 +176,32 @@ class FireDetector(VisionModel):
             # box is [x1, y1, x2, y2] in pixels (corner format from IMX500)
             # convert to [cx, cy, w, h] which the rest of the pipeline expects
             x1, y1, x2, y2 = float(box[0]), float(box[1]), float(box[2]), float(box[3])
+
+            # ── Coordinate-space fix ─────────────────────────────────────────
+            # The IMX500 returns boxes in the NETWORK's input space (e.g. 320 or
+            # 640 px depending on the .rpk), NOT in the captured-frame space.
+            # Feeding those straight through made cluster origin_x reach 1.10 and
+            # crash system_state's [0,1] guard. convert_inference_coords() maps a
+            # network-space [x0,y0,w,h] box to true frame pixels using metadata.
+            # Wrapped in try/except: if the API shape differs on this picamera2
+            # version, we fall back to the raw values rather than killing the loop.
+            try:
+                if self._picam2 is not None:
+                    conv = self._imx500.convert_inference_coords(
+                        (x1, y1, x2 - x1, y2 - y1), metadata, self._picam2
+                    )
+                    # convert_inference_coords returns (x, y, w, h) rect in frame px
+                    cx_px, cy_px, cw_px, ch_px = conv
+                    x1, y1 = float(cx_px), float(cy_px)
+                    x2, y2 = x1 + float(cw_px), y1 + float(ch_px)
+            except Exception as e:
+                if diag:
+                    logger.warning(
+                        "FireDetector: convert_inference_coords failed (%s) — "
+                        "using raw coords; boxes/aim may be off until fixed",
+                        type(e).__name__
+                    )
+
             w = x2 - x1
             h = y2 - y1
             x = x1 + w / 2   # center x
@@ -513,6 +540,15 @@ class FireDetector(VisionModel):
             origin_y_px = sum(b.bbox[1] for b in group_boxes) / len(group_boxes)
             origin_x    = origin_x_px / frame_width
             origin_y    = origin_y_px / frame_height
+
+            # Backstop: clamp to [0, 1] so a residual coord-space mismatch can
+            # never crash the capture loop on system_state's [0,1] guard again.
+            # With convert_inference_coords working, this is a no-op; if conversion
+            # is unavailable/imperfect the box may be slightly off but the loop
+            # survives and still draws/aims. A value hitting 0 or 1 exactly is the
+            # signal that conversion still needs attention.
+            origin_x = min(1.0, max(0.0, origin_x))
+            origin_y = min(1.0, max(0.0, origin_y))
 
             # average confidence across all boxes in cluster
             # more reliable than max — represents overall cluster certainty

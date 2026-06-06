@@ -160,6 +160,11 @@ class IMX500Camera:
         return self._imx500                     # VisionFuser passes this to FireDetector
 
     @property
+    def picam2(self):
+        """Get the Picamera2 object — needed by convert_inference_coords()."""
+        return self._picam2
+
+    @property
     def is_active(self) -> bool:
         """Check if camera is currently running."""
         return self._active                     # is camera currently running?
