@@ -30,6 +30,9 @@ class ThinkEngine:
     # ── Lifecycle ─────────────────────────────────────────────────────────────
 
     def start(self):
+        # Child process: ignore SIGINT so Ctrl+C is handled only by parent.
+        import signal as _signal
+        _signal.signal(_signal.SIGINT, _signal.SIG_IGN)
         logger.info("ThinkEngine: starting")
 
         # ── Connect to DB ─────────────────────────────────────────────────────
@@ -630,20 +633,32 @@ class ThinkEngine:
     # ── Live align (destructive — pops the queues) ────────────────────────────
 
     def _align_live(self):
+        """
+        IMPORTANT: all queue.get() calls here use timeout=0.1 instead of
+        blocking indefinitely. The empty()-then-get() pattern has a TOCTOU
+        race: the queue can become empty between the check and the pop.
+        Without a timeout, THINK hangs inside get() and never sees
+        system_running=False, which blocks the entire shutdown sequence.
+        """
+        import queue as _queue
         sense_snap = None
         see_snap   = None
 
-        if not self._state.see_queue.empty():
-            see_snap = self._state.see_queue.get()
+        try:
+            see_snap = self._state.see_queue.get(timeout=0.1)
             logger.debug(
                 f"ThinkEngine: dequeued from see_queue | "
                 f"timestamp={see_snap.timestamp.isoformat()}"
             )
+        except _queue.Empty:
+            see_snap = None
 
         if see_snap is None:
             # No SEE → just pull SENSE if present, return what we have.
-            if not self._state.sense_queue.empty():
-                sense_snap = self._state.sense_queue.get()
+            try:
+                sense_snap = self._state.sense_queue.get(timeout=0.1)
+            except _queue.Empty:
+                sense_snap = None
             if sense_snap is None:
                 return None
             return ThinkSnapshot(
@@ -658,7 +673,10 @@ class ThinkEngine:
         prev = None
         chosen = None
         while not self._state.sense_queue.empty():
-            candidate = self._state.sense_queue.get()
+            try:
+                candidate = self._state.sense_queue.get(timeout=0.1)
+            except _queue.Empty:
+                break
             gap_ms = abs(
                 (candidate.timestamp - see_snap.timestamp).total_seconds() * 1000
             )

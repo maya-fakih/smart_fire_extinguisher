@@ -62,9 +62,12 @@ class ActEngine:
     def start(self) -> None:
         logger.info("ActEngine: starting")
         try:
+            # Child process: ignore SIGINT — Ctrl+C is handled by the parent only.
+            # SIGTERM is still handled (see below) so orchestrator.stop() works cleanly.
+            import signal as _signal
+            _signal.signal(_signal.SIGINT, _signal.SIG_IGN)
             # Install SIGTERM handler so process.terminate() from the orchestrator
             # still runs cleanup (neutralizes arm, stops pump) before exiting.
-            import signal as _signal
             def _on_term(sig, frame):
                 logger.info("ActEngine: SIGTERM received — running cleanup")
                 self.stop()

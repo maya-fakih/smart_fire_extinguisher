@@ -70,6 +70,9 @@ class SensorFuser:
     # ------------------------------------------------------------------
 
     def start(self):
+        # Child process: ignore SIGINT so Ctrl+C is handled only by parent.
+        import signal as _signal
+        _signal.signal(_signal.SIGINT, _signal.SIG_IGN)
         logger.info("SensorFuser: starting")
         self._running = True
         self._state.sense_running = True

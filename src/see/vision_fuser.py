@@ -132,6 +132,9 @@ class VisionFuser:
     # ── Start ─────────────────────────────────────────────────────────────────
     # starts the camera, builds fire detector, launches capture loop
     def start(self) -> None:
+        # Child process: ignore SIGINT so Ctrl+C is handled only by parent.
+        import signal as _signal
+        _signal.signal(_signal.SIGINT, _signal.SIG_IGN)
         """
         Start camera and launch capture loop.
 

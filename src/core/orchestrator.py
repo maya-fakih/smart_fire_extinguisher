@@ -167,7 +167,19 @@ class SystemOrchestrator:
             if process and process.is_alive():
                 logger.debug(f"Orchestrator: terminating {process.name}")
                 process.terminate()
-                process.join(timeout=2)
+                process.join(timeout=3)
+                # If still alive after SIGTERM + 3s, escalate to SIGKILL.
+                # Happens when a child is stuck in a blocking syscall (queue.get,
+                # camera I/O, GPIO). Without this the Manager.shutdown() that
+                # follows hangs indefinitely because the child still holds an
+                # IPC connection to the Manager server.
+                if process.is_alive():
+                    logger.warning(
+                        f"Orchestrator: {process.name} did not exit after SIGTERM "
+                        f"— sending SIGKILL"
+                    )
+                    process.kill()
+                    process.join(timeout=2)
 
         self._notifier.notify(
             EventType.SYSTEM_STOPPED,
