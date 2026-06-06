@@ -87,7 +87,12 @@ class VisionFuser:
         # labels map class ids to names: {0: "fire", 1: "other", 2: "smoke"}
         import json
         with open(vision_cfg["labels"], "r") as f:
-            self._labels = json.load(f)         # loaded once at startup
+            # JSON keys are ALWAYS strings ("0","1","2"). FireDetector does
+            # `class_id = int(class_id)` then `class_id in self._labels`, so
+            # string keys make EVERY lookup miss → every detection skipped →
+            # YOLO appears to detect nothing. Coerce keys to int at the
+            # boundary so the int-key assumption downstream becomes true.
+            self._labels = {int(k): v for k, v in json.load(f).items()}
 
         # ── Build camera ──────────────────────────────────────────────────────
         # camera owns IMX500 hardware and loads .rpk model onto chip
