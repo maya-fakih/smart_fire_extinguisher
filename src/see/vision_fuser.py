@@ -140,6 +140,12 @@ class VisionFuser:
         # Child process: ignore SIGINT so Ctrl+C is handled only by parent.
         import signal as _signal
         _signal.signal(_signal.SIGINT, _signal.SIG_IGN)
+
+        # ── Re-initialize logging in this child process ───────────────────────
+        # multiprocessing children don't inherit dictConfig from main.py.
+        # Without this every logger call in SEE silently vanishes.
+        from core.child_logging import setup_child_logging
+        setup_child_logging()
         """
         Start camera and launch capture loop.
 

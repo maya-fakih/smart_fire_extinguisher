@@ -73,6 +73,8 @@ class SensorFuser:
         # Child process: ignore SIGINT so Ctrl+C is handled only by parent.
         import signal as _signal
         _signal.signal(_signal.SIGINT, _signal.SIG_IGN)
+        from core.child_logging import setup_child_logging
+        setup_child_logging()
         logger.info("SensorFuser: starting")
         self._running = True
         self._state.sense_running = True

@@ -60,6 +60,8 @@ class ActEngine:
     # ------------------------------------------------------------------
 
     def start(self) -> None:
+        from core.child_logging import setup_child_logging
+        setup_child_logging()
         logger.info("ActEngine: starting")
         try:
             # Child process: ignore SIGINT — Ctrl+C is handled by the parent only.
