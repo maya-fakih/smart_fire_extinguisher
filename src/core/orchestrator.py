@@ -525,4 +525,5 @@ class SystemOrchestrator:
             "camera_feed_active": self._state.camera_feed_active,
             "prediction_id": self._state.prediction_id,
             "copilot_decision": self._state.copilot_decision,
+            "latest_heat_matrix": self._state.latest_heat_matrix,
         }

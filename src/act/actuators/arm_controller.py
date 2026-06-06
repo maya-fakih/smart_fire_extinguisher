@@ -169,7 +169,7 @@ class ArmController(Actuator):
 
                 err = self._compute_error()
                 if err is None:
-                    self._sleep_cycle(triggered)
+                    time.sleep(0)  # yield to scheduler, no artificial delay
                     continue
 
                 err_x, err_y = err
@@ -183,7 +183,7 @@ class ArmController(Actuator):
                     )
                     self._step_joints(err_x, err_y)
 
-                self._sleep_cycle(triggered)
+                time.sleep(0)  # yield to scheduler, no artificial delay
 
             except Exception as e:
                 logger.error(

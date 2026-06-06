@@ -15,7 +15,7 @@
     "handlers": {
       "console": {
         "class": "logging.StreamHandler",
-        "level": "DEBUG",
+        "level": "INFO",
         "formatter": "standard",
         "stream": "ext://sys.stdout"
       },
@@ -29,39 +29,23 @@
       }
     },
     "root": {
-      "level": "DEBUG",
-      "handlers": [
-        "console",
-        "file"
-      ]
+      "level": "INFO",
+      "handlers": ["console", "file"]
     },
     "loggers": {
-      "sense": {
-        "level": "DEBUG"
-      },
-      "think": {
-        "level": "DEBUG"
-      },
-      "act": {
-        "level": "DEBUG"
-      },
-      "see": {
-        "level": "DEBUG"
-      },
-      "core": {
-        "level": "DEBUG"
-      }
+      "sense": { "level": "INFO" },
+      "think": { "level": "INFO" },
+      "act":   { "level": "INFO" },
+      "see":   { "level": "INFO" },
+      "core":  { "level": "INFO" }
     }
   },
   "system": {
     "system_mode": "surveillance",
-    "polling_interval_idle_ms": 10000,
-    "polling_interval_active_ms": 1000,
+    "polling_interval_idle_ms": 200,
+    "polling_interval_active_ms": 200,
     "i2c_buses": {
-      "primary": {
-        "scl": "SCL",
-        "sda": "SDA"
-      }
+      "primary": { "scl": "SCL", "sda": "SDA" }
     }
   },
   "sensors": {
@@ -74,12 +58,7 @@
       "channel": 0,
       "gain": 1,
       "equation": "A * (((3.3 - (raw / 32767.0) * 3.3) / ((raw / 32767.0) * 3.3)) * RL / Ro) ** B",
-      "eq_params": {
-        "RL": 8200,
-        "Ro": 9500,
-        "A": 574.25,
-        "B": -2.222
-      },
+      "eq_params": { "RL": 8200, "Ro": 9500, "A": 574.25, "B": -2.222 },
       "raw_min": 0,
       "raw_max": 32767,
       "physical_min": 0,
@@ -105,10 +84,7 @@
   },
   "vision": {
     "camera": {
-      "resolution": [
-        320,
-        240
-      ],
+      "resolution": [320, 240],
       "fps": 30,
       "stream_jpeg_quality": 55
     },
@@ -140,37 +116,18 @@
     },
     "chain_length": 5,
     "poa_map": {
-      "1": [
-        "monitor"
-      ],
-      "2": [
-        "monitor"
-      ],
-      "3": [
-        "alert"
-      ],
-      "4": [
-        "alert",
-        "suppress"
-      ],
-      "5": [
-        "alert",
-        "suppress",
-        "evacuate"
-      ]
+      "1": ["monitor"],
+      "2": ["monitor"],
+      "3": ["alert"],
+      "4": ["alert", "suppress"],
+      "5": ["alert", "suppress", "evacuate"]
     },
     "label_encoding": {
       "composite_label": {
-        "none": 0,
-        "smoke": 1,
-        "fire": 2,
-        "fire_smoke": 3
+        "none": 0, "smoke": 1, "fire": 2, "fire_smoke": 3
       },
       "scene_label": {
-        "clear": 0,
-        "hazy": 1,
-        "smoky": 2,
-        "fire": 3
+        "clear": 0, "hazy": 1, "smoky": 2, "fire": 3
       }
     },
     "xgboost": {
@@ -188,12 +145,7 @@
       "copilot_timeout_s": 60
     },
     "actions": {
-      "available": [
-        "monitor",
-        "alert",
-        "suppress",
-        "evacuate"
-      ],
+      "available": ["monitor", "alert", "suppress", "evacuate"],
       "requires_actuator": {
         "monitor": null,
         "alert": null,
@@ -215,7 +167,7 @@
         "joints": {
           "pan": {
             "pin": 12,
-            "step_deg": 0.5,
+            "step_deg": 1.0,
             "limit_min_deg": -90,
             "limit_max_deg": 90,
             "servo_min_deg": -90,
@@ -224,7 +176,7 @@
           },
           "tilt": {
             "pin": 13,
-            "step_deg": 0.5,
+            "step_deg": 1.0,
             "limit_min_deg": -45,
             "limit_max_deg": 45,
             "servo_min_deg": -90,
@@ -233,21 +185,15 @@
           }
         },
         "feedback": {
-          "heat_use_threshold_c": 30,
+          "heat_use_threshold_c": 25,
           "tolerance_normalized": 0.1,
           "sensor_offsets": {
-            "heat": {
-              "x_bias": 0.0,
-              "y_bias": 0.0
-            },
-            "camera": {
-              "x_bias": 0.0,
-              "y_bias": 0.0
-            }
+            "heat":   { "x_bias": 0.0, "y_bias": 0.0 },
+            "camera": { "x_bias": 0.0, "y_bias": 0.0 }
           }
         },
-        "cycle_active_ms": 100,
-        "cycle_idle_ms": 500
+        "cycle_active_ms": 20,
+        "cycle_idle_ms": 20
       }
     }
   },
