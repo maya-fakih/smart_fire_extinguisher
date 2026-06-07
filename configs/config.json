@@ -222,7 +222,7 @@
             "limit_max_deg": 90,
             "servo_min_deg": -90,
             "servo_max_deg": 90,
-            "invert": false
+            "invert": true
           },
           "tilt": {
             "pin": 13,
@@ -231,7 +231,7 @@
             "limit_max_deg": 45,
             "servo_min_deg": -90,
             "servo_max_deg": 90,
-            "invert": false
+            "invert": true
           }
         },
         "feedback": {

@@ -90,7 +90,7 @@ HEAT_FLIP_X = ARM_CFG["feedback"]["heat_flip_x"]         # False
 # ⚠ DEMO OVERRIDE: config says 50°C (designed for large fire) but candle/lighter
 # only reaches 28-32°C on AMG8833. Override so arm actually tracks in demo.
 # Swap back to ARM_CFG["feedback"]["heat_use_threshold_c"] for production.
-ARM_HEAT_TRACK_THRESHOLD = 26.5   # °C — just above room baseline (~20-23°C)
+ARM_HEAT_TRACK_THRESHOLD = 29   # °C — just above room baseline (~20-23°C)
 
 # XGBoost labels (sorted keys must match train_model.py FEATURE_COLS order)
 FEATURE_KEYS = sorted([
@@ -175,6 +175,7 @@ def _raw_to_ppm(raw: float) -> float:
 # ─────────────────────────────────────────────────────────────────────────────
 print("[init] Connecting I2C sensors …")
 i2c = busio.I2C(board.SCL, board.SDA)
+time.sleep(0.5)  # AMG8833 needs ~500ms after power-on before it responds
 
 # AMG8833 heat grid
 amg = adafruit_amg88xx.AMG88XX(i2c, addr=int(HEAT_CFG["address"], 16))
