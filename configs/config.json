@@ -37,7 +37,9 @@
     },
     "loggers": {
       "sense": {
-        "level": "DEBUG"
+        "level": "DEBUG",
+        "handlers": ["file"],
+        "propagate": false
       },
       "think": {
         "level": "DEBUG"

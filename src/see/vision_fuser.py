@@ -499,79 +499,93 @@ class VisionFuser:
         self._queue.put(snapshot)
 
     # ── Save Frame ────────────────────────────────────────────────────────────
-    # saves captured frame to disk and returns its URL
-    # URL is stored in VisionSnapshot so THINK can reference the image
+    # Two jobs:
+    #   1. Stream  → write stream.jpg to RAM (/dev/shm/), annotated, every frame.
+    #                Only reached when camera_feed_active or sensor_triggered
+    #                (the capture loop gate handles that — never called when idle).
+    #                YOLO boxes drawn when detected, plain frame otherwise.
+    #   2. USB     → only save when sensor_triggered AND YOLO detected fire/smoke.
+    #                Saves the annotated frame (with boxes) for training data.
+    #                Never saves empty frames or idle streaming frames.
     def _save_frame(self, frame, raw_detections=None, clusters=None) -> str:
         """
-        Save captured frame to disk and return its URL.
+        Write stream.jpg (always) and save annotated frame to USB (only on detection).
 
-        Creates frame storage directory if needed, saves frame with
-        timestamp filename, and returns the web-accessible URL.
+        Stream:
+            Written every single frame to /dev/shm/fire_robot/stream.jpg.
+            Always annotated — YOLO boxes drawn when detected, plain frame otherwise.
+            No condition on sensor_triggered or camera_feed_active.
 
-        Also overwrites stream.jpg atomically (temp + os.replace) when
-        camera_feed_active is True — this is the rolling buffer that
-        powers the MJPEG feed. One file, always overwritten, no accumulation.
+        USB permanent save:
+            Only written when raw_detections is non-empty (YOLO found fire or smoke).
+            Saves the annotated frame (boxes drawn) — not the raw frame.
+            This is the training data: every saved image already has detections in it.
 
         Args:
-            frame: Numpy array frame from camera
+            frame: Numpy array frame from camera (unmodified)
+            raw_detections: List of Detection objects from FireDetector (may be empty)
+            clusters: List of FireCluster objects (may be empty)
 
         Returns:
-            str: Web URL to access the saved frame
+            str: Web URL prefix + filename (points to the USB save if it happened,
+                 otherwise a placeholder filename for VisionSnapshot)
         """
 
         os.makedirs(self._stream_dir, exist_ok=True)
-
-        # ── Timestamped frame (permanent, only on sensor-triggered events) ────
-        # Goes to USB (frame_permanent_path) to avoid SD card wear.
-        # Falls back to frame_image_path if USB is not available.
         filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jpg"
 
-        if self._state.sensor_triggered:
-            # Save to USB only — never fall back to SD card.
+        # ── Annotate once, reuse for both stream and USB ──────────────────────
+        # _annotate_frame returns a copy with boxes drawn if detections exist,
+        # or the original frame reference if nothing to draw (safe to write either way).
+        annotated = self._annotate_frame(frame, raw_detections, clusters)
+
+        # ── 1. Stream buffer — always, every frame ────────────────────────────
+        # Lives in RAM (tmpfs) so zero SD card wear. Written atomically via
+        # tmp + os.replace so the MJPEG reader never gets a half-written file.
+        stream_path = os.path.join(self._stream_dir, "stream.jpg")
+        tmp_path    = os.path.join(self._stream_dir, "stream.tmp.jpg")
+        try:
+            encode_params = [cv2.IMWRITE_JPEG_QUALITY, self._stream_jpeg_quality]
+            ok = cv2.imwrite(tmp_path, annotated, encode_params)
+            if ok:
+                os.replace(tmp_path, stream_path)
+        except Exception as e:
+            logger.warning(f"VisionFuser: stream.jpg write failed — {e}")
+
+        # ── 2. USB permanent save — threshold hit AND YOLO detected something ──
+        # sensor_triggered = heat/smoke threshold crossed.
+        # raw_detections   = YOLO actually saw fire or smoke in this frame.
+        # Both must be true — no point saving frames where sensors fired but
+        # camera saw nothing, or YOLO detected something during idle streaming.
+        if self._state.sensor_triggered and raw_detections:
             save_dir = self._frame_permanent_path
             try:
                 os.makedirs(save_dir, exist_ok=True)
                 filepath = os.path.join(save_dir, filename)
-                ok = cv2.imwrite(filepath, frame)
+                ok = cv2.imwrite(filepath, annotated)
                 if not ok:
                     raise IOError(f"cv2.imwrite returned False for {filepath}")
+                logger.debug(
+                    f"VisionFuser: saved annotated frame to USB | "
+                    f"detections={len(raw_detections)} | path={filepath}"
+                )
             except Exception as e:
-                # USB not mounted or write failed — skip this frame silently.
-                # Log once per 50 failures to avoid flooding.
                 if not hasattr(self, '_frame_fail_count'):
                     self._frame_fail_count = 0
                 self._frame_fail_count += 1
                 if self._frame_fail_count == 1 or self._frame_fail_count % 50 == 0:
                     logger.warning(
-                        f"VisionFuser: permanent frame save skipped "
+                        f"VisionFuser: USB frame save skipped "
                         f"(count={self._frame_fail_count}) — {type(e).__name__}: {e}"
                     )
-
-        # ── Stream buffer (in RAM — /dev/shm/) ───────────────────────────────
-        # Written every frame when camera feed is active. Lives in tmpfs so
-        # there is zero SD card I/O — just memory writes.
-        #
-        # Annotation: YOLO boxes are drawn on a COPY of the frame before write,
-        # so the on-disk permanent save (USB) stays clean for training data.
-        # The annotated copy goes only to stream.jpg (the live MJPEG feed).
-        if self._state.camera_feed_active:
-            stream_path = os.path.join(self._stream_dir, "stream.jpg")
-            tmp_path    = os.path.join(self._stream_dir, "stream.tmp.jpg")
-            try:
-                annotated = self._annotate_frame(frame, raw_detections, clusters)
-                encode_params = [cv2.IMWRITE_JPEG_QUALITY, self._stream_jpeg_quality]
-                ok = cv2.imwrite(tmp_path, annotated, encode_params)
-                if ok:
-                    os.replace(tmp_path, stream_path)
-            except Exception as e:
-                logger.warning(f"stream.jpg write failed: {e}")
 
         return self._frame_url_prefix + filename
 
     # ─────────────────────────────────────────────────────────────────────────
     # Annotation helper — draws YOLO boxes onto a COPY of the frame.
-    # Used only for the live MJPEG stream. The on-disk permanent save uses the
-    # raw unannotated frame so training data stays clean.
+    # Used for both the live MJPEG stream AND the USB permanent save.
+    # Returns the original frame reference (not a copy) when there is nothing
+    # to draw, so callers can write it directly without an extra allocation.
     # ─────────────────────────────────────────────────────────────────────────
     def _annotate_frame(self, frame, raw_detections, clusters):
         """
